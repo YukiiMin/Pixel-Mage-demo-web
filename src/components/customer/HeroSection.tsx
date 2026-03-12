@@ -1,59 +1,69 @@
-import { motion, useInView } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
-import { fadeInLeft, fadeInRight, staggerContainer } from "@/lib/motion-variants";
-import tarotCard from "@/assets/tarot-the-fool.png";
+'use client'
+
+import tarotCard from '@/assets/tarot-the-fool.png'
+import {
+  fadeInLeft,
+  fadeInRight,
+  staggerContainer,
+} from '@/lib/motion-variants'
+import { motion, useInView } from 'framer-motion'
+import Image from 'next/image'
+import { useEffect, useRef, useState } from 'react'
 
 const CounterStat = ({ end, label }: { end: string; label: string }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true });
-  const [val, setVal] = useState("0");
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true })
+  const [val, setVal] = useState('0')
 
   useEffect(() => {
-    if (!inView) return;
-    const num = parseInt(end.replace(/[^0-9]/g, ""));
-    const suffix = end.replace(/[0-9]/g, "");
-    const duration = 1200;
-    const start = performance.now();
+    if (!inView) return
+    const num = parseInt(end.replace(/[^0-9]/g, '10'))
+    const suffix = end.replace(/[0-9]/g, '')
+    const duration = 1200
+    const start = performance.now()
     const tick = (now: number) => {
-      const p = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setVal(Math.round(num * eased) + suffix);
-      if (p < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }, [inView, end]);
+      const p = Math.min((now - start) / duration, 1)
+      const eased = 1 - (1 - p) ** 3
+      setVal(Math.round(num * eased) + suffix)
+      if (p < 1) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  }, [inView, end])
 
   return (
     <div ref={ref} className="text-center">
       <span className="text-2xl md:text-3xl font-bold text-primary">{val}</span>
       <p className="text-xs text-muted-foreground mt-1">{label}</p>
     </div>
-  );
-};
+  )
+}
 
 const FloatingBadge = ({
   children,
   className,
   delay = 0,
 }: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
+  children: React.ReactNode
+  className?: string
+  delay?: number
 }) => (
   <motion.div
     initial={{ opacity: 0, scale: 0.7 }}
     animate={{ opacity: 1, scale: 1 }}
-    transition={{ delay, duration: 0.5, ease: "easeOut" }}
+    transition={{ delay, duration: 0.5, ease: 'easeOut' }}
     className={`glass-card rounded-xl px-3 py-2 text-xs font-medium text-foreground absolute animate-orbit ${className}`}
     style={{ animationDelay: `${delay}s` }}
   >
     {children}
   </motion.div>
-);
+)
 
 const HeroSection = () => {
   return (
-    <section id="hero" className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden">
+    <section
+      id="hero"
+      className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden"
+    >
       {/* Gold radial glow */}
       <div className="absolute right-[10%] top-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
 
@@ -103,14 +113,14 @@ const HeroSection = () => {
                 href="#how-it-works"
                 className="border border-primary/40 text-primary font-medium rounded-full px-7 py-3 hover:bg-primary/10 transition-colors"
               >
-                {">"} Tìm Hiểu Thêm
+                {'>'} Tìm Hiểu Thêm
               </a>
             </div>
 
             {/* Social proof */}
             <div className="flex items-center gap-3 pt-2">
               <div className="flex -space-x-2">
-                {["M", "T", "B", "H"].map((l, i) => (
+                {['M', 'T', 'B', 'H'].map((l, i) => (
                   <div
                     key={i}
                     className="w-8 h-8 rounded-full gradient-gold-purple-bg flex items-center justify-center text-xs font-bold text-primary-foreground ring-2 ring-background"
@@ -120,8 +130,10 @@ const HeroSection = () => {
                 ))}
               </div>
               <div className="text-sm">
-                <span className="text-primary">★★★★★</span>{" "}
-                <span className="text-muted-foreground">1,000+ Tarot Readers tin tưởng</span>
+                <span className="text-primary">★★★★★</span>{' '}
+                <span className="text-muted-foreground">
+                  1,000+ Tarot Readers tin tưởng
+                </span>
               </div>
             </div>
 
@@ -136,17 +148,21 @@ const HeroSection = () => {
           </motion.div>
 
           {/* RIGHT — 3D Card */}
-          <motion.div variants={fadeInRight} className="relative flex justify-center">
+          <motion.div
+            variants={fadeInRight}
+            className="relative flex justify-center"
+          >
             <motion.div
               className="relative z-10"
               whileHover={{ rotateY: 12, rotateX: -5 }}
-              transition={{ type: "spring", stiffness: 200 }}
-              style={{ perspective: 800, transformStyle: "preserve-3d" }}
+              transition={{ type: 'spring', stiffness: 200 }}
+              style={{ perspective: 800, transformStyle: 'preserve-3d' }}
             >
-              <img
+              <Image
                 src={tarotCard}
                 alt="The Fool Tarot Card"
-                className="w-64 md:w-72 lg:w-80 rounded-2xl shadow-2xl"
+                className="w-64 md:w-72 lg:w-80 rounded-2xl shadow-2xl h-auto"
+                priority
               />
             </motion.div>
 
@@ -164,7 +180,7 @@ const HeroSection = () => {
         </motion.div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default HeroSection;
+export default HeroSection
