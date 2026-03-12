@@ -1,3 +1,4 @@
+"use client";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import * as React from "react";
 
@@ -24,3 +25,4 @@ const Slider = React.forwardRef<
 Slider.displayName = SliderPrimitive.Root.displayName;
 
 export { Slider };
+

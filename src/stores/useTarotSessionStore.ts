@@ -1,3 +1,4 @@
+"use client";
 import { create } from "zustand";
 
 export type TarotTopic = "love" | "career" | "general" | "finance";
@@ -94,3 +95,4 @@ export const useTarotSessionStore = create<TarotSessionState>((set, get) => ({
 			interpretation: "",
 		}),
 }));
+
