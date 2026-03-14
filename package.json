@@ -4,7 +4,7 @@
 	"version": "0.1.0",
 	"type": "module",
 	"scripts": {
-		"dev": "pnpm next dev",
+		"dev": "pnpm next dev -turbo",
 		"build": "pnpm next build",
 		"start": "pnpm next start",
 		"preview": "pnpm build && pnpm start",
@@ -16,6 +16,7 @@
 		"format:check": "pnpm biome format .",
 		"check": "pnpm lint && pnpm typecheck",
 		"check:fix": "pnpm lint:fix && pnpm typecheck",
+		"orchestra:check": "pnpm lint && pnpm typecheck && pnpm build",
 		"clean": "rimraf .next node_modules",
 		"ci": "pnpm clean && pnpm install && pnpm lint && pnpm typecheck && pnpm build"
 	},
