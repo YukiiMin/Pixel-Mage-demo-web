@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 const navLinks = [
@@ -36,11 +37,11 @@ const Header = () => {
         } ${hidden ? '-translate-y-full' : 'translate-y-0'}`}
       >
         <div className="container mx-auto px-6 flex items-center justify-between">
-          <a href="#hero" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <span className="text-2xl font-heading font-bold gradient-gold-purple">
               PixelMage
             </span>
-          </a>
+          </Link>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-8">
@@ -56,17 +57,17 @@ const Header = () => {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <a
-              href="#"
+            <Link
+              href="/login"
               className="text-sm font-medium text-muted-foreground hover:text-foreground border border-border rounded-full px-5 py-2 transition-colors"
             >
               Đăng Nhập
-            </a>
+            </Link>
             <a
-              href="#download"
+              href="/register"
               className="text-sm font-semibold gradient-gold-purple-bg text-primary-foreground rounded-full px-5 py-2 glow-gold transition-transform hover:scale-105"
             >
-              🔮 Tải Ngay
+              ✨ Đăng Ký
             </a>
           </div>
 
@@ -99,12 +100,19 @@ const Header = () => {
               {l.label}
             </a>
           ))}
+          <Link
+            href="/login"
+            onClick={() => setMobileOpen(false)}
+            className="text-lg font-semibold text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Đăng Nhập
+          </Link>
           <a
-            href="#download"
+            href="/register"
             onClick={() => setMobileOpen(false)}
             className="gradient-gold-purple-bg text-primary-foreground rounded-full px-8 py-3 font-semibold glow-gold"
           >
-            🔮 Tải Ngay
+            ✨ Đăng Ký
           </a>
         </motion.div>
       )}
