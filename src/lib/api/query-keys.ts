@@ -5,5 +5,6 @@ export const queryKeys = {
 	},
 	roles: {
 		all: ["roles"] as const,
+		detail: (id: number) => ["roles", "detail", id] as const,
 	},
 };

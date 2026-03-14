@@ -29,3 +29,16 @@ export interface AuthPayload {
 	token: string;
 	account?: Account;
 }
+
+export interface Role {
+	id: number;
+	roleName: string;
+}
+
+export interface CreateRolePayload {
+	roleName: string;
+}
+
+export interface UpdateRolePayload {
+	roleName: string;
+}
