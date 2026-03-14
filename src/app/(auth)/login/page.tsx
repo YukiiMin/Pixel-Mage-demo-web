@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { login } from "@/lib/api/accounts";
 import { getApiErrorMessage } from "@/lib/auth/errors";
-import { setAccessToken } from "@/lib/auth/session";
+import { setSession } from "@/lib/auth/session";
 
 const loginSchema = z.object({
 	email: z.email("Please enter a valid email address."),
@@ -49,7 +49,7 @@ export default function LoginPage() {
 		startTransition(async () => {
 			try {
 				const auth = await login(values);
-				setAccessToken(auth.token);
+				setSession(auth.token, auth.account ?? null);
 
 				toast.success("Signed in successfully.");
 				router.replace(redirectTo);

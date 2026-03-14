@@ -1,9 +1,14 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { LogOut, Menu, User, X } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useTransition, useState } from 'react'
+import { toast } from 'sonner'
+import { logout } from '@/lib/api/accounts'
+import { getApiErrorMessage } from '@/lib/auth/errors'
+import { clearSession } from '@/lib/auth/session'
+import { useAuthSession } from '@/hooks/useAuthSession'
 
 const navLinks = [
   { label: 'Trang chủ', href: '#hero' },
@@ -13,10 +18,28 @@ const navLinks = [
 ]
 
 const Header = () => {
+  const authSession = useAuthSession()
+  const [isLoggingOut, startTransition] = useTransition()
   const [scrolled, setScrolled] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [lastY, setLastY] = useState(0)
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  const handleLogout = () => {
+    startTransition(async () => {
+      try {
+        if (authSession.isAuthenticated) {
+          await logout()
+        }
+      } catch (error) {
+        toast.error(getApiErrorMessage(error, 'Unable to sign out cleanly.'))
+      } finally {
+        clearSession()
+        toast.success('Signed out successfully.')
+        setMobileOpen(false)
+      }
+    })
+  }
 
   useEffect(() => {
     const onScroll = () => {
@@ -57,18 +80,41 @@ const Header = () => {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <Link
-              href="/login"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground border border-border rounded-full px-5 py-2 transition-colors"
-            >
-              Đăng Nhập
-            </Link>
-            <a
-              href="/register"
-              className="text-sm font-semibold gradient-gold-purple-bg text-primary-foreground rounded-full px-5 py-2 glow-gold transition-transform hover:scale-105"
-            >
-              ✨ Đăng Ký
-            </a>
+            {authSession.isAuthenticated ? (
+              <>
+                <Link
+                  href="/profile"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground border border-border rounded-full px-5 py-2 transition-colors"
+                >
+                  <User size={16} />
+                  {authSession.account?.name || 'Hồ Sơ'}
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="inline-flex items-center gap-2 text-sm font-semibold gradient-gold-purple-bg text-primary-foreground rounded-full px-5 py-2 glow-gold transition-transform hover:scale-105 disabled:opacity-60"
+                >
+                  <LogOut size={16} />
+                  {isLoggingOut ? 'Đang Thoát...' : 'Đăng Xuất'}
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground border border-border rounded-full px-5 py-2 transition-colors"
+                >
+                  Đăng Nhập
+                </Link>
+                <Link
+                  href="/register"
+                  className="text-sm font-semibold gradient-gold-purple-bg text-primary-foreground rounded-full px-5 py-2 glow-gold transition-transform hover:scale-105"
+                >
+                  ✨ Đăng Ký
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile hamburger */}
@@ -100,20 +146,42 @@ const Header = () => {
               {l.label}
             </a>
           ))}
-          <Link
-            href="/login"
-            onClick={() => setMobileOpen(false)}
-            className="text-lg font-semibold text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Đăng Nhập
-          </Link>
-          <a
-            href="/register"
-            onClick={() => setMobileOpen(false)}
-            className="gradient-gold-purple-bg text-primary-foreground rounded-full px-8 py-3 font-semibold glow-gold"
-          >
-            ✨ Đăng Ký
-          </a>
+          {authSession.isAuthenticated ? (
+            <>
+              <Link
+                href="/profile"
+                onClick={() => setMobileOpen(false)}
+                className="text-lg font-semibold text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Hồ Sơ
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="gradient-gold-purple-bg text-primary-foreground rounded-full px-8 py-3 font-semibold glow-gold disabled:opacity-60"
+              >
+                {isLoggingOut ? 'Đang Thoát...' : 'Đăng Xuất'}
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                onClick={() => setMobileOpen(false)}
+                className="text-lg font-semibold text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Đăng Nhập
+              </Link>
+              <Link
+                href="/register"
+                onClick={() => setMobileOpen(false)}
+                className="gradient-gold-purple-bg text-primary-foreground rounded-full px-8 py-3 font-semibold glow-gold"
+              >
+                ✨ Đăng Ký
+              </Link>
+            </>
+          )}
         </motion.div>
       )}
     </>
