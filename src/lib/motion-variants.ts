@@ -46,4 +46,3 @@ export const staggerFast: Variants = {
 	hidden: {},
 	visible: { transition: { staggerChildren: 0.08 } },
 };
-

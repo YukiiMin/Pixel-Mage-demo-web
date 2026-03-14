@@ -53,7 +53,7 @@ const DownloadSection = () => {
 
 						<div className="flex flex-wrap gap-3 pt-2">
 							<a
-								href="#"
+								href="/"
 								className="gradient-gold-purple-bg text-primary-foreground font-semibold rounded-full px-6 py-3 glow-gold transition-transform hover:scale-105 flex items-center gap-2"
 							>
 								<Smartphone className="w-4 h-4" /> Tải Android APK
@@ -127,4 +127,3 @@ const DownloadSection = () => {
 };
 
 export default DownloadSection;
-
