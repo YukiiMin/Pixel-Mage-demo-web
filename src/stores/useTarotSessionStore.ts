@@ -95,4 +95,3 @@ export const useTarotSessionStore = create<TarotSessionState>((set, get) => ({
 			interpretation: "",
 		}),
 }));
-

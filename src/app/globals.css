@@ -1,8 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600;1,9..144,700&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 /* ─── Tailwind v4: bridge CSS variables → utility classes ─── */
-/* Dùng @theme inline để bg-background = hsl(var(--background)) — giữ nguyên behavior v3 */
 @theme inline {
 	--color-background: hsl(var(--background));
 	--color-foreground: hsl(var(--foreground));
@@ -33,15 +32,17 @@
 	--color-sidebar-border: hsl(var(--sidebar-border));
 	--color-sidebar-ring: hsl(var(--sidebar-ring));
 
-	--font-heading: "Cinzel", serif;
-	--font-body: "Inter", sans-serif;
+	/* ✦ COMBO HẾT NƯỚC CHẤM ✦ */
+	--font-heading: "Fraunces", serif;
+	--font-body: "Plus Jakarta Sans", sans-serif;
+	--font-stats: "Space Grotesk", sans-serif;
 
 	--radius-lg: var(--radius);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-sm: calc(var(--radius) - 4px);
 }
 
-/* ─── CSS Variables (IDENTIK với bản gốc – KHÔNG thay đổi màu sắc) ─── */
+/* ─── CSS Variables ─── */
 :root {
 	--background: 235 52% 10%;
 	--foreground: 0 0% 100%;
@@ -74,12 +75,9 @@
 	--sidebar-accent-foreground: 0 0% 100%;
 	--sidebar-border: 230 20% 22%;
 	--sidebar-ring: 45 65% 55%;
-
-	--font-heading: "Cinzel", serif;
-	--font-body: "Inter", sans-serif;
 }
 
-/* ─── Base (IDENTIK với bản gốc) ─── */
+/* ─── Base ─── */
 @layer base {
 	* {
 		@apply border-border;
@@ -88,6 +86,8 @@
 		@apply bg-background text-foreground;
 		font-family: var(--font-body);
 	}
+
+	/* ✦ Heading render sắc nét, chống blur trên màn hình retina ✦ */
 	h1,
 	h2,
 	h3,
@@ -95,10 +95,41 @@
 	h5,
 	h6 {
 		font-family: var(--font-heading);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-rendering: optimizeLegibility;
+		font-feature-settings:
+			"kern" 1,
+			"liga" 1;
+	}
+
+	/* ✦ H1 hero — To, line-height sát (mướt rượt) ✦ */
+	h1 {
+		font-weight: 700;
+		font-style: italic;
+		letter-spacing: -0.01em;
+		line-height: 1.05;
+	}
+
+	/* ✦ H2 section — semi-bold, line-height sát ✦ */
+	h2 {
+		font-weight: 600;
+		letter-spacing: -0.01em;
+		line-height: 1.1;
+	}
+
+	h3 {
+		font-weight: 500;
+		line-height: 1.2;
+	}
+
+	/* Utilities cho font stats */
+	.font-stats {
+		font-family: var(--font-stats);
 	}
 }
 
-/* ─── Components (IDENTIK với bản gốc) ─── */
+/* ─── Components ─── */
 @layer components {
 	.glass-card {
 		background: hsl(230 40% 12% / 0.6);
@@ -132,9 +163,97 @@
 			hsl(235, 52%, 10%) 100%
 		);
 	}
+
+	/* ✦ MYSTICAL TEXT EFFECTS ✦ */
+
+	/* Heading có viền sáng mờ ảo như ánh nến */
+	.text-mystic {
+		font-family: var(--font-heading);
+		font-style: italic;
+		text-shadow:
+			0 0 40px hsl(45 65% 55% / 0.5),
+			0 0 80px hsl(270 38% 50% / 0.25),
+			0 2px 4px hsl(235 52% 5% / 0.8);
+	}
+
+	/* Chữ gradient vàng-tím + ánh sáng huyền bí */
+	.text-mystic-gradient {
+		font-family: var(--font-heading);
+		font-style: italic;
+		background: linear-gradient(
+			135deg,
+			hsl(45, 80%, 75%) 0%,
+			hsl(45, 65%, 55%) 35%,
+			hsl(310, 50%, 70%) 65%,
+			hsl(270, 38%, 60%) 100%
+		);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+		filter: drop-shadow(0 0 20px hsl(45 65% 55% / 0.4));
+	}
+
+	/* Glow text — dùng cho hero headline */
+	.text-glow-gold {
+		text-shadow:
+			0 0 20px hsl(45 65% 55% / 0.8),
+			0 0 40px hsl(45 65% 55% / 0.4),
+			0 0 80px hsl(45 65% 55% / 0.2);
+	}
+
+	/* Mờ ảo kiểu sương — phù hợp cho tagline */
+	.text-ethereal {
+		font-family: var(--font-heading);
+		font-weight: 400;
+		font-style: italic;
+		opacity: 0.85;
+		text-shadow:
+			0 0 30px hsl(220 40% 80% / 0.3),
+			0 1px 3px hsl(235 52% 5% / 0.6);
+		letter-spacing: 0.05em;
+	}
+
+	/* ✦ Divider huyền bí giữa section ✦ */
+	.divider-mystic {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		color: hsl(45 65% 55% / 0.6);
+		font-family: var(--font-heading);
+		font-style: italic;
+		font-size: 0.875rem;
+		letter-spacing: 0.1em;
+	}
+	.divider-mystic::before,
+	.divider-mystic::after {
+		content: "";
+		flex: 1;
+		height: 1px;
+		background: linear-gradient(
+			90deg,
+			transparent,
+			hsl(45 65% 55% / 0.4),
+			transparent
+		);
+	}
+
+	/* ✦ Badge / label nhỏ kiểu rune ✦ */
+	.badge-mystic {
+		font-family: var(--font-body);
+		font-size: 0.7rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		padding: 0.25rem 0.75rem;
+		border: 1px solid hsl(45 65% 55% / 0.35);
+		border-radius: 999px;
+		background: hsl(45 65% 55% / 0.08);
+		color: hsl(45 65% 70%);
+		backdrop-filter: blur(8px);
+	}
 }
 
-/* ─── Keyframes & Utilities (IDENTIK với bản gốc) ─── */
+/* ─── Keyframes & Utilities ─── */
 @layer utilities {
 	@keyframes accordion-down {
 		from {
@@ -205,6 +324,51 @@
 		}
 	}
 
+	/* ✦ THÊM: flicker ánh nến huyền bí ✦ */
+	@keyframes flicker {
+		0%,
+		100% {
+			opacity: 1;
+			text-shadow: 0 0 20px hsl(45 65% 55% / 0.8);
+		}
+		92% {
+			opacity: 0.95;
+			text-shadow: 0 0 30px hsl(45 65% 55% / 0.6);
+		}
+		94% {
+			opacity: 0.85;
+			text-shadow: 0 0 10px hsl(45 65% 55% / 0.3);
+		}
+		96% {
+			opacity: 0.95;
+			text-shadow: 0 0 25px hsl(45 65% 55% / 0.7);
+		}
+	}
+
+	/* ✦ THÊM: fog fade — chữ hiện ra từ sương mù ✦ */
+	@keyframes fog-in {
+		0% {
+			opacity: 0;
+			filter: blur(12px);
+			transform: translateY(8px);
+		}
+		100% {
+			opacity: 1;
+			filter: blur(0);
+			transform: translateY(0);
+		}
+	}
+
+	/* ✦ THÊM: shimmer text vàng chạy qua ✦ */
+	@keyframes gold-shimmer {
+		0% {
+			background-position: -200% center;
+		}
+		100% {
+			background-position: 200% center;
+		}
+	}
+
 	.animate-twinkle {
 		animation: twinkle 3s ease-in-out infinite;
 	}
@@ -220,5 +384,50 @@
 	}
 	.animate-pulse-glow {
 		animation: pulse-glow 2s ease-in-out infinite;
+	}
+
+	/* ✦ NEW ANIMATIONS ✦ */
+	.animate-flicker {
+		animation: flicker 6s ease-in-out infinite;
+	}
+	.animate-fog-in {
+		animation: fog-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+
+	/* Delay helpers cho stagger animation */
+	.delay-100 {
+		animation-delay: 100ms;
+	}
+	.delay-200 {
+		animation-delay: 200ms;
+	}
+	.delay-300 {
+		animation-delay: 300ms;
+	}
+	.delay-500 {
+		animation-delay: 500ms;
+	}
+	.delay-700 {
+		animation-delay: 700ms;
+	}
+	.delay-1000 {
+		animation-delay: 1000ms;
+	}
+
+	/* ✦ Gold shimmer text — dùng với class animate-shimmer ✦ */
+	.text-gold-shimmer {
+		background: linear-gradient(
+			90deg,
+			hsl(45, 65%, 45%) 0%,
+			hsl(45, 80%, 75%) 30%,
+			hsl(45, 65%, 55%) 50%,
+			hsl(45, 80%, 75%) 70%,
+			hsl(45, 65%, 45%) 100%
+		);
+		background-size: 200% auto;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+		animation: gold-shimmer 4s linear infinite;
 	}
 }
