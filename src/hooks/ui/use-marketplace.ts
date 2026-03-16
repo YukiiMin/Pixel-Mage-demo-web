@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import {
 	API_ENDPOINTS,
 	apiRequest,
-	getStoredAccessToken,
 } from "@/lib/api-config";
 import { getApiErrorMessage, isApiHttpError } from "@/types/api";
 import type {
@@ -59,10 +58,23 @@ function normalizeProducts(payload: unknown): MarketplaceProduct[] {
 			}
 
 			const raw = item as Record<string, unknown>;
-			const id = String(raw.id ?? raw.productId ?? "").trim();
-			const name = String(raw.name ?? raw.productName ?? "").trim();
-			const description = String(raw.description ?? raw.summary ?? "").trim();
-			const price = Number(raw.price ?? raw.unitPrice ?? 0);
+			const product =
+				raw.product && typeof raw.product === "object"
+					? (raw.product as Record<string, unknown>)
+					: raw;
+
+			const id = String(
+				raw.id ?? raw.packId ?? product.id ?? product.productId ?? "",
+			).trim();
+			const name = String(
+				product.name ?? raw.name ?? raw.productName ?? "",
+			).trim();
+			const description = String(
+				product.description ?? raw.description ?? raw.summary ?? "",
+			).trim();
+			const price = Number(
+				product.price ?? raw.price ?? raw.unitPrice ?? 0,
+			);
 
 			if (!id || !name || !Number.isFinite(price)) {
 				return null;
@@ -73,11 +85,11 @@ function normalizeProducts(payload: unknown): MarketplaceProduct[] {
 				name,
 				description,
 				price,
-				category: normalizeCategory(raw.category),
-				rarity: normalizeRarity(raw.rarity),
+				category: normalizeCategory(raw.category ?? product.category),
+				rarity: normalizeRarity(raw.rarity ?? product.rarity),
 				isLimited: Boolean(raw.isLimited ?? raw.limited),
 				releaseDate: String(
-					raw.releaseDate ?? raw.createdAt ?? new Date().toISOString(),
+					raw.releaseDate ?? raw.createdAt ?? product.createdAt ?? new Date().toISOString(),
 				),
 				imageEmoji: "🃏",
 			};
@@ -93,13 +105,11 @@ interface ProductFetchResult {
 async function fetchProductsFromBackend(): Promise<ProductFetchResult> {
 	let lastError: unknown = null;
 
-	for (const endpoint of API_ENDPOINTS.marketplace.products) {
+	for (const endpoint of API_ENDPOINTS.marketplace.catalog) {
 		try {
-			const token = getStoredAccessToken() ?? undefined;
 			const response = await apiRequest<unknown>(endpoint, {
 				method: "GET",
 				cache: "no-store",
-				token,
 			});
 
 			return {

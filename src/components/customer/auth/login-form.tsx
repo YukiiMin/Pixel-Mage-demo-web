@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Eye, EyeOff, LoaderCircle, LogIn, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,16 +11,18 @@ import { useAuth } from "@/hooks/ui/use-auth";
 
 export function LoginForm() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const { login, loading, errorMessage } = useAuth();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
+	const justRegistered = searchParams.get("registered") === "1";
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		try {
 			await login({ email, password });
-			router.push("/profile");
+			router.replace("/");
 		} catch {
 			// useAuth already sets a user-facing error message.
 		}
@@ -76,6 +78,12 @@ export function LoginForm() {
 					</button>
 				</div>
 			</div>
+
+			{justRegistered ? (
+				<p className="mt-3 text-sm text-emerald-300">
+					Đăng ký thành công. Vui lòng đăng nhập để vào hệ thống.
+				</p>
+			) : null}
 
 			{errorMessage ? (
 				<p className="mt-3 text-sm text-destructive">{errorMessage}</p>

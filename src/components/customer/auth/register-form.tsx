@@ -26,9 +26,9 @@ export function RegisterForm() {
 				email,
 				phoneNumber,
 				password,
-				roleId: 1,
+				roleId: 3,
 			});
-			router.push("/login");
+			router.replace("/login?registered=1");
 		} catch {
 			// useAuth already sets a user-facing error message.
 		}

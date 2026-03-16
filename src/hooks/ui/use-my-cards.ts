@@ -4,8 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
 	API_ENDPOINTS,
 	apiRequest,
-	getStoredAccessToken,
-	getStoredUserId,
+	ensureStoredUserId,
 } from "@/lib/api-config";
 import { getApiErrorMessage, isApiHttpError } from "@/types/api";
 import type { CollectionProgressItem, MyCardItem } from "@/types/commerce";
@@ -135,7 +134,7 @@ export function useMyCards() {
 			setStatus("loading");
 			setStatusMessage("Đang tải bộ sưu tập từ hệ thống...");
 
-			const userId = getStoredUserId();
+			const userId = await ensureStoredUserId();
 			if (!userId) {
 				if (!active) {
 					return;
@@ -149,7 +148,6 @@ export function useMyCards() {
 				return;
 			}
 
-			const token = getStoredAccessToken() ?? undefined;
 			const cardsPath = `${API_ENDPOINTS.inventoryManagement.myCards}?userId=${userId}`;
 			const progressPath = `${API_ENDPOINTS.collectionProgress.list}?customerId=${userId}`;
 
@@ -158,12 +156,10 @@ export function useMyCards() {
 					apiRequest<unknown>(cardsPath, {
 						method: "GET",
 						cache: "no-store",
-						token,
 					}),
 					apiRequest<unknown>(progressPath, {
 						method: "GET",
 						cache: "no-store",
-						token,
 					}),
 				]);
 

@@ -4,8 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
 	API_ENDPOINTS,
 	apiRequest,
-	getStoredAccessToken,
-	getStoredUserId,
+	ensureStoredUserId,
 } from "@/lib/api-config";
 import { getApiErrorMessage } from "@/types/api";
 import type { OrderListItem } from "@/types/order";
@@ -78,7 +77,7 @@ export function useOrders() {
 			setStatus("loading");
 			setStatusMessage("Đang tải đơn hàng từ hệ thống...");
 
-			const userId = getStoredUserId();
+			const userId = await ensureStoredUserId();
 			if (!userId) {
 				if (!active) return;
 				setOrders([]);
@@ -90,13 +89,11 @@ export function useOrders() {
 			}
 
 			try {
-				const token = getStoredAccessToken() ?? undefined;
 				const response = await apiRequest<unknown>(
 					API_ENDPOINTS.orderManagement.byCustomer(userId),
 					{
 						method: "GET",
 						cache: "no-store",
-						token,
 					},
 				);
 				if (!active) return;

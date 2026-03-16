@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import {
 	API_ENDPOINTS,
 	apiRequest,
-	getStoredAccessToken,
+	ensureStoredUserId,
 } from "@/lib/api-config";
 import { getApiErrorMessage } from "@/types/api";
 import type { OrderDetail, OrderItem } from "@/types/order";
@@ -24,7 +24,11 @@ function normalizeItem(raw: Record<string, unknown>): OrderItem | null {
 	};
 }
 
-function normalizeOrderDetail(payload: unknown, orderId: string): OrderDetail | null {
+function normalizeOrderDetail(
+	payload: unknown,
+	orderId: string,
+	orderItemsPayload?: unknown,
+): OrderDetail | null {
 	const raw = (
 		payload && typeof payload === "object"
 			? (payload as Record<string, unknown>).data ?? payload
@@ -34,11 +38,18 @@ function normalizeOrderDetail(payload: unknown, orderId: string): OrderDetail | 
 	if (!raw) return null;
 
 	const id = String(raw.id ?? raw.orderId ?? orderId).trim();
+	const fallbackItemsSource =
+		orderItemsPayload && typeof orderItemsPayload === "object"
+			? ((orderItemsPayload as Record<string, unknown>).data ?? orderItemsPayload)
+			: orderItemsPayload;
+
 	const itemsRaw = Array.isArray(raw.items)
 		? raw.items
 		: Array.isArray(raw.orderItems)
 			? raw.orderItems
-			: [];
+			: Array.isArray(fallbackItemsSource)
+				? fallbackItemsSource
+				: [];
 
 	const items: OrderItem[] = (itemsRaw as unknown[])
 		.map((i) => (i && typeof i === "object" ? normalizeItem(i as Record<string, unknown>) : null))
@@ -72,15 +83,55 @@ export function useOrderDetail(orderId: string) {
 			setStatus("loading");
 			setStatusMessage("Đang tải chi tiết đơn hàng...");
 
-			try {
-				const token = getStoredAccessToken() ?? undefined;
-				const response = await apiRequest<unknown>(
-					API_ENDPOINTS.orderManagement.byId(orderId),
-					{ method: "GET", cache: "no-store", token },
+			const userId = await ensureStoredUserId();
+			if (!userId) {
+				if (!active) return;
+				setOrder(null);
+				setStatus("unavailable");
+				setStatusMessage(
+					"Chưa xác định được user hiện tại. Không thể tải chi tiết đơn hàng.",
 				);
+				return;
+			}
+
+			try {
+				const [ordersByCustomerResponse, orderItemsResponse] = await Promise.all([
+					apiRequest<unknown>(API_ENDPOINTS.orderManagement.byCustomer(userId), {
+						method: "GET",
+						cache: "no-store",
+					}),
+					apiRequest<unknown>(API_ENDPOINTS.orderItems.byOrder(orderId), {
+						method: "GET",
+						cache: "no-store",
+					}).catch(() => null),
+				]);
 				if (!active) return;
 
-				const normalized = normalizeOrderDetail(response.data, orderId);
+				const orderListSource = Array.isArray(ordersByCustomerResponse.data)
+					? ordersByCustomerResponse.data
+					: ordersByCustomerResponse.data &&
+						  typeof ordersByCustomerResponse.data === "object"
+						? ((ordersByCustomerResponse.data as { data?: unknown; items?: unknown })
+								.data ??
+							(ordersByCustomerResponse.data as { data?: unknown; items?: unknown })
+								.items)
+						: undefined;
+
+				const targetOrder = Array.isArray(orderListSource)
+					? orderListSource.find((item) => {
+							if (!item || typeof item !== "object") {
+								return false;
+							}
+							const raw = item as Record<string, unknown>;
+							return String(raw.id ?? raw.orderId ?? "").trim() === orderId;
+						})
+					: null;
+
+				const normalized = normalizeOrderDetail(
+					targetOrder,
+					orderId,
+					orderItemsResponse?.data,
+				);
 				if (!normalized) {
 					setOrder(null);
 					setStatus("unavailable");

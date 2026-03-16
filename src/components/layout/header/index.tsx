@@ -5,9 +5,9 @@ import { Menu, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+	AUTH_SESSION_CHANGED_EVENT,
 	clearStoredAuthSession,
-	getStoredAccessToken,
-	getStoredUserId,
+	hasStoredAuthSession,
 } from "@/lib/api-config";
 import { getInitials, resolveSectionHref, sectionLinks } from "./_config";
 import DesktopActions from "./DesktopActions";
@@ -30,13 +30,19 @@ const Header = () => {
 
 	// --- Auth sync ---
 	const syncAuthState = useCallback(() => {
-		const token = getStoredAccessToken();
-		const userId = getStoredUserId();
-		const authed = Boolean(token) && Boolean(userId);
+		const authed = hasStoredAuthSession();
 		setIsAuth(authed);
 		if (authed) {
-			setUserName(window.localStorage.getItem("name") ?? "");
-			setUserEmail(window.localStorage.getItem("email") ?? "");
+			setUserName(
+				window.sessionStorage.getItem("name") ??
+					window.localStorage.getItem("name") ??
+					"",
+			);
+			setUserEmail(
+				window.sessionStorage.getItem("email") ??
+					window.localStorage.getItem("email") ??
+					"",
+			);
 		} else {
 			setUserName("");
 			setUserEmail("");
@@ -44,15 +50,25 @@ const Header = () => {
 	}, []);
 
 	const handleLogout = useCallback(() => {
-		clearStoredAuthSession();
-		syncAuthState();
-		router.push("/");
+		void fetch("/api/auth/logout", { method: "POST", cache: "no-store" })
+			.catch(() => {
+				// Ignore network errors; clear client auth state regardless.
+			})
+			.finally(() => {
+				clearStoredAuthSession();
+				syncAuthState();
+				router.push("/");
+			});
 	}, [router, syncAuthState]);
 
 	useEffect(() => {
 		syncAuthState();
 		window.addEventListener("storage", syncAuthState);
-		return () => window.removeEventListener("storage", syncAuthState);
+		window.addEventListener(AUTH_SESSION_CHANGED_EVENT, syncAuthState);
+		return () => {
+			window.removeEventListener("storage", syncAuthState);
+			window.removeEventListener(AUTH_SESSION_CHANGED_EVENT, syncAuthState);
+		};
 	}, [syncAuthState]);
 
 	// --- Scroll hide ---
