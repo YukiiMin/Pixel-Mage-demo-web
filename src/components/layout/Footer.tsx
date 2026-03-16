@@ -35,6 +35,42 @@ const Footer = () => (
 								Tải App
 							</a>
 						</li>
+						<li>
+							<a
+								href="/marketplace"
+								className="hover:text-primary transition-colors"
+							>
+								Marketplace
+							</a>
+						</li>
+						<li>
+							<a
+								href="/my-cards"
+								className="hover:text-primary transition-colors"
+							>
+								My Cards
+							</a>
+						</li>
+						<li>
+							<a href="/orders" className="hover:text-primary transition-colors">
+								Orders
+							</a>
+						</li>
+						<li>
+							<a href="/profile" className="hover:text-primary transition-colors">
+								Profile
+							</a>
+						</li>
+						<li>
+							<a href="/login" className="hover:text-primary transition-colors">
+								Đăng Nhập
+							</a>
+						</li>
+						<li>
+							<a href="/register" className="hover:text-primary transition-colors">
+								Đăng Ký
+							</a>
+						</li>
 					</ul>
 				</div>
 				<div>
