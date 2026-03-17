@@ -8,6 +8,7 @@ const BE_BASE_URL = (
 ).replace(/\/$/, "");
 
 const ACCESS_COOKIE = "pm_access_token";
+const REFRESH_COOKIE = "pm_refresh_token";
 const LOGIN_COOKIE = "pm_logged_in";
 const USER_ID_COOKIE = "pm_user_id";
 const EMAIL_COOKIE = "pm_email";
@@ -91,6 +92,7 @@ function extractFromJwt(token: string): {
 
 function normalizeLoginPayload(payload: unknown): {
   token: string | null;
+  refreshToken: string | null;
   userId: number | null;
   email: string | null;
   name: string | null;
@@ -102,6 +104,7 @@ function normalizeLoginPayload(payload: unknown): {
   const token = normalizeAccessToken(
     raw.accessToken ?? raw.token ?? data?.accessToken ?? data?.token,
   );
+  const refreshToken = String(raw.refreshToken ?? data?.refreshToken ?? "").trim() || null;
 
   let userId =
     parsePositiveInt(account?.id) ??
@@ -133,6 +136,7 @@ function normalizeLoginPayload(payload: unknown): {
 
   return {
     token: tokenStr,
+    refreshToken,
     userId,
     email,
     name,
@@ -152,7 +156,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   let upstream: Response;
   try {
-    upstream = await fetch(`${BE_BASE_URL}/api/accounts/login`, {
+    upstream = await fetch(`${BE_BASE_URL}/api/accounts/auth/login`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -211,6 +215,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     path: "/",
     maxAge: COOKIE_MAX_AGE_SECONDS,
   });
+
+  if (normalized.refreshToken) {
+    // Refresh token will typically live longer, e.g. 30 days
+    response.cookies.set({
+      name: REFRESH_COOKIE,
+      value: normalized.refreshToken,
+      httpOnly: true,
+      secure: isProd(),
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+    });
+  }
+
   response.cookies.set({
     name: LOGIN_COOKIE,
     value: "1",

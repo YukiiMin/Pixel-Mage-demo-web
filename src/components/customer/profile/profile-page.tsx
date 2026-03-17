@@ -169,12 +169,12 @@ export function ProfilePage() {
 						</p>
 						<p className="text-muted-foreground">
 							Role ID:{" "}
-							<span className="text-foreground">{displayProfile?.roleId ?? "N/A"}</span>
+							<span className="text-foreground">{displayProfile?.role?.roleName ?? "N/A"}</span>
 						</p>
 						<p className="text-muted-foreground">
 							Provider:{" "}
 							<span className="text-foreground">
-								{displayProfile?.provider || "LOCAL"}
+								{displayProfile?.authProvider || "LOCAL"}
 							</span>
 						</p>
 					</div>

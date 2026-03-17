@@ -1,10 +1,19 @@
 export interface UserProfile {
-	id: number;
+	customerId: number;
 	email: string;
 	name: string;
 	phoneNumber?: string;
-	roleId?: number;
-	provider?: string;
+	avatarUrl?: string;
+	emailVerified?: boolean;
+	authProvider?: string;
+	providerId?: string;
+	createdAt?: string;
+	updatedAt?: string;
+	isActive?: boolean;
+	role?: {
+		roleId: number;
+		roleName: string;
+	};
 }
 
 export interface RegisterPayload {
@@ -12,7 +21,7 @@ export interface RegisterPayload {
 	password: string;
 	name: string;
 	phoneNumber?: string;
-	roleId?: number;
+	roleName?: string;
 }
 
 export interface LoginPayload {

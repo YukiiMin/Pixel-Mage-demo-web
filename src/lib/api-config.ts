@@ -16,10 +16,24 @@ export const API_CONFIG = {
 
 export const AUTH_SESSION_CHANGED_EVENT = "auth-session-changed";
 
+let authSyncChannel: BroadcastChannel | null = null;
+if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+  authSyncChannel = new BroadcastChannel("auth_sync_channel");
+  authSyncChannel.onmessage = (event) => {
+    if (event.data === "login") {
+      // Re-fetch session from backend quietly if another tab logs in
+      getAuthSession({ syncStorage: true, broadcast: false }).catch(() => {});
+    } else if (event.data === "logout") {
+      // Clear locally without broadcasting back
+      clearStoredAuthSession({ broadcast: false });
+    }
+  };
+}
+
 export const API_ENDPOINTS = {
   accountManagement: {
-    registration: "/api/accounts/registration",
-    login: "/api/accounts/login",
+    registration: "/api/accounts/auth/registration",
+    login: "/api/accounts/auth/login",
     list: "/api/accounts",
     byId: (id: number | string) => `/api/accounts/${id}`,
     byEmail: (email: string) =>
@@ -230,15 +244,20 @@ export function getStoredAccessToken(): string | null {
   return null;
 }
 
-export function setStoredAuthSession(payload: {
-  token?: string | null;
-  userId?: number | null;
-  email?: string | null;
-  name?: string | null;
-}): void {
+export function setStoredAuthSession(
+  payload: {
+    token?: string | null;
+    userId?: number | null;
+    email?: string | null;
+    name?: string | null;
+  },
+  options: { broadcast?: boolean } = {}
+): void {
   if (typeof window === "undefined") {
     return;
   }
+
+  const broadcast = options.broadcast ?? true;
 
   const localKeys = [
     "token",
@@ -272,12 +291,18 @@ export function setStoredAuthSession(payload: {
     window.sessionStorage.setItem("name", payload.name);
   }
   window.dispatchEvent(new Event(AUTH_SESSION_CHANGED_EVENT));
+
+  if (broadcast && authSyncChannel) {
+    authSyncChannel.postMessage("login");
+  }
 }
 
-export function clearStoredAuthSession(): void {
+export function clearStoredAuthSession(options: { broadcast?: boolean } = {}): void {
   if (typeof window === "undefined") {
     return;
   }
+
+  const broadcast = options.broadcast ?? true;
 
   const keys = [
     "token",
@@ -297,6 +322,10 @@ export function clearStoredAuthSession(): void {
   document.cookie = `${AUTH_LOGIN_MARKER_COOKIE}=; Max-Age=0; Path=/; SameSite=Lax`;
   document.cookie = "pm_user_id=; Max-Age=0; Path=/; SameSite=Lax";
   window.dispatchEvent(new Event(AUTH_SESSION_CHANGED_EVENT));
+
+  if (broadcast && authSyncChannel) {
+    authSyncChannel.postMessage("logout");
+  }
 }
 
 export function getStoredUserId(): number | null {
@@ -392,9 +421,10 @@ export interface AuthSessionSnapshot {
 }
 
 export async function getAuthSession(
-  options: { syncStorage?: boolean } = {},
+  options: { syncStorage?: boolean; broadcast?: boolean } = {},
 ): Promise<AuthSessionSnapshot | null> {
   const syncStorage = options.syncStorage ?? true;
+  const broadcast = options.broadcast ?? false;
 
   try {
     const session = await apiRequest<unknown>("/api/auth/session", {

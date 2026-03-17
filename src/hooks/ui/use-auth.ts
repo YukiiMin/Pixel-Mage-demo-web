@@ -24,14 +24,33 @@ function normalizeUser(payload: unknown): UserProfile | null {
   if (!id || !email || !name) {
     return null;
   }
+
+  const role = pickRecord(raw.role);
+
   return {
-    id,
+    customerId: id,
     email,
     name,
     phoneNumber: String(raw.phoneNumber ?? "") || undefined,
-    roleId: Number(raw.roleId ?? 0) || undefined,
-    provider: String(raw.provider ?? raw.authProvider ?? "") || undefined,
+    role: role ? {
+      roleId: Number(role.roleId ?? role.id ?? 0),
+      roleName: String(role.roleName ?? role.name ?? ""),
+    } : undefined,
+    authProvider: String(raw.authProvider ?? raw.provider ?? "") || undefined,
+    providerId: String(raw.providerId ?? "") || undefined,
+    avatarUrl: String(raw.avatarUrl ?? "") || undefined,
+    emailVerified: Boolean(raw.emailVerified ?? false),
+    createdAt: String(raw.createdAt ?? "") || undefined,
+    updatedAt: String(raw.updatedAt ?? "") || undefined,
+    isActive: raw.isActive !== undefined ? Boolean(raw.isActive) : undefined,
   };
+}
+
+function pickRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+  return value as Record<string, unknown>;
 }
 
 function normalizeLoginResult(payload: unknown): {
@@ -58,7 +77,7 @@ function normalizeLoginResult(payload: unknown): {
     normalizeUser(raw.data);
 
   const userIdCandidate =
-    user?.id ??
+    user?.customerId ??
     Number(
       raw.userId ??
         raw.accountId ??
@@ -98,7 +117,7 @@ export function useAuth() {
         (response.data as Record<string, unknown>)?.userId ?? 0,
       );
       const userIdFromSession =
-        result?.user?.id ??
+        result?.user?.customerId ??
         result?.userId ??
         (Number.isInteger(fallbackUserId) && fallbackUserId > 0
           ? fallbackUserId
@@ -145,7 +164,7 @@ export function useAuth() {
         method: "POST",
         body: JSON.stringify({
           ...payload,
-          roleId: 3,
+          roleName: payload.roleName || "USER",
         }),
       });
     } catch (error) {

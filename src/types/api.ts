@@ -37,7 +37,7 @@ export class ApiHttpError extends Error {
 export function isApiHttpError(error: unknown): error is ApiHttpError {
 	return (
 		error instanceof ApiHttpError ||
-		(Boolean(error) &&
+		(error !== null &&
 			typeof error === "object" &&
 			"status" in error &&
 			"data" in error)

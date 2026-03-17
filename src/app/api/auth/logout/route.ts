@@ -8,6 +8,7 @@ const BE_BASE_URL = (
 ).replace(/\/$/, "");
 
 const ACCESS_COOKIE = "pm_access_token";
+const REFRESH_COOKIE = "pm_refresh_token";
 const LOGIN_COOKIE = "pm_logged_in";
 const USER_ID_COOKIE = "pm_user_id";
 const EMAIL_COOKIE = "pm_email";
@@ -31,6 +32,7 @@ function clearCookie(response: NextResponse, name: string): void {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const token = request.cookies.get(ACCESS_COOKIE)?.value;
+  const refreshToken = request.cookies.get(REFRESH_COOKIE)?.value;
   const incomingCookie = request.headers.get("cookie");
 
   if (token || incomingCookie) {
@@ -43,7 +45,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         headers.set("cookie", incomingCookie);
       }
 
-      await fetch(`${BE_BASE_URL}/api/accounts/auth/logout`, {
+      let beUrl = `${BE_BASE_URL}/api/accounts/auth/logout`;
+      if (refreshToken) {
+        beUrl += `?refreshToken=${encodeURIComponent(refreshToken)}`;
+      }
+
+      await fetch(beUrl, {
         method: "POST",
         headers,
         cache: "no-store",
@@ -55,6 +62,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const response = NextResponse.json({ authenticated: false }, { status: 200 });
   clearCookie(response, ACCESS_COOKIE);
+  clearCookie(response, REFRESH_COOKIE);
   clearCookie(response, LOGIN_COOKIE);
   clearCookie(response, USER_ID_COOKIE);
   clearCookie(response, EMAIL_COOKIE);
