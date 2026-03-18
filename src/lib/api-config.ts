@@ -43,6 +43,10 @@ export const API_ENDPOINTS = {
     canLink: "/api/accounts/auth/can-link",
     logout: "/api/accounts/auth/logout",
     googleAuth: "/api/accounts/auth/google",
+    updateProfile: (id: number | string) => `/api/accounts/${id}`,
+    changePassword: (id: number | string) => `/api/accounts/${id}/password`,
+    forgotPassword: "/api/accounts/auth/forgot-password",
+    resetPassword: "/api/accounts/auth/reset-password",
   },
   roleManagement: {
     list: "/api/roles",

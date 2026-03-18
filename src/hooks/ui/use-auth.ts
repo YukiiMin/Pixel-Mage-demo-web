@@ -9,7 +9,15 @@ import {
   setStoredAuthSession,
 } from "@/lib/api-config";
 import { getApiErrorMessage } from "@/types/api";
-import type { LoginPayload, RegisterPayload, UserProfile } from "@/types/user";
+import type { 
+  LoginPayload, 
+  RegisterPayload, 
+  UserProfile,
+  UpdateProfilePayload,
+  ChangePasswordPayload,
+  ForgotPasswordPayload,
+  ResetPasswordPayload
+} from "@/types/user";
 
 function normalizeUser(payload: unknown): UserProfile | null {
   if (!payload || typeof payload !== "object") {
@@ -272,11 +280,6 @@ export function useProfile() {
   };
 }
 
-export interface UpdateProfilePayload {
-  name?: string;
-  phoneNumber?: string;
-}
-
 export function useUpdateProfile() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -293,7 +296,7 @@ export function useUpdateProfile() {
       }
       try {
         const response = await apiRequest<unknown>(
-          API_ENDPOINTS.accountManagement.byId(userId),
+          API_ENDPOINTS.accountManagement.updateProfile(userId),
           { method: "PUT", body: JSON.stringify(payload) },
         );
         const normalized = normalizeUser(response.data);
@@ -311,3 +314,94 @@ export function useUpdateProfile() {
 
   return { updateProfile, loading, errorMessage };
 }
+
+export function useChangePassword() {
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const changePassword = useCallback(
+    async (payload: ChangePasswordPayload): Promise<boolean> => {
+      setLoading(true);
+      setErrorMessage("");
+      const userId = await ensureStoredUserId();
+      if (!userId) {
+        setErrorMessage("Chưa xác định được tài khoản hiện tại.");
+        setLoading(false);
+        return false;
+      }
+      try {
+        await apiRequest<unknown>(
+          API_ENDPOINTS.accountManagement.changePassword(userId),
+          { method: "PUT", body: JSON.stringify(payload) },
+        );
+        return true;
+      } catch (error) {
+        const message = getApiErrorMessage(error, "Không thể đổi mật khẩu.");
+        setErrorMessage(message);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  return { changePassword, loading, errorMessage };
+}
+
+export function useForgotPassword() {
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const forgotPassword = useCallback(
+    async (payload: ForgotPasswordPayload): Promise<boolean> => {
+      setLoading(true);
+      setErrorMessage("");
+      try {
+        await apiRequest<unknown>(
+          API_ENDPOINTS.accountManagement.forgotPassword,
+          { method: "POST", body: JSON.stringify(payload) },
+        );
+        return true;
+      } catch (error) {
+        const message = getApiErrorMessage(error, "Không thể gửi yêu cầu đặt lại mật khẩu.");
+        setErrorMessage(message);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  return { forgotPassword, loading, errorMessage };
+}
+
+export function useResetPassword() {
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const resetPassword = useCallback(
+    async (payload: ResetPasswordPayload): Promise<boolean> => {
+      setLoading(true);
+      setErrorMessage("");
+      try {
+        await apiRequest<unknown>(
+          API_ENDPOINTS.accountManagement.resetPassword,
+          { method: "POST", body: JSON.stringify(payload) },
+        );
+        return true;
+      } catch (error) {
+        const message = getApiErrorMessage(error, "Không thể đặt lại mật khẩu.");
+        setErrorMessage(message);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  return { resetPassword, loading, errorMessage };
+}
+

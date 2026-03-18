@@ -10,7 +10,7 @@ const BE_BASE_URL = (
 const ACCESS_COOKIE = "pm_access_token";
 const REFRESH_COOKIE = "pm_refresh_token";
 
-const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 8; // Access token age (8 hours)
+const COOKIE_MAX_AGE_SECONDS = 60 * 15; // Access token age (15 minutes)
 
 function isProd(): boolean {
   return process.env.NODE_ENV === "production";

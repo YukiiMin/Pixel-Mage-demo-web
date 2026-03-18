@@ -1,12 +1,12 @@
 "use client";
 
-import { Check, LoaderCircle, LogOut, Pencil, UserRound, X } from "lucide-react";
+import { Check, LoaderCircle, LogOut, Pencil, UserRound, X, KeyRound, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ReadingHistory } from "@/components/customer/tarot/reading-history";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuth, useProfile, useUpdateProfile } from "@/hooks/ui/use-auth";
+import { useAuth, useProfile, useUpdateProfile, useChangePassword } from "@/hooks/ui/use-auth";
 import { useAuthGuard } from "@/hooks/ui/use-auth-guard";
 
 export function ProfilePage() {
@@ -15,10 +15,17 @@ export function ProfilePage() {
 	const { logout } = useAuth();
 	const { profile, status, statusMessage } = useProfile();
 	const { updateProfile, loading: saving, errorMessage: saveError } = useUpdateProfile();
+	const { changePassword, loading: changingPwd, errorMessage: changePwdError } = useChangePassword();
 	const [editing, setEditing] = useState(false);
 	const [editName, setEditName] = useState("");
 	const [editPhone, setEditPhone] = useState("");
 	const [localProfile, setLocalProfile] = useState(profile);
+	const [pwdEditing, setPwdEditing] = useState(false);
+	const [oldPassword, setOldPassword] = useState("");
+	const [newPassword, setNewPassword] = useState("");
+	const [confirmPassword, setConfirmPassword] = useState("");
+	const [pwdSuccess, setPwdSuccess] = useState("");
+	const [localPwdError, setLocalPwdError] = useState("");
 
 	const handleLogout = async () => {
 		await logout();
@@ -41,6 +48,45 @@ export function ProfilePage() {
 			setEditing(false);
 		} catch {
 			// saveError already set by hook
+		}
+	};
+
+	const startPwdEdit = () => {
+		setPwdEditing(true);
+		setPwdSuccess("");
+		setLocalPwdError("");
+		setOldPassword("");
+		setNewPassword("");
+		setConfirmPassword("");
+	}
+
+	const cancelPwdEdit = () => {
+		setPwdEditing(false);
+		setLocalPwdError("");
+	}
+
+	const savePassword = async () => {
+		setLocalPwdError("");
+		if (!oldPassword || !newPassword || !confirmPassword) {
+			setLocalPwdError("Vui lòng nhập đầy đủ thông tin.");
+			return;
+		}
+		if (newPassword !== confirmPassword) {
+			setLocalPwdError("Mật khẩu mới và xác nhận không khớp.");
+			return;
+		}
+		try {
+			const success = await changePassword({ oldPassword, newPassword });
+			if (success) {
+				setPwdSuccess("Đổi mật khẩu thành công!");
+				setPwdEditing(false);
+				setOldPassword("");
+				setNewPassword("");
+				setConfirmPassword("");
+				setTimeout(() => setPwdSuccess(""), 3000);
+			}
+		} catch {
+			// changePwdError already set by hook
 		}
 	};
 
@@ -179,7 +225,112 @@ export function ProfilePage() {
 						</p>
 					</div>
 				)}
+			</div>
 
+			{/* CHANGE PASSWORD SECTION (Only for LOCAL provider) */}
+			{(!displayProfile?.authProvider || displayProfile?.authProvider === "LOCAL") && (
+				<div className="glass-card mt-6 rounded-2xl border border-border/50 p-6">
+					<div className="mb-4 flex items-start justify-between gap-2">
+						<div className="flex items-center gap-2 text-foreground">
+							<KeyRound className="h-5 w-5 text-primary" />
+							<p className="text-lg font-semibold">Mật khẩu và Bảo mật</p>
+						</div>
+						{!pwdEditing && (
+							<button
+								type="button"
+								onClick={startPwdEdit}
+								className="flex items-center gap-1.5 rounded-lg border border-border/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
+							>
+								<Pencil className="h-3.5 w-3.5" /> Đổi mật khẩu
+							</button>
+						)}
+					</div>
+
+					{pwdSuccess && (
+						<div className="mb-4 rounded-lg bg-green-500/10 p-3 text-sm text-green-500 border border-green-500/20">
+							{pwdSuccess}
+						</div>
+					)}
+
+					{pwdEditing ? (
+						<div className="space-y-4">
+							<div className="space-y-3 max-w-sm">
+								<div className="space-y-1">
+									<label className="text-xs font-medium text-muted-foreground">
+										Mật khẩu hiện tại
+									</label>
+									<Input
+										type="password"
+										value={oldPassword}
+										onChange={(e) => setOldPassword(e.target.value)}
+										placeholder="Nhập mật khẩu cũ"
+										className="bg-card/60"
+									/>
+								</div>
+								<div className="space-y-1">
+									<label className="text-xs font-medium text-muted-foreground">
+										Mật khẩu mới
+									</label>
+									<Input
+										type="password"
+										value={newPassword}
+										onChange={(e) => setNewPassword(e.target.value)}
+										placeholder="Nhập mật khẩu mới"
+										className="bg-card/60"
+									/>
+								</div>
+								<div className="space-y-1">
+									<label className="text-xs font-medium text-muted-foreground">
+										Xác nhận mật khẩu mới
+									</label>
+									<Input
+										type="password"
+										value={confirmPassword}
+										onChange={(e) => setConfirmPassword(e.target.value)}
+										placeholder="Nhập lại mật khẩu mới"
+										className="bg-card/60"
+									/>
+								</div>
+							</div>
+							{(localPwdError || changePwdError) && (
+								<div className="flex items-center gap-2 text-xs text-destructive">
+									<AlertCircle className="h-4 w-4" />
+									<p>{localPwdError || changePwdError}</p>
+								</div>
+							)}
+							<div className="flex items-center gap-2">
+								<Button
+									type="button"
+									size="sm"
+									onClick={savePassword}
+									disabled={changingPwd}
+									className="gradient-gold-purple-bg rounded-full px-5 text-xs font-semibold text-primary-foreground glow-gold"
+								>
+									{changingPwd ? <LoaderCircle className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+									Lưu mật khẩu
+								</Button>
+								<Button
+									type="button"
+									size="sm"
+									variant="ghost"
+									onClick={cancelPwdEdit}
+									disabled={changingPwd}
+									className="rounded-full px-5 text-xs"
+								>
+									<X className="h-3.5 w-3.5" /> Hủy
+								</Button>
+							</div>
+						</div>
+					) : (
+						<div className="text-sm text-muted-foreground">
+							<p>Sử dụng mật khẩu mạnh để bảo vệ tài khoản của bạn.</p>
+							<p className="mt-1 text-xs">Cập nhật lần cuối: Chưa rõ</p>
+						</div>
+					)}
+				</div>
+			)}
+			
+			<div className="mt-8 flex justify-end">
 				<Button
 					onClick={handleLogout}
 					variant="outline"

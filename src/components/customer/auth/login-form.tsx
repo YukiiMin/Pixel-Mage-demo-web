@@ -50,9 +50,9 @@ export function LoginForm() {
   }
 
   return (
-    <div className="group relative w-full overflow-hidden rounded-[20px] p-[1px]">
+    <div className="group relative w-full overflow-hidden rounded-[20px] p-1px">
       {/* Hiệu ứng viền chạy tông Vàng - Tím */}
-      <div className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#FDE047_0%,#A855F7_50%,#FDE047_100%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <div className="absolute -inset-full animate-[spin_4s_linear_infinite] bg-linear-to-r from-transparent via-border/60 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
       <motion.form
         variants={containerVariants}
@@ -116,6 +116,15 @@ export function LoginForm() {
               )}
             </button>
           </motion.div>
+          
+          <motion.div variants={itemVariants} className="flex justify-end px-1">
+            <Link
+              href="/auth/forgot-password"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-yellow-400"
+            >
+              Quên mật khẩu?
+            </Link>
+          </motion.div>
         </div>
 
         {justRegistered ? (
@@ -160,9 +169,9 @@ export function LoginForm() {
           variants={itemVariants}
           className="divider-mystic mt-6 flex items-center justify-center space-x-3 text-xs font-medium uppercase tracking-wider text-muted-foreground"
         >
-          <span className="h-[1px] w-full bg-gradient-to-r from-transparent via-border/60 to-transparent" />
+          <span className="h-1px w-full bg-linear-to-r from-transparent via-border/60 to-transparent" />
           <span>hoặc</span>
-          <span className="h-[1px] w-full bg-gradient-to-l from-transparent via-border/60 to-transparent" />
+          <span className="h-1px w-full bg-linear-to-l from-transparent via-border/60 to-transparent" />
         </motion.div>
 
         <motion.div

@@ -28,3 +28,23 @@ export interface LoginPayload {
 	email: string;
 	password: string;
 }
+
+export interface UpdateProfilePayload {
+	name?: string;
+	phoneNumber?: string;
+	avatarUrl?: string;
+}
+
+export interface ChangePasswordPayload {
+	oldPassword?: string;
+	newPassword?: string;
+}
+
+export interface ForgotPasswordPayload {
+	email: string;
+}
+
+export interface ResetPasswordPayload {
+	token: string;
+	newPassword: string;
+}

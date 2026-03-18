@@ -6,7 +6,7 @@ const LOGIN_COOKIE = "pm_logged_in";
 const EMAIL_COOKIE = "pm_email";
 const NAME_COOKIE = "pm_name";
 
-const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 8; // 8 hours for access token
+const COOKIE_MAX_AGE_SECONDS = 60 * 15; // 15 minutes for access token
 
 function isProd(): boolean {
   return process.env.NODE_ENV === "production";

@@ -14,7 +14,7 @@ const USER_ID_COOKIE = "pm_user_id";
 const EMAIL_COOKIE = "pm_email";
 const NAME_COOKIE = "pm_name";
 
-const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 8;
+const COOKIE_MAX_AGE_SECONDS = 60 * 15; // 15 minutes
 
 function isProd(): boolean {
   return process.env.NODE_ENV === "production";
