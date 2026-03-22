@@ -1,6 +1,6 @@
-import { TarotSessionPage } from "@/components/customer/tarot/tarot-session-page";
-import Header from "@/components/layout/Header";
+import Header from "@/components/layout/header";
 import StarBackground from "@/components/ui/star-background";
+import { TarotSessionPage } from "@/features/tarot/components/tarot-session-page";
 
 export default function TarotSessionRoute() {
 	return (

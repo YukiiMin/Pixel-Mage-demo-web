@@ -1,7 +1,7 @@
-import { MyCardsPage } from "@/components/customer/my-cards/my-cards-page";
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/footer";
+import Header from "@/components/layout/header";
 import StarBackground from "@/components/ui/star-background";
+import { MyCardsPage } from "@/features/inventory/components/my-cards-page";
 
 export default function MyCardsRoutePage() {
 	return (

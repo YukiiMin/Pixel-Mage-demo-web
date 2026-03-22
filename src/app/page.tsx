@@ -1,10 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import HeroSection from "@/components/customer/HeroSection";
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/footer";
+import Header from "@/components/layout/header";
 import { Skeleton } from "@/components/ui/skeleton";
+import HeroSection from "@/features/landing/components/hero-section";
 
 // StarBackground is purely visual canvas — no SSR needed
 const StarBackground = dynamic(
@@ -14,7 +14,7 @@ const StarBackground = dynamic(
 
 // Below-fold sections: lazy load with skeleton placeholders
 const FeaturedSection = dynamic(
-	() => import("@/components/customer/FeaturedSection"),
+	() => import("@/features/landing/components/featured-section"),
 	{
 		loading: () => (
 			<section className="py-24">
@@ -31,22 +31,25 @@ const FeaturedSection = dynamic(
 	},
 );
 
-const HowItWorks = dynamic(() => import("@/components/customer/HowItWorks"), {
-	loading: () => (
-		<section className="py-24">
-			<div className="container mx-auto px-6 space-y-6">
-				<Skeleton className="h-8 w-56 mx-auto" />
-				<div className="grid md:grid-cols-2 gap-6">
-					<Skeleton className="h-36 rounded-2xl" />
-					<Skeleton className="h-36 rounded-2xl" />
+const HowItWorks = dynamic(
+	() => import("@/features/landing/components/how-it-works"),
+	{
+		loading: () => (
+			<section className="py-24">
+				<div className="container mx-auto px-6 space-y-6">
+					<Skeleton className="h-8 w-56 mx-auto" />
+					<div className="grid md:grid-cols-2 gap-6">
+						<Skeleton className="h-36 rounded-2xl" />
+						<Skeleton className="h-36 rounded-2xl" />
+					</div>
 				</div>
-			</div>
-		</section>
-	),
-});
+			</section>
+		),
+	},
+);
 
 const DownloadSection = dynamic(
-	() => import("@/components/customer/DownloadSection"),
+	() => import("@/features/landing/components/download-section"),
 	{
 		loading: () => (
 			<section className="py-24">

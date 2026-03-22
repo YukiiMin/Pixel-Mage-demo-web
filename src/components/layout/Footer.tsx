@@ -52,12 +52,18 @@ const Footer = () => (
 							</a>
 						</li>
 						<li>
-							<a href="/orders" className="hover:text-primary transition-colors">
+							<a
+								href="/orders"
+								className="hover:text-primary transition-colors"
+							>
 								Orders
 							</a>
 						</li>
 						<li>
-							<a href="/profile" className="hover:text-primary transition-colors">
+							<a
+								href="/profile"
+								className="hover:text-primary transition-colors"
+							>
 								Profile
 							</a>
 						</li>
@@ -67,7 +73,10 @@ const Footer = () => (
 							</a>
 						</li>
 						<li>
-							<a href="/register" className="hover:text-primary transition-colors">
+							<a
+								href="/register"
+								className="hover:text-primary transition-colors"
+							>
 								Đăng Ký
 							</a>
 						</li>

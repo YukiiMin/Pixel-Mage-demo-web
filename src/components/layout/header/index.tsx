@@ -10,10 +10,10 @@ import {
 	hasStoredAuthSession,
 } from "@/lib/api-config";
 import { getInitials, resolveSectionHref, sectionLinks } from "./_config";
-import DesktopActions from "./DesktopActions";
-import DesktopNav from "./DesktopNav";
-import HeaderLogo from "./HeaderLogo";
-import MobileMenu from "./MobileMenu";
+import DesktopActions from "./desktop-actions";
+import DesktopNav from "./desktop-nav";
+import HeaderLogo from "./header-logo";
+import MobileMenu from "./mobile-menu";
 
 const Header = () => {
 	const pathname = usePathname();

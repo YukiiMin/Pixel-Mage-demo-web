@@ -1,7 +1,7 @@
-import { TarotSetupPage } from "@/components/customer/tarot/tarot-setup-page";
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/footer";
+import Header from "@/components/layout/header";
 import StarBackground from "@/components/ui/star-background";
+import { TarotSetupPage } from "@/features/tarot/components/tarot-setup-page";
 
 export default function TarotPage() {
 	return (

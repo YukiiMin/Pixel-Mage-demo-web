@@ -1,6 +1,7 @@
 export type ProductCategory = "deck" | "booster" | "collectible";
 
-export type ProductRarity = "common" | "rare" | "epic" | "legendary";
+export type Rarity = "COMMON" | "RARE" | "LEGENDARY";
+export type CollectionType = "STANDARD" | "LIMITED" | "HIDDEN";
 
 export interface MarketplaceProduct {
 	id: string;
@@ -8,7 +9,7 @@ export interface MarketplaceProduct {
 	description: string;
 	price: number;
 	category: ProductCategory;
-	rarity: ProductRarity;
+	rarity: Rarity;
 	isLimited: boolean;
 	releaseDate: string;
 	imageEmoji: string;
@@ -19,7 +20,7 @@ export interface MyCardItem {
 	name: string;
 	description: string;
 	quantity: number;
-	rarity: ProductRarity;
+	rarity: Rarity;
 	status: string;
 	updatedAt: string;
 }

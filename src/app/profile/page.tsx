@@ -1,7 +1,7 @@
-import { ProfilePage } from "@/components/customer/profile/profile-page";
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/footer";
+import Header from "@/components/layout/header";
 import StarBackground from "@/components/ui/star-background";
+import { ProfilePage } from "@/features/profile/components/profile-page";
 
 export default function ProfileRoute() {
 	return (

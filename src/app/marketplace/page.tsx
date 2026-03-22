@@ -1,7 +1,7 @@
-import { MarketplacePage } from "@/components/customer/marketplace/marketplace-page";
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/footer";
+import Header from "@/components/layout/header";
 import StarBackground from "@/components/ui/star-background";
+import { MarketplacePage } from "@/features/marketplace/components/marketplace-page";
 
 export default function MarketplaceRoutePage() {
 	return (
