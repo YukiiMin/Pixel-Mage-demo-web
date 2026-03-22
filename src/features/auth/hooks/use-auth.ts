@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useCallback, useState } from "react";
 import {
 	API_ENDPOINTS,
 	apiRequest,

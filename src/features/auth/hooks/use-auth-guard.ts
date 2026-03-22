@@ -15,12 +15,16 @@ export function useAuthGuard(mode: AuthGuardMode, redirectTo: string) {
 
 		const check = async () => {
 			const quickCheck = document.cookie.includes("pm_logged_in=1");
-			console.log(`[AuthGuard] Mode: ${mode}, RedirectTo: ${redirectTo}, QuickCheck: ${quickCheck}`);
+			console.log(
+				`[AuthGuard] Mode: ${mode}, RedirectTo: ${redirectTo}, QuickCheck: ${quickCheck}`,
+			);
 
 			try {
 				// 1. Unauthenticated case (fast check)
 				if (mode === "authenticated-only" && !quickCheck) {
-					console.log("[AuthGuard] Fast check failed for authenticated-only route.");
+					console.log(
+						"[AuthGuard] Fast check failed for authenticated-only route.",
+					);
 					if (active) {
 						setChecking(false);
 						router.replace(redirectTo);
@@ -35,18 +39,24 @@ export function useAuthGuard(mode: AuthGuardMode, redirectTo: string) {
 				console.log("[AuthGuard] IsAuthenticated:", isAuthenticated);
 
 				if (!active) {
-					console.log("[AuthGuard] Check completed but old effect is no longer active.");
+					console.log(
+						"[AuthGuard] Check completed but old effect is no longer active.",
+					);
 					return;
 				}
 
 				if (mode === "guest-only" && isAuthenticated) {
-					console.log("[AuthGuard] User is authenticated on guest-only route. Redirecting...");
+					console.log(
+						"[AuthGuard] User is authenticated on guest-only route. Redirecting...",
+					);
 					router.replace(redirectTo);
 					return;
 				}
 
 				if (mode === "authenticated-only" && !isAuthenticated) {
-					console.log("[AuthGuard] User is not authenticated on protected route. Redirecting...");
+					console.log(
+						"[AuthGuard] User is not authenticated on protected route. Redirecting...",
+					);
 					router.replace(redirectTo);
 					return;
 				}

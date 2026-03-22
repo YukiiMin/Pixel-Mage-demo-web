@@ -117,10 +117,13 @@ function normalizeLoginPayload(payload: unknown): {
 		parsePositiveInt(account?.id) ??
 		parsePositiveInt(account?.accountId) ??
 		parsePositiveInt(account?.userId) ??
+		parsePositiveInt(account?.customerId) ??
 		parsePositiveInt(raw.accountId) ??
 		parsePositiveInt(raw.userId) ??
+		parsePositiveInt(raw.customerId) ??
 		parsePositiveInt(data?.accountId) ??
-		parsePositiveInt(data?.userId);
+		parsePositiveInt(data?.userId) ??
+		parsePositiveInt(data?.customerId);
 
 	let email =
 		String(account?.email ?? raw.email ?? data?.email ?? "").trim() || null;
@@ -198,6 +201,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 	}
 
 	const normalized = normalizeLoginPayload(upstreamPayload);
+
 	if (!normalized.token) {
 		return NextResponse.json(
 			{ message: "Login response missing access token." },

@@ -425,7 +425,10 @@ export async function getAuthSession(
 	}
 
 	try {
-		console.log("[getAuthSession] Requesting account details for ID:", storedId);
+		console.log(
+			"[getAuthSession] Requesting account details for ID:",
+			storedId,
+		);
 		// Call a REAL backend endpoint that requires authentication.
 		// This will hit the [...proxy] which handles 401 retries and refreshes.
 		const response = await apiRequest<any>(
@@ -443,7 +446,9 @@ export async function getAuthSession(
 		}
 
 		// The backend returns an Account object. We normalize it to our session format.
-		const userIdRaw = Number(raw.id ?? raw.userId ?? raw.accountId ?? 0);
+		const userIdRaw = Number(
+			raw.id ?? raw.userId ?? raw.accountId ?? raw.customerId ?? 0,
+		);
 		const userId =
 			Number.isInteger(userIdRaw) && userIdRaw > 0 ? userIdRaw : null;
 		const email = String(raw.email ?? "").trim() || null;

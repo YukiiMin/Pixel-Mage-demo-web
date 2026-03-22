@@ -18,22 +18,22 @@ interface CardDetailModalProps {
 
 const RARITY_CONFIG: Record<
 	MyCardItem["rarity"],
-	{ label: string; className: string; glow: string }
+	{ label: string; className: string; modalClass?: string }
 > = {
 	LEGENDARY: {
 		label: "Legendary",
-		className: "border-yellow-300/60 bg-yellow-300/10 text-yellow-200",
-		glow: "glow-gold",
+		className: "border-primary/60 bg-primary/10 text-primary",
+		modalClass: "border-primary/60 animate-pulse-glow glow-gold",
 	},
 	RARE: {
 		label: "Rare",
-		className: "border-sky-300/60 bg-sky-300/10 text-sky-200",
-		glow: "",
+		className: "border-secondary/60 bg-secondary/10 text-secondary",
+		modalClass: "border-secondary/30",
 	},
 	COMMON: {
 		label: "Common",
 		className: "border-border bg-muted/30 text-muted-foreground",
-		glow: "",
+		modalClass: "border-border/50",
 	},
 };
 
@@ -45,7 +45,8 @@ export function CardDetailModal({ card, onClose }: CardDetailModalProps) {
 	return (
 		<Dialog open={!!card} onOpenChange={(open) => !open && onClose()}>
 			<DialogContent
-				className={`glass-card ${rarity.glow} max-w-md border border-border/50 p-0`}
+				data-testid="card-detail-modal"
+				className={`glass-card max-w-md p-0 border ${rarity.modalClass}`}
 			>
 				<DialogHeader className="border-b border-border/40 px-6 py-5">
 					<div className="flex items-start justify-between gap-3">
@@ -53,7 +54,12 @@ export function CardDetailModal({ card, onClose }: CardDetailModalProps) {
 							<p className="badge-mystic mb-2 inline-flex">
 								<Layers3 className="mr-1.5 h-3 w-3" /> {card.status}
 							</p>
-							<DialogTitle className="text-2xl text-foreground">
+							<DialogTitle
+								className="text-2xl text-foreground"
+								style={{
+									fontFamily: "Cormorant Garamond, var(--font-heading)",
+								}}
+							>
 								{card.name}
 							</DialogTitle>
 						</div>

@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getStoredUserId } from "@/lib/api-config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,6 +22,7 @@ import {
 } from "@/features/auth/hooks/use-auth";
 import { useAuthGuard } from "@/features/auth/hooks/use-auth-guard";
 import { ReadingHistory } from "@/features/tarot/components/reading-history";
+import { getStoredUserId } from "@/lib/api-config";
 
 export function ProfilePage() {
 	const router = useRouter();
