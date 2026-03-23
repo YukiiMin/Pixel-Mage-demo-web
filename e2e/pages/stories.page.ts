@@ -19,31 +19,28 @@ export class StoriesPage {
 
 	async gotoWithMock() {
 		await this.mockAuth();
-		await this.page.route(
-			"**/api/stories?userId=123",
-			async (route: Route) => {
-				await route.fulfill({
-					json: {
-						data: [
-							{
-								id: 1,
-								title: "Unlocked Story",
-								summary: "Unlocked summary",
-								coverImageUrl: null,
-								isLocked: false,
-							},
-							{
-								id: 2,
-								title: "Locked Story",
-								summary: "Locked summary",
-								coverImageUrl: null,
-								isLocked: true,
-							},
-						],
-					},
-				});
-			},
-		);
+		await this.page.route("**/api/stories?userId=123", async (route: Route) => {
+			await route.fulfill({
+				json: {
+					data: [
+						{
+							id: 1,
+							title: "Unlocked Story",
+							summary: "Unlocked summary",
+							coverImageUrl: null,
+							isLocked: false,
+						},
+						{
+							id: 2,
+							title: "Locked Story",
+							summary: "Locked summary",
+							coverImageUrl: null,
+							isLocked: true,
+						},
+					],
+				},
+			});
+		});
 		await this.page.goto("/stories");
 		await expect(
 			this.page.locator('[data-testid^="story-card-"]').first(),
