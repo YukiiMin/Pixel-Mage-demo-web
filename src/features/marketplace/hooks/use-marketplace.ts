@@ -1,217 +1,66 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import { getApiErrorMessage, isApiHttpError } from "@/types/api";
-import type { MarketplaceProduct, ProductCategory } from "@/types/commerce";
+import { useMemo, useState } from "react";
+import type { Pack, ProductCategory, Rarity } from "@/types/commerce";
+import { usePacks } from "./use-packs";
 
 export type ProductSort = "newest" | "price-asc" | "price-desc";
 export type MarketplaceStatus =
 	| "idle"
 	| "loading"
 	| "ready"
-	| "unavailable"
 	| "error";
 
-function normalizeCategory(value: unknown): ProductCategory {
-	if (value === "deck" || value === "booster" || value === "collectible") {
-		return value;
-	}
-	return "collectible";
-}
+export function useMarketplace() {
+	const { data: packs = [], isLoading, isError, error } = usePacks();
 
-function normalizeRarity(value: unknown): Record<string, any>["rarity"] {
-	if (
-		value === "COMMON" ||
-		value === "RARE" ||
-		value === "LEGENDARY" ||
-		value === "common" ||
-		value === "rare" ||
-		value === "legendary"
-	) {
-		return typeof value === "string" ? value.toUpperCase() : "COMMON";
-	}
-	return "COMMON";
-}
+	const status: MarketplaceStatus = isLoading
+		? "loading"
+		: isError
+			? "error"
+			: "ready";
 
-function normalizeProducts(payload: unknown): MarketplaceProduct[] {
-	const source = Array.isArray(payload)
-		? payload
-		: payload && typeof payload === "object"
-			? ((payload as { data?: unknown; items?: unknown }).data ??
-				(payload as { data?: unknown; items?: unknown }).items)
-			: undefined;
-
-	if (!Array.isArray(source)) {
-		return [];
-	}
-
-	return source
-		.map((item) => {
-			if (!item || typeof item !== "object") {
-				return null;
-			}
-
-			const raw = item as Record<string, unknown>;
-			const product =
-				raw.product && typeof raw.product === "object"
-					? (raw.product as Record<string, unknown>)
-					: raw;
-
-			const id = String(
-				raw.id ?? raw.packId ?? product.id ?? product.productId ?? "",
-			).trim();
-			const name = String(
-				product.name ?? raw.name ?? raw.productName ?? "",
-			).trim();
-			const description = String(
-				product.description ?? raw.description ?? raw.summary ?? "",
-			).trim();
-			const price = Number(product.price ?? raw.price ?? raw.unitPrice ?? 0);
-
-			if (!id || !name || !Number.isFinite(price)) {
-				return null;
-			}
-
-			return {
-				id,
-				name,
-				description,
-				price,
-				category: normalizeCategory(raw.category ?? product.category),
-				rarity: normalizeRarity(raw.rarity ?? product.rarity),
-				isLimited: Boolean(raw.isLimited ?? raw.limited),
-				releaseDate: String(
-					raw.releaseDate ??
-						raw.createdAt ??
-						product.createdAt ??
-						new Date().toISOString(),
-				),
-				imageEmoji: "🃏",
-			};
-		})
-		.filter((product): product is MarketplaceProduct => product !== null);
-}
-
-interface ProductFetchResult {
-	products: MarketplaceProduct[] | null;
-	error: unknown;
-}
-
-async function fetchProductsFromBackend(): Promise<ProductFetchResult> {
-	let lastError: unknown = null;
-
-	for (const endpoint of API_ENDPOINTS.marketplace.catalog) {
-		try {
-			const response = await apiRequest<unknown>(endpoint, {
-				method: "GET",
-				cache: "no-store",
-			});
-
-			return {
-				products: normalizeProducts(response.data),
-				error: null,
-			};
-		} catch (error) {
-			lastError = error;
+	// Determine status message
+	let statusMessage = "";
+	if (isLoading) {
+		statusMessage = "Đang tải sản phẩm từ hệ thống...";
+	} else if (isError) {
+		const errObj = error as any;
+		if (errObj && errObj.status === 401) {
+			statusMessage = "Bạn cần đăng nhập để truy cập ưu đãi.";
+		} else if (errObj && errObj.status === 403) {
+			statusMessage = "Tài khoản hiện tại chưa có quyền truy cập.";
+		} else {
+			statusMessage = "Không thể tải dữ liệu marketplace từ BE.";
 		}
 	}
 
-	return {
-		products: null,
-		error: lastError,
-	};
-}
-
-export function useMarketplace() {
-	const [products, setProducts] = useState<MarketplaceProduct[]>([]);
-	const [status, setStatus] = useState<MarketplaceStatus>("idle");
-	const [statusMessage, setStatusMessage] = useState("");
 	const [searchTerm, setSearchTerm] = useState("");
+	// Category left here for API compatibility or future product mixed usage,
+	// but for packs it might just be ignored.
 	const [category, setCategory] = useState<ProductCategory | "all">("all");
-	const [rarity, setRarity] = useState<Record<string, any>["rarity"] | "all">(
-		"all",
-	);
+	const [rarity, setRarity] = useState<Rarity | "all">("all");
 	const [limitedOnly, setLimitedOnly] = useState(false);
 	const [sortBy, setSortBy] = useState<ProductSort>("newest");
 
-	useEffect(() => {
-		let active = true;
-
-		const loadProducts = async () => {
-			setStatus("loading");
-			setStatusMessage("Đang tải sản phẩm từ hệ thống...");
-
-			const { products: backendProducts, error } =
-				await fetchProductsFromBackend();
-			if (!active) {
-				return;
-			}
-
-			if (backendProducts === null) {
-				setProducts([]);
-				setStatus("unavailable");
-
-				if (isApiHttpError(error) && error.status === 401) {
-					setStatusMessage(
-						"Bạn cần đăng nhập để truy cập API sản phẩm. Chức năng chưa cập nhật cho khách chưa đăng nhập.",
-					);
-					return;
-				}
-
-				if (isApiHttpError(error) && error.status === 403) {
-					setStatusMessage(
-						"Tài khoản hiện tại chưa có quyền truy cập API sản phẩm. Chức năng chưa cập nhật.",
-					);
-					return;
-				}
-
-				setStatusMessage(
-					`${getApiErrorMessage(error, "Marketplace chưa kết nối được API sản phẩm từ BE đã deploy.")} Chức năng chưa cập nhật.`,
-				);
-				return;
-			}
-
-			if (backendProducts.length === 0) {
-				setProducts([]);
-				setStatus("unavailable");
-				setStatusMessage(
-					"BE đã phản hồi nhưng chưa có dữ liệu sản phẩm. Chức năng chưa cập nhật.",
-				);
-				return;
-			}
-
-			setProducts(backendProducts);
-			setStatus("ready");
-			setStatusMessage("");
-		};
-
-		loadProducts().catch(() => {
-			if (!active) {
-				return;
-			}
-			setProducts([]);
-			setStatus("error");
-			setStatusMessage("Không thể tải dữ liệu marketplace từ BE.");
-		});
-
-		return () => {
-			active = false;
-		};
-	}, []);
-
-	const filteredProducts = useMemo(() => {
+	const filteredPacks = useMemo(() => {
 		const normalizedSearch = searchTerm.trim().toLowerCase();
-		const result = products.filter((product) => {
-			const matchCategory = category === "all" || product.category === category;
-			const matchRarity = rarity === "all" || product.rarity === rarity;
-			const matchLimited = !limitedOnly || product.isLimited;
+		const result = packs.filter((pack) => {
+			// Typically packs don't have a category mapped directly like products,
+			// but if they do via collectionType we can match. For now, category filter usually
+			// doesn't apply to packs. If we wanted, we could map it.
+
+			// Since Packs don't have direct rarity yet (it's inside drops), we might
+			// need to ignore rarity filter or map it. Let's ignore it for packs unless specified.
+			// Or if name includes it loosely. For now, just apply search and limited.
+
+			const matchLimited = !limitedOnly || pack.isLimited;
 			const matchSearch =
 				normalizedSearch.length === 0 ||
-				product.name.toLowerCase().includes(normalizedSearch) ||
-				product.description.toLowerCase().includes(normalizedSearch);
+				pack.name.toLowerCase().includes(normalizedSearch) ||
+				pack.description.toLowerCase().includes(normalizedSearch);
 
-			return matchCategory && matchRarity && matchLimited && matchSearch;
+			return matchLimited && matchSearch;
 		});
 
 		const sorted = [...result].sort((a, b) => {
@@ -221,33 +70,29 @@ export function useMarketplace() {
 			if (sortBy === "price-desc") {
 				return b.price - a.price;
 			}
-			return (
-				new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime()
-			);
+			return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 		});
 
 		return sorted;
-	}, [category, limitedOnly, products, rarity, searchTerm, sortBy]);
+	}, [limitedOnly, packs, searchTerm, sortBy]);
 
 	const stats = useMemo(() => {
-		const total = filteredProducts.length;
+		const total = filteredPacks.length;
 		const avgPrice =
 			total === 0
 				? 0
 				: Math.round(
-						filteredProducts.reduce((sum, item) => sum + item.price, 0) / total,
+						filteredPacks.reduce((sum, item) => sum + item.price, 0) / total,
 					);
-		const limitedCount = filteredProducts.filter(
-			(item) => item.isLimited,
-		).length;
+		const limitedCount = filteredPacks.filter((item) => item.isLimited).length;
 
 		return { total, avgPrice, limitedCount };
-	}, [filteredProducts]);
+	}, [filteredPacks]);
 
 	return {
 		status,
 		statusMessage,
-		filteredProducts,
+		filteredPacks, // Renamed from filteredProducts
 		searchTerm,
 		setSearchTerm,
 		category,
@@ -270,7 +115,7 @@ export function formatVnd(amount: number): string {
 	}).format(amount);
 }
 
-export function getRarityLabel(rarity: MarketplaceProduct["rarity"]): string {
+export function getRarityLabel(rarity: string): string {
 	if (rarity === "LEGENDARY") return "Legendary";
 	if (rarity === "RARE") return "Rare";
 	return "Common";

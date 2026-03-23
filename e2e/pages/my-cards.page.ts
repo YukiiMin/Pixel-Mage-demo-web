@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page, type Route } from "@playwright/test";
-import { mockMyCardsApi } from "../mocks/handlers";
+import { mockAuthSession, mockMyCardsApi } from "../mocks/handlers";
 
 export class MyCardsPage {
 	readonly page: Page;
@@ -33,17 +33,11 @@ export class MyCardsPage {
 	}
 
 	async gotoEmpty() {
-		await this.page.context().addCookies([
-			{ name: "pm_logged_in", value: "1", domain: "localhost", path: "/" },
-			{ name: "pm_user_id", value: "123", domain: "localhost", path: "/" },
-		]);
+		await mockAuthSession(this.page);
 
-		await this.page.route(
-			"**/api/inventory/my-cards*",
-			async (route: Route) => {
-				await route.fulfill({ json: { data: [] } });
-			},
-		);
+		await this.page.route("**/api/inventory/my-cards*", async (route: Route) => {
+			await route.fulfill({ json: { data: [] } });
+		});
 		await this.page.route(
 			"**/api/collections/progress*",
 			async (route: Route) => {

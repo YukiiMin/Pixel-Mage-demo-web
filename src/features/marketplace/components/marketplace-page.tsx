@@ -1,27 +1,27 @@
 "use client";
 
 import { ShoppingBag } from "lucide-react";
+import { useState } from "react";
+import { PackDetailModal } from "@/features/marketplace/components/pack-detail-modal";
+import { PackGrid } from "@/features/marketplace/components/pack-grid";
 import { ProductFilter } from "@/features/marketplace/components/product-filter";
-import { ProductGrid } from "@/features/marketplace/components/product-grid";
 import { useMarketplace } from "@/features/marketplace/hooks/use-marketplace";
 
 export function MarketplacePage() {
 	const {
 		status,
 		statusMessage,
-		filteredProducts,
+		filteredPacks,
 		searchTerm,
 		setSearchTerm,
-		category,
-		setCategory,
-		rarity,
-		setRarity,
 		sortBy,
 		setSortBy,
 		limitedOnly,
 		setLimitedOnly,
 		stats,
 	} = useMarketplace();
+
+	const [selectedPackId, setSelectedPackId] = useState<number | null>(null);
 
 	const canUseMarketplace = status === "ready";
 
@@ -82,10 +82,6 @@ export function MarketplacePage() {
 					<ProductFilter
 						searchTerm={searchTerm}
 						onSearchTermChange={setSearchTerm}
-						category={category}
-						onCategoryChange={setCategory}
-						rarity={rarity}
-						onRarityChange={setRarity}
 						sortBy={sortBy}
 						onSortByChange={setSortBy}
 						limitedOnly={limitedOnly}
@@ -93,10 +89,16 @@ export function MarketplacePage() {
 					/>
 
 					<div className="mt-6">
-						<ProductGrid products={filteredProducts} />
+						<PackGrid packs={filteredPacks} onSelectPack={setSelectedPackId} />
 					</div>
 				</>
 			) : null}
+
+			<PackDetailModal
+				open={selectedPackId !== null}
+				packId={selectedPackId}
+				onClose={() => setSelectedPackId(null)}
+			/>
 		</div>
 	);
 }

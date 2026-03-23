@@ -51,11 +51,24 @@ export const mockCollectionProgressData = {
 
 import type { Page, Route } from "@playwright/test";
 
-export async function mockMyCardsApi(page: Page) {
+export async function mockAuthSession(page: Page, userId = "123") {
 	await page.context().addCookies([
 		{ name: "pm_logged_in", value: "1", domain: "localhost", path: "/" },
-		{ name: "pm_user_id", value: "123", domain: "localhost", path: "/" },
+		{ name: "pm_user_id", value: userId, domain: "localhost", path: "/" },
 	]);
+
+	// Mock account session check for useAuthGuard
+	await page.route(`**/api/accounts/${userId}`, async (route: Route) => {
+		await route.fulfill({
+			json: {
+				data: { id: Number(userId), email: "test@example.com", name: "Test User" },
+			},
+		});
+	});
+}
+
+export async function mockMyCardsApi(page: Page) {
+	await mockAuthSession(page);
 
 	await page.route("**/api/inventory/my-cards*", async (route: Route) => {
 		await route.fulfill({ json: mockMyCardsData });
@@ -63,12 +76,5 @@ export async function mockMyCardsApi(page: Page) {
 
 	await page.route("**/api/collections/progress*", async (route: Route) => {
 		await route.fulfill({ json: mockCollectionProgressData });
-	});
-
-	// Mock account session check for useAuthGuard
-	await page.route("**/api/accounts/123", async (route: Route) => {
-		await route.fulfill({
-			json: { data: { id: 123, email: "test@example.com", name: "Test User" } },
-		});
 	});
 }

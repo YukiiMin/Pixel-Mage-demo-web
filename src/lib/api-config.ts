@@ -212,6 +212,8 @@ export const API_ENDPOINTS = {
 	},
 	marketplace: {
 		catalog: ["/api/packs/available", "/api/products"] as const,
+		packs: "/api/packs/available",
+		packById: (id: number | string) => `/api/packs/${id}`,
 	},
 } as const;
 
