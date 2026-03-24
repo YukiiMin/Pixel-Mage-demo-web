@@ -1,4 +1,4 @@
-import Footer from '@/components/layout/footer1'
+import Footer from '@/components/layout/footer'
 import Header from '@/components/layout/header/index'
 import StarBackground from '@/components/ui/star-background'
 import { TarotSetupPage } from '@/features/tarot/components/tarot-setup-page'
