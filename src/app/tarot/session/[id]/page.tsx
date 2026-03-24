@@ -1,4 +1,4 @@
-import Header from '@/components/layout/header1/index'
+import Header from '@/components/layout/header/index'
 import StarBackground from '@/components/ui/star-background'
 import { TarotSessionPage } from '@/features/tarot/components/tarot-session-page'
 
