@@ -147,7 +147,6 @@ export function useAuth() {
 				).trim() ||
 					normalizedPayload.email);
 
-
 			return result;
 		} catch (error) {
 			const rawMessage = getApiErrorMessage(error, "Không thể đăng nhập.");

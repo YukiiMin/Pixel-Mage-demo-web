@@ -1,102 +1,70 @@
 "use client";
 import { create } from "zustand";
-import type {
-	DeckMode,
-	ReadingCard,
-	SelectedSlot,
-	SessionPhase,
-	SpreadType,
-	TarotSetup,
-	TarotTopic,
-} from "@/types/tarot";
+import type { ReadingCard } from "@/types/tarot";
+
+export type SessionPhase =
+	| "SETUP"
+	| "SHUFFLING"
+	| "DRAWING"
+	| "REVEAL"
+	| "INTERPRET"
+	| "COMPLETE";
 
 interface TarotSessionState {
-	// --- MỚI (Tương lai) ---
+	// Setup Draft State
 	selectedSpreadId: number | null;
+	setSelectedSpread: (id: number) => void;
 	mainQuestion: string;
-	activeSessionId: number | null;
-	drawnCards: ReadingCard[];
-	setSelectedSpread: (spreadId: number) => void;
 	setMainQuestion: (q: string) => void;
-	setActiveSession: (sessionId: number) => void;
+
+	// Active Session State
+	activeSessionId: number | null;
+	spreadId: number | null;
+	mode: "EXPLORE" | "YOUR_DECK" | null;
+	drawnCards: ReadingCard[];
+	phase: SessionPhase;
+
+	setActiveSession: (
+		sessionId: number,
+		spreadId: number,
+		mode: "EXPLORE" | "YOUR_DECK",
+		mainQuestion?: string,
+	) => void;
 	setDrawnCards: (cards: ReadingCard[]) => void;
+
+	setPhase: (phase: SessionPhase) => void;
 	clearSession: () => void;
-
-	// --- CŨ (Hiện tại đang dùng) ---
-	setup: TarotSetup;
-	setTopic: (t: TarotTopic) => void;
-	setQuestion: (q: string) => void;
-	setSpreadType: (s: SpreadType) => void;
-	setDeckMode: (m: DeckMode) => void;
-
-	phase: SessionPhase; // Dùng kiểu cũ tạm chờ refactor
-	setPhase: (p: SessionPhase) => void;
-	selectedCards: SelectedSlot[];
-	addCard: (slot: SelectedSlot) => void;
-	revealedCount: number;
-	setRevealedCount: (n: number) => void;
-	interpretation: string;
-	setInterpretation: (t: string) => void;
-
-	requiredCards: () => number;
 	reset: () => void;
 }
 
-const initialSetup: TarotSetup = {
-	topic: null,
-	question: "",
-	spreadType: "3-cards",
-	deckMode: "EXPLORE",
-};
-
 const initialState = {
+	activeSessionId: null,
+	spreadId: null,
+	mode: null,
 	selectedSpreadId: null,
 	mainQuestion: "",
-	activeSessionId: null,
 	drawnCards: [],
+	phase: "SHUFFLING" as SessionPhase,
 };
 
-export const useTarotSessionStore = create<TarotSessionState>((set, get) => ({
+export const useTarotSessionStore = create<TarotSessionState>((set) => ({
 	...initialState,
-	setSelectedSpread: (spreadId) => set({ selectedSpreadId: spreadId }),
+	setSelectedSpread: (id) => set({ selectedSpreadId: id }),
 	setMainQuestion: (q) => set({ mainQuestion: q }),
-	setActiveSession: (sessionId) => set({ activeSessionId: sessionId }),
-	setDrawnCards: (cards) => set({ drawnCards: cards }),
-	clearSession: () =>
-		set({ activeSessionId: null, drawnCards: [], phase: "SHUFFLING" }),
-
-	// --- CŨ ---
-	setup: { ...initialSetup },
-	setTopic: (t) => set((s) => ({ setup: { ...s.setup, topic: t } })),
-	setQuestion: (q) => set((s) => ({ setup: { ...s.setup, question: q } })),
-	setSpreadType: (s) =>
-		set((st) => ({ setup: { ...st.setup, spreadType: s } })),
-	setDeckMode: (m) => set((s) => ({ setup: { ...s.setup, deckMode: m } })),
-
-	phase: "SHUFFLING",
-	setPhase: (p) => set({ phase: p }),
-	selectedCards: [],
-	addCard: (slot) =>
-		set((s) => ({ selectedCards: [...s.selectedCards, slot] })),
-	revealedCount: 0,
-	setRevealedCount: (n) => set({ revealedCount: n }),
-	interpretation: "",
-	setInterpretation: (t) => set({ interpretation: t }),
-
-	requiredCards: () => {
-		const spread = get().setup.spreadType;
-		if (spread === "1-card") return 1;
-		if (spread === "3-cards") return 3;
-		return 10;
-	},
-
-	reset: () =>
+	setActiveSession: (sessionId, spreadId, mode, mainQuestion = "") =>
 		set({
-			...initialState,
-			setup: { ...initialSetup },
-			phase: "SHUFFLING",
-			selectedCards: [],
-			revealedCount: 0,
-			interpretation: "",
+			activeSessionId: sessionId,
+			spreadId,
+			mode,
+			mainQuestion,
 		}),
+	setDrawnCards: (cards) => set({ drawnCards: cards }),
+	setPhase: (phase) => set({ phase }),
+	clearSession: () =>
+		set({
+			activeSessionId: null,
+			drawnCards: [],
+			phase: "SHUFFLING",
+		}),
+	reset: () => set({ ...initialState }),
 }));

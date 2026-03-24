@@ -4,10 +4,7 @@ import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-	clearStoredAuthSession,
-	hasStoredAuthSession,
-} from "@/lib/api-config";
+import { clearStoredAuthSession, hasStoredAuthSession } from "@/lib/api-config";
 import { getInitials, resolveSectionHref, sectionLinks } from "./_config";
 import DesktopActions from "./desktop-actions";
 import DesktopNav from "./desktop-nav";

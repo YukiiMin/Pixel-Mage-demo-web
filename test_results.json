@@ -1,0 +1,803 @@
+{
+  "config": {
+    "configFile": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\playwright.config.ts",
+    "rootDir": "D:/Minh/FU_Learning/EXE201/PixelMage_Rebase/project_src/WEB/Pixel-Mage-demo-web/e2e/specs",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Minh/FU_Learning/EXE201/PixelMage_Rebase/project_src/WEB/Pixel-Mage-demo-web/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "D:/Minh/FU_Learning/EXE201/PixelMage_Rebase/project_src/WEB/Pixel-Mage-demo-web/e2e/specs",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "runAgents": "none",
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.58.2",
+    "workers": 1,
+    "webServer": {
+      "command": "pnpm exec next dev",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "tarot-session.spec.ts",
+      "file": "tarot-session.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tarot Session Flow",
+          "file": "tarot-session.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "scenario 1: Loading skeleton visible khi GET /sessions/{id} delay",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 413,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[BROWSER LOG]: [HMR] connected\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-24T05:38:51.493Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3a441b0639a1e786f0c4-7d0d284b3cae351a4c29",
+              "file": "tarot-session.spec.ts",
+              "line": 53,
+              "column": 2
+            },
+            {
+              "title": "scenario 2: Resume COMPLETED ΓÇö hiß╗çn result ngay",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 475,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[BROWSER LOG]: [HMR] connected\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: COMPLETED, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: COMPLETED, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: COMPLETED\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: Transitioning to COMPLETE\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: COMPLETED, phase: COMPLETE}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: COMPLETED, phase: COMPLETE}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: COMPLETED\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: Transitioning to COMPLETE\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: COMPLETED, phase: COMPLETE}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: COMPLETED, phase: COMPLETE}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: COMPLETED\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: Transitioning to COMPLETE\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-24T05:38:52.005Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3a441b0639a1e786f0c4-19af511a4d738f3edcb4",
+              "file": "tarot-session.spec.ts",
+              "line": 73,
+              "column": 2
+            },
+            {
+              "title": "scenario 3: Resume INTERPRETING ΓÇö hiß╗çn spinner",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 484,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[BROWSER LOG]: [HMR] connected\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: INTERPRETING, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: INTERPRETING, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: INTERPRETING\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: Transitioning to INTERPRET\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: INTERPRETING, phase: INTERPRET}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: INTERPRETING, phase: INTERPRET}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: INTERPRETING\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: Transitioning to INTERPRET\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-24T05:38:52.498Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3a441b0639a1e786f0c4-d65de49c803451cd76c2",
+              "file": "tarot-session.spec.ts",
+              "line": 109,
+              "column": 2
+            },
+            {
+              "title": "scenario 4: Resume EXPIRED ΓÇö hiß╗çn expired screen",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 484,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[BROWSER LOG]: [HMR] connected\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: EXPIRED, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: EXPIRED, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: EXPIRED\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-24T05:38:52.997Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3a441b0639a1e786f0c4-748d8f9eb3a1c2a61515",
+              "file": "tarot-session.spec.ts",
+              "line": 144,
+              "column": 2
+            },
+            {
+              "title": "scenario 5: Resume PENDING ΓÇö hiß╗çn card draw UI",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4289,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[BROWSER LOG]: [HMR] connected\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: PENDING, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: PENDING, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: PENDING\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: PENDING, phase: DRAWING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: PENDING, phase: DRAWING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: PENDING\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-24T05:38:53.494Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3a441b0639a1e786f0c4-fcd79d73e90d30516be4",
+              "file": "tarot-session.spec.ts",
+              "line": 160,
+              "column": 2
+            },
+            {
+              "title": "scenario 6: Timeout 60s ΓÇö warning + Thß╗¡ lß║íi button",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 532,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[BROWSER LOG]: [HMR] connected\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: INTERPRETING, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: INTERPRETING, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: INTERPRETING\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: Transitioning to INTERPRET\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: INTERPRETING, phase: INTERPRET}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: INTERPRETING, phase: INTERPRET}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: INTERPRETING\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: Transitioning to INTERPRET\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-24T05:38:57.794Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3a441b0639a1e786f0c4-9ed3d9ae88eb268508c7",
+              "file": "tarot-session.spec.ts",
+              "line": 171,
+              "column": 2
+            },
+            {
+              "title": "scenario 7: Max retries ΓÇö sau 2 retries -> Vß╗ü trang Tarot",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 5420,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByTestId('retry-button')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('retry-button')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByTestId('retry-button')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('retry-button')\u001b[22m\n\n    at D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts:224:41",
+                        "location": {
+                          "file": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts",
+                          "column": 41,
+                          "line": 224
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 222 |\u001b[39m \t\t\u001b[90m// First timeout\u001b[39m\n \u001b[90m 223 |\u001b[39m \t\t\u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclock\u001b[33m.\u001b[39mfastForward(\u001b[35m61000\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 224 |\u001b[39m \t\t\u001b[36mawait\u001b[39m expect(sessionPage\u001b[33m.\u001b[39mretryButton)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m \t\t                                      \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 225 |\u001b[39m \t\t\u001b[36mawait\u001b[39m sessionPage\u001b[33m.\u001b[39mretryButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 226 |\u001b[39m\n \u001b[90m 227 |\u001b[39m \t\t\u001b[90m// Second timeout\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts",
+                            "column": 41,
+                            "line": 224
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByTestId('retry-button')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('retry-button')\u001b[22m\n\n\n  222 | \t\t// First timeout\n  223 | \t\tawait page.clock.fastForward(61000);\n> 224 | \t\tawait expect(sessionPage.retryButton).toBeVisible();\n      | \t\t                                      ^\n  225 | \t\tawait sessionPage.retryButton.click();\n  226 |\n  227 | \t\t// Second timeout\n    at D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts:224:41"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "[BROWSER LOG]: [HMR] connected\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: INTERPRETING, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: INTERPRETING, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: INTERPRETING\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: Transitioning to INTERPRET\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: INTERPRETING, phase: INTERPRET}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: INTERPRETING, phase: INTERPRET}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: INTERPRETING\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: Transitioning to INTERPRET\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-24T05:38:58.336Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\test-results\\tarot-session-Tarot-Sessio-7b04d--2-retries---Vß╗ü-trang-Tarot-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts",
+                        "column": 41,
+                        "line": 224
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3a441b0639a1e786f0c4-07490bf37cbbf8cb1674",
+              "file": "tarot-session.spec.ts",
+              "line": 201,
+              "column": 2
+            },
+            {
+              "title": "scenario 8: isReversed card ΓÇö c├│ class rotate-180 trong DOM",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 5405,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.rotate-180').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.rotate-180').first()\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.rotate-180').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.rotate-180').first()\u001b[22m\n\n    at D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts:269:26",
+                        "location": {
+                          "file": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts",
+                          "column": 26,
+                          "line": 269
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 267 |\u001b[39m \t\t\u001b[90m// Check classes for rotate-180\u001b[39m\n \u001b[90m 268 |\u001b[39m \t\t\u001b[36mconst\u001b[39m cardFace \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m\".rotate-180\"\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 269 |\u001b[39m \t\t\u001b[36mawait\u001b[39m expect(cardFace)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m \t\t                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 270 |\u001b[39m \t})\u001b[33m;\u001b[39m\n \u001b[90m 271 |\u001b[39m\n \u001b[90m 272 |\u001b[39m \ttest(\u001b[32m\"scenario 9: History ΓÇö COMPLETED sessions shown\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts",
+                            "column": 26,
+                            "line": 269
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.rotate-180').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.rotate-180').first()\u001b[22m\n\n\n  267 | \t\t// Check classes for rotate-180\n  268 | \t\tconst cardFace = page.locator(\".rotate-180\").first();\n> 269 | \t\tawait expect(cardFace).toBeVisible();\n      | \t\t                       ^\n  270 | \t});\n  271 |\n  272 | \ttest(\"scenario 9: History ΓÇö COMPLETED sessions shown\", async ({ page }) => {\n    at D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts:269:26"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "[BROWSER LOG]: [HMR] connected\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: true, status: undefined, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: COMPLETED, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: COMPLETED, phase: SHUFFLING}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: COMPLETED\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: Transitioning to COMPLETE\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: COMPLETED, phase: COMPLETE}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: COMPLETED, phase: COMPLETE}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: COMPLETED\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: Transitioning to COMPLETE\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: COMPLETED, phase: COMPLETE}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage render: {sessionId: 1, isLoading: false, status: COMPLETED, phase: COMPLETE}\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: TarotSessionPage sessionData received: COMPLETED\n"
+                        },
+                        {
+                          "text": "[BROWSER LOG]: Transitioning to COMPLETE\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-24T05:39:05.316Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\test-results\\tarot-session-Tarot-Sessio-3a8c0--class-rotate-180-trong-DOM-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts",
+                        "column": 26,
+                        "line": 269
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3a441b0639a1e786f0c4-6bd45052af221dff2642",
+              "file": "tarot-session.spec.ts",
+              "line": 239,
+              "column": 2
+            },
+            {
+              "title": "scenario 9: History ΓÇö COMPLETED sessions shown",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 471,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByTestId('reading-history')\nExpected: visible\nError: strict mode violation: getByTestId('reading-history') resolved to 2 elements:\n    1) <div id=\"reading-history\" data-testid=\"reading-history\">ΓÇª</div> aka locator('#reading-history')\n    2) <div class=\"space-y-6\" data-testid=\"reading-history\">ΓÇª</div> aka getByText('Lß╗ïch Sß╗¡ ─Éß╗ìc B├áiXem lß║íi nhß╗»ng th├┤ng ─æiß╗çp v┼⌐ trß╗Ñ ─æ├ú gß╗¡i cho bß║ínKh├┤ng t├¼m thß║Ñy kß║┐t')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('reading-history')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByTestId('reading-history')\nExpected: visible\nError: strict mode violation: getByTestId('reading-history') resolved to 2 elements:\n    1) <div id=\"reading-history\" data-testid=\"reading-history\">ΓÇª</div> aka locator('#reading-history')\n    2) <div class=\"space-y-6\" data-testid=\"reading-history\">ΓÇª</div> aka getByText('Lß╗ïch Sß╗¡ ─Éß╗ìc B├áiXem lß║íi nhß╗»ng th├┤ng ─æiß╗çp v┼⌐ trß╗Ñ ─æ├ú gß╗¡i cho bß║ínKh├┤ng t├¼m thß║Ñy kß║┐t')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('reading-history')\u001b[22m\n\n    at D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts:301:42",
+                        "location": {
+                          "file": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts",
+                          "column": 42,
+                          "line": 301
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 299 |\u001b[39m \t\t\u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/tarot\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 300 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 301 |\u001b[39m \t\t\u001b[36mawait\u001b[39m expect(sessionPage\u001b[33m.\u001b[39mhistoryPanel)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m \t\t                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 302 |\u001b[39m \t\t\u001b[36mconst\u001b[39m historyItemBlock \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m\"[data-testid='history-item-2']\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 303 |\u001b[39m \t\t\u001b[36mawait\u001b[39m expect(historyItemBlock)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 304 |\u001b[39m \t\t\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts",
+                            "column": 42,
+                            "line": 301
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByTestId('reading-history')\nExpected: visible\nError: strict mode violation: getByTestId('reading-history') resolved to 2 elements:\n    1) <div id=\"reading-history\" data-testid=\"reading-history\">ΓÇª</div> aka locator('#reading-history')\n    2) <div class=\"space-y-6\" data-testid=\"reading-history\">ΓÇª</div> aka getByText('Lß╗ïch Sß╗¡ ─Éß╗ìc B├áiXem lß║íi nhß╗»ng th├┤ng ─æiß╗çp v┼⌐ trß╗Ñ ─æ├ú gß╗¡i cho bß║ínKh├┤ng t├¼m thß║Ñy kß║┐t')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('reading-history')\u001b[22m\n\n\n  299 | \t\tawait page.goto(\"/tarot\");\n  300 |\n> 301 | \t\tawait expect(sessionPage.historyPanel).toBeVisible();\n      | \t\t                                       ^\n  302 | \t\tconst historyItemBlock = page.locator(\"[data-testid='history-item-2']\");\n  303 | \t\tawait expect(historyItemBlock).toBeVisible();\n  304 | \t\t\n    at D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts:301:42"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "[BROWSER LOG]: [HMR] connected\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-24T05:39:12.362Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\test-results\\tarot-session-Tarot-Sessio-3b3ba--ΓÇö-COMPLETED-sessions-shown-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts",
+                        "column": 42,
+                        "line": 301
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3a441b0639a1e786f0c4-7de9538873da5125e298",
+              "file": "tarot-session.spec.ts",
+              "line": 272,
+              "column": 2
+            },
+            {
+              "title": "scenario 10: History empty ΓÇö empty state visible",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 454,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByTestId('reading-history')\nExpected: visible\nError: strict mode violation: getByTestId('reading-history') resolved to 2 elements:\n    1) <div id=\"reading-history\" data-testid=\"reading-history\">ΓÇª</div> aka locator('#reading-history')\n    2) <div class=\"space-y-6\" data-testid=\"reading-history\">ΓÇª</div> aka getByText('Lß╗ïch Sß╗¡ ─Éß╗ìc B├áiXem lß║íi nhß╗»ng th├┤ng ─æiß╗çp v┼⌐ trß╗Ñ ─æ├ú gß╗¡i cho bß║ínKh├┤ng t├¼m thß║Ñy kß║┐t')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('reading-history')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByTestId('reading-history')\nExpected: visible\nError: strict mode violation: getByTestId('reading-history') resolved to 2 elements:\n    1) <div id=\"reading-history\" data-testid=\"reading-history\">ΓÇª</div> aka locator('#reading-history')\n    2) <div class=\"space-y-6\" data-testid=\"reading-history\">ΓÇª</div> aka getByText('Lß╗ïch Sß╗¡ ─Éß╗ìc B├áiXem lß║íi nhß╗»ng th├┤ng ─æiß╗çp v┼⌐ trß╗Ñ ─æ├ú gß╗¡i cho bß║ínKh├┤ng t├¼m thß║Ñy kß║┐t')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('reading-history')\u001b[22m\n\n    at D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts:323:42",
+                        "location": {
+                          "file": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts",
+                          "column": 42,
+                          "line": 323
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 321 |\u001b[39m \t\t\u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/tarot\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 322 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 323 |\u001b[39m \t\t\u001b[36mawait\u001b[39m expect(sessionPage\u001b[33m.\u001b[39mhistoryPanel)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m \t\t                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 324 |\u001b[39m \t\t\u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m\"text=Bß║ín ch╞░a c├│ phi├¬n ─æß╗ìc b├ái n├áo ho├án tß║Ñt.\"\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 325 |\u001b[39m \t})\u001b[33m;\u001b[39m\n \u001b[90m 326 |\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts",
+                            "column": 42,
+                            "line": 323
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByTestId('reading-history')\nExpected: visible\nError: strict mode violation: getByTestId('reading-history') resolved to 2 elements:\n    1) <div id=\"reading-history\" data-testid=\"reading-history\">ΓÇª</div> aka locator('#reading-history')\n    2) <div class=\"space-y-6\" data-testid=\"reading-history\">ΓÇª</div> aka getByText('Lß╗ïch Sß╗¡ ─Éß╗ìc B├áiXem lß║íi nhß╗»ng th├┤ng ─æiß╗çp v┼⌐ trß╗Ñ ─æ├ú gß╗¡i cho bß║ínKh├┤ng t├¼m thß║Ñy kß║┐t')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('reading-history')\u001b[22m\n\n\n  321 | \t\tawait page.goto(\"/tarot\");\n  322 |\n> 323 | \t\tawait expect(sessionPage.historyPanel).toBeVisible();\n      | \t\t                                       ^\n  324 | \t\tawait expect(page.locator(\"text=Bß║ín ch╞░a c├│ phi├¬n ─æß╗ìc b├ái n├áo ho├án tß║Ñt.\")).toBeVisible();\n  325 | \t});\n  326 | });\n    at D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts:323:42"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "[BROWSER LOG]: [HMR] connected\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-24T05:39:14.435Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\test-results\\tarot-session-Tarot-Sessio-4bc8d-empty-ΓÇö-empty-state-visible-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\Minh\\FU_Learning\\EXE201\\PixelMage_Rebase\\project_src\\WEB\\Pixel-Mage-demo-web\\e2e\\specs\\tarot-session.spec.ts",
+                        "column": 42,
+                        "line": 323
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3a441b0639a1e786f0c4-e916fe16150877f75f84",
+              "file": "tarot-session.spec.ts",
+              "line": 309,
+              "column": 2
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-03-24T05:38:49.947Z",
+    "duration": 25145.068,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 4,
+    "flaky": 0
+  }
+}

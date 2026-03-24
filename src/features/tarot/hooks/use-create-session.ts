@@ -19,7 +19,12 @@ export function useCreateSession(userId: number | null) {
 
 		onSuccess: (session) => {
 			// Set store + navigate (handled by component via router.push)
-			setActiveSession(session.sessionId);
+			setActiveSession(
+				session.sessionId,
+				session.spreadId,
+				session.mode as "EXPLORE" | "YOUR_DECK",
+				session.mainQuestion,
+			);
 			setPhase("SHUFFLING");
 			// Invalidate account để refresh guestReadingUsedAt
 			queryClient.invalidateQueries({ queryKey: ["account", userId] });

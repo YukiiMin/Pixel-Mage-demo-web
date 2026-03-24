@@ -1,16 +1,33 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { useTarotSessionStore } from "@/stores/use-tarot-session-store";
-import type { SessionPhase } from "@/types/tarot";
+import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
+import {
+	type SessionPhase,
+	useTarotSessionStore,
+} from "@/stores/use-tarot-session-store";
+import type { ReadingSession } from "@/types/tarot";
 
 const PHASE_ORDER: SessionPhase[] = [
 	"SHUFFLING",
-	"SELECTING",
-	"REVEALING",
-	"INTERPRETING",
+	"DRAWING",
+	"REVEAL",
+	"INTERPRET",
 	"COMPLETE",
 ];
+
+export function useSessionDetail(sessionId: number | null) {
+	return useQuery({
+		queryKey: ["tarot-session-detail", sessionId],
+		queryFn: () =>
+			apiRequest<ReadingSession>(
+				API_ENDPOINTS.tarotReadings.sessionById(sessionId!),
+			).then((r) => r.data),
+		enabled: !!sessionId,
+		staleTime: 0,
+	});
+}
 
 export function useTarotSession() {
 	const phase = useTarotSessionStore((state) => state.phase);

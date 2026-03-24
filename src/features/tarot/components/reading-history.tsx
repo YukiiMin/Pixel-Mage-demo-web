@@ -1,124 +1,141 @@
 "use client";
 
-import { Clock3, History, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/sonner";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+import { motion } from "framer-motion";
+import { AlertCircle, BookOpen, Clock, Search } from "lucide-react";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 import { useTarotReadingHistory } from "@/features/tarot/hooks/use-tarot-reading-history";
-import { useTarotSessionStore } from "@/stores/use-tarot-session-store";
+import { getStoredUserId } from "@/lib/api-config";
 
-const TOPIC_LABELS = {
-	love: "Tình Yêu",
-	career: "Sự Nghiệp",
-	general: "Tổng Quát",
-	finance: "Tài Chính",
-} as const;
-
-const SPREAD_LABELS = {
-	"1-card": "1 Lá",
-	"3-cards": "3 Lá",
-	"celtic-cross": "Celtic Cross",
-} as const;
+const SPREAD_NAMES: Record<number, string> = {
+	1: "Rút 1 Lá (Trong Ngày)",
+	2: "Quá Khứ - Hiện Tại - Tương Lai",
+	3: "Mối Quan Hệ (3 Lá)",
+	4: "Công Việc - Tài Chính (3 Lá)",
+	5: "Trải Bài Celtic Cross (10 Lá)",
+};
 
 export function ReadingHistory() {
-	const { history, removeReading, clearHistory } = useTarotReadingHistory();
-	const setTopic = useTarotSessionStore((state) => state.setTopic);
-	const setQuestion = useTarotSessionStore((state) => state.setQuestion);
-	const setSpreadType = useTarotSessionStore((state) => state.setSpreadType);
-	const setDeckMode = useTarotSessionStore((state) => state.setDeckMode);
+	const [searchTerm, setSearchTerm] = useState("");
+	const userId = getStoredUserId();
 
-	if (history.length === 0) {
-		return (
-			<div className="mt-16">
-				<h3 className="mb-4 flex items-center gap-2 text-xl font-bold text-foreground">
-					<History className="h-5 w-5 text-primary" /> Lịch Sử Đọc Bài
-				</h3>
-				<div className="glass-card rounded-xl p-8 text-center">
-					<p className="text-sm text-muted-foreground">
-						Chưa có lịch sử đọc bài. Bắt đầu trải bài đầu tiên nào!
-					</p>
-				</div>
-			</div>
-		);
-	}
+	const {
+		data: history,
+		isLoading,
+		isError,
+	} = useTarotReadingHistory(userId || 0);
+
+	const filteredHistory =
+		history?.filter((item) =>
+			item.mainQuestion?.toLowerCase().includes(searchTerm.toLowerCase()),
+		) || [];
 
 	return (
-		<div className="mt-16 space-y-4">
-			<div className="flex items-center justify-between">
-				<h3 className="flex items-center gap-2 text-xl font-bold text-foreground">
-					<History className="h-5 w-5 text-primary" /> Lịch Sử Đọc Bài
-				</h3>
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() => {
-						clearHistory();
-						toast.success("Đã xóa toàn bộ lịch sử đọc bài");
-					}}
-					className="border-destructive/40 text-destructive hover:bg-destructive/10"
-				>
-					<Trash2 className="mr-1 h-4 w-4" /> Xóa hết
-				</Button>
+		<div className="space-y-6" data-testid="reading-history-unique-v1">
+			{/* Header & Search */}
+			<div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+				<div>
+					<h2 className="font-(--font-heading) text-2xl  text-foreground">
+						Lịch Sử Đọc Bài
+					</h2>
+					<p className="text-sm text-muted-foreground">
+						Xem lại những thông điệp vũ trụ đã gửi cho bạn
+					</p>
+				</div>
+
+				<div className="relative w-full md:w-72">
+					<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+					<Input
+						placeholder="Tìm kiếm theo câu hỏi..."
+						value={searchTerm}
+						onChange={(e) => setSearchTerm(e.target.value)}
+						className="border-primary/20 bg-background/50 pl-9 focus-visible:ring-primary/50"
+					/>
+				</div>
 			</div>
-			<div className="space-y-3">
-				{history
-					.slice(0, 5)
-					.map(
-						(item: import("@/types/tarot-history").TarotReadingHistoryItem) => (
-							<div key={item.id} className="glass-card rounded-xl p-4">
-								<div className="flex flex-wrap items-center justify-between gap-2">
-									<div>
-										<p className="text-sm font-semibold text-foreground">
-											{item.topic
-												? TOPIC_LABELS[
-														item.topic as import("@/types/tarot").TarotTopic
-													]
-												: "Không chọn chủ đề"}{" "}
-											•{" "}
-											{
-												SPREAD_LABELS[
-													item.spreadType as import("@/types/tarot").SpreadType
-												]
-											}
-										</p>
-										<p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-											<Clock3 className="h-3.5 w-3.5" />
-											{new Date(item.createdAt).toLocaleString("vi-VN")}
-										</p>
+
+			{isError && (
+				<div className="glass-card rounded-xl p-8 text-center border-destructive/20 bg-destructive/5">
+					<AlertCircle className="mx-auto mb-2 h-8 w-8 text-destructive" />
+					<p className="text-destructive font-medium">
+						Không thể tải lịch sử đọc bài
+					</p>
+					<p className="text-sm text-muted-foreground">Vui lòng thử lại sau</p>
+				</div>
+			)}
+
+			{/* List */}
+			<div className="space-y-4">
+				{isLoading ? (
+					Array.from({ length: 3 }).map((_, i) => (
+						<div
+							key={i}
+							className="glass-card h-32 animate-pulse rounded-xl border-primary/10 bg-card/40"
+						/>
+					))
+				) : history?.length === 0 ? (
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						className="glass-card flex flex-col items-center justify-center rounded-xl p-12 text-center"
+					>
+						<div className="mb-4 rounded-full bg-primary/10 p-4">
+							<BookOpen className="h-8 w-8 text-primary" />
+						</div>
+						<h3 className="mb-2 font-(--font-heading) text-xl  text-foreground">
+							Trống
+						</h3>
+						<p className="text-muted-foreground max-w-sm">
+							Bạn chưa có lịch sử đọc bài nào được hoàn thành. Đọc bài ngay để
+							lưu lại những thông điệp giá trị.
+						</p>
+					</motion.div>
+				) : filteredHistory.length === 0 ? (
+					<div className="glass-card rounded-xl p-8 text-center text-muted-foreground">
+						Không tìm thấy kết quả phù hợp với "{searchTerm}"
+					</div>
+				) : (
+					filteredHistory.map((item, index) => (
+						<motion.div
+							key={item.sessionId}
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ delay: index * 0.05 }}
+							className="glass-card group relative overflow-hidden rounded-xl border border-primary/10 bg-card/40 p-5 transition-all hover:border-primary/30 hover:bg-card/60"
+							data-testid={`history-item-${item.sessionId}`}
+						>
+							<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+								<div className="space-y-2">
+									<div className="flex items-center gap-2">
+										<span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-semibold text-primary inline-flex">
+											{SPREAD_NAMES[item.spreadId] || `Spread ${item.spreadId}`}
+										</span>
 									</div>
-									<div className="flex gap-2">
-										<Button
-											variant="outline"
-											size="sm"
-											onClick={() => {
-												setTopic(item.topic ?? "general");
-												setQuestion(item.question);
-												setSpreadType(item.spreadType);
-												setDeckMode(item.deckMode);
-												toast.success("Đã nạp lại cấu hình phiên đọc");
-											}}
-										>
-											Dùng lại
-										</Button>
-										<Button
-											variant="ghost"
-											size="sm"
-											onClick={() => {
-												removeReading(item.id);
-												toast.success("Đã xóa mục lịch sử");
-											}}
-										>
-											<Trash2 className="h-4 w-4" />
-										</Button>
+									<p className="font-medium text-foreground line-clamp-1">
+										"{item.mainQuestion || "Không có câu hỏi cụ thể"}"
+									</p>
+									<div className="flex items-center gap-2 text-xs text-muted-foreground">
+										<Clock className="h-3 w-3" />
+										<span>
+											{format(new Date(item.createdAt), "HH:mm - dd/MM/yyyy", {
+												locale: vi,
+											})}
+										</span>
 									</div>
 								</div>
-								{item.question && (
-									<p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-										“{item.question}”
-									</p>
-								)}
+
+								<div className="flex items-center sm:self-center">
+									{/* The old 'read again' button has been removed per specs, just showing the mode as decorative */}
+									<span className="text-xs text-secondary bg-secondary/10 px-2 py-1 rounded">
+										{item.mode === "EXPLORE" ? "Khám Phá" : "Bộ Của Bạn"}
+									</span>
+								</div>
 							</div>
-						),
-					)}
+						</motion.div>
+					))
+				)}
 			</div>
 		</div>
 	);

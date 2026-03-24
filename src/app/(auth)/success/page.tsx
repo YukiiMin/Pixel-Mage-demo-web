@@ -44,7 +44,7 @@ export default function AuthSuccessPage() {
 				} else {
 					setError("Đã xảy ra lỗi khi tạo phiên đăng nhập.");
 				}
-			} catch (err) {
+			} catch (_err) {
 				setError("Đã xảy ra lỗi không xác định.");
 			}
 		};
