@@ -60,13 +60,13 @@ export interface ReadingSession {
 	mainQuestion: string;
 	status: ReadingSessionStatus;
 	createdAt: string;
-	interpretation?: string;
-	drawnCards?: ReadingCard[];
+	aiInterpretation?: string;
+	readingCards?: ReadingCard[];
 }
 
 export interface InterpretResponse {
-	interpretation: string;
-	session: ReadingSession;
+	aiInterpretation: string;
+	legalDisclaimer: string;
 }
 
 // Create session request

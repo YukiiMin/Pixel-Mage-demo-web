@@ -10,9 +10,5 @@ export function useTarotInterpret(sessionId: number | null) {
 				API_ENDPOINTS.tarotReadings.interpret(sessionId!),
 			).then((r) => r.data),
 		enabled: !!sessionId,
-		refetchInterval: (query) => {
-			const status = query.state.data?.session?.status;
-			return status === "INTERPRETING" ? 2000 : false;
-		},
 	});
 }

@@ -70,7 +70,7 @@ export function CompletionPhase({ sessionId }: CompletionPhaseProps) {
 				</h2>
 
 				<div className="mb-12 mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-					{sessionData.drawnCards?.map((card) => (
+					{sessionData.readingCards?.map((card) => (
 						<div
 							key={card.positionIndex}
 							className="group relative flex flex-col items-center gap-3"
@@ -100,8 +100,11 @@ export function CompletionPhase({ sessionId }: CompletionPhaseProps) {
 					<p className="mb-4 text-xs font-bold uppercase tracking-widest text-primary/60">
 						Lời khuyên từ Vũ Trụ
 					</p>
-					<pre className="whitespace-pre-wrap font-(--font-body) text-sm leading-relaxed text-secondary">
-						{sessionData.interpretation}
+					<pre 
+						className="whitespace-pre-wrap font-(--font-body) text-sm leading-relaxed"
+						style={{ color: "hsl(270 40% 80%)" }}
+					>
+						{sessionData.aiInterpretation}
 					</pre>
 				</div>
 

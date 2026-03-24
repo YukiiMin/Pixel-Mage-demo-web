@@ -10,14 +10,14 @@ interface CardRevealProps {
 }
 
 export function CardReveal({ onAllRevealed }: CardRevealProps) {
-	const drawnCards = useTarotSessionStore((state) => state.drawnCards);
+	const readingCards = useTarotSessionStore((state) => state.readingCards);
 
 	// Tự động reveal xong sau khi hiển thị xong bài
 	useEffect(() => {
-		const totalAnimationTime = drawnCards.length * 300 + 1500;
+		const totalAnimationTime = readingCards.length * 300 + 1500;
 		const timer = setTimeout(onAllRevealed, totalAnimationTime);
 		return () => clearTimeout(timer);
-	}, [drawnCards.length, onAllRevealed]);
+	}, [readingCards.length, onAllRevealed]);
 
 	return (
 		<motion.div
@@ -32,7 +32,7 @@ export function CardReveal({ onAllRevealed }: CardRevealProps) {
 			</h2>
 
 			<div className="mx-auto flex max-w-4xl flex-wrap justify-center gap-8">
-				{drawnCards.map((card, index) => (
+				{readingCards.map((card, index) => (
 					<motion.div
 						key={card.readingCardId}
 						data-testid={`card-${card.readingCardId}`}

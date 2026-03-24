@@ -25,7 +25,10 @@ export function useSessionDetail(sessionId: number | null) {
 				API_ENDPOINTS.tarotReadings.sessionById(sessionId!),
 			).then((r) => r.data),
 		enabled: !!sessionId,
-		staleTime: 0,
+		refetchInterval: (query) => {
+			const status = query.state.data?.status;
+			return status === "INTERPRETING" ? 2000 : false;
+		},
 	});
 }
 

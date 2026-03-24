@@ -21,7 +21,7 @@ interface TarotSessionState {
 	activeSessionId: number | null;
 	spreadId: number | null;
 	mode: "EXPLORE" | "YOUR_DECK" | null;
-	drawnCards: ReadingCard[];
+	readingCards: ReadingCard[];
 	phase: SessionPhase;
 
 	setActiveSession: (
@@ -30,7 +30,7 @@ interface TarotSessionState {
 		mode: "EXPLORE" | "YOUR_DECK",
 		mainQuestion?: string,
 	) => void;
-	setDrawnCards: (cards: ReadingCard[]) => void;
+	setReadingCards: (cards: ReadingCard[]) => void;
 
 	setPhase: (phase: SessionPhase) => void;
 	clearSession: () => void;
@@ -43,7 +43,7 @@ const initialState = {
 	mode: null,
 	selectedSpreadId: null,
 	mainQuestion: "",
-	drawnCards: [],
+	readingCards: [],
 	phase: "SHUFFLING" as SessionPhase,
 };
 
@@ -58,12 +58,12 @@ export const useTarotSessionStore = create<TarotSessionState>((set) => ({
 			mode,
 			mainQuestion,
 		}),
-	setDrawnCards: (cards) => set({ drawnCards: cards }),
+	setReadingCards: (cards) => set({ readingCards: cards }),
 	setPhase: (phase) => set({ phase }),
 	clearSession: () =>
 		set({
 			activeSessionId: null,
-			drawnCards: [],
+			readingCards: [],
 			phase: "SHUFFLING",
 		}),
 	reset: () => set({ ...initialState }),

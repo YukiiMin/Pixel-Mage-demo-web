@@ -124,6 +124,7 @@ export function TarotSessionPage({ sessionId }: { sessionId: number }) {
           <InterpretPanel
             key="interpreting"
             sessionId={sessionId}
+            status={sessionData.status}
             onComplete={() => goTo('COMPLETE')}
           />
         )}

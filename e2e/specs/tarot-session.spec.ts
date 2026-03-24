@@ -24,7 +24,7 @@ test.describe("Tarot Session Flow", () => {
 						mode: "EXPLORE",
 						mainQuestion: "Question",
 						status: "PENDING",
-						drawnCards: [],
+						readingCards: [],
 						createdAt: new Date().toISOString(),
 						updatedAt: new Date().toISOString(),
 					},
@@ -64,7 +64,7 @@ test.describe("Tarot Session Flow", () => {
 		});
 
 		await sessionPage.goto(1);
-		
+
 		// Wait for loading skeleton
 		const skeleton = page.locator(".animate-pulse").first();
 		await expect(skeleton).toBeVisible();
@@ -81,7 +81,7 @@ test.describe("Tarot Session Flow", () => {
 						sessionId: 1,
 						spreadId: 1,
 						status: "COMPLETED",
-						drawnCards: [
+						readingCards: [
 							{
 								readingCardId: 101,
 								cardTemplate: {
@@ -95,7 +95,7 @@ test.describe("Tarot Session Flow", () => {
 								isReversed: false,
 							},
 						],
-						interpretation: "This is the final interpretation.",
+						aiInterpretation: "This is the final aiInterpretation.",
 					},
 				},
 			});
@@ -105,7 +105,9 @@ test.describe("Tarot Session Flow", () => {
 
 		// Thử check UI completionPhase
 		await expect(sessionPage.completionPhase).toBeVisible();
-		await expect(page.locator("text=This is the final interpretation.")).toBeVisible();
+		await expect(
+			page.locator("text=This is the final aiInterpretation."),
+		).toBeVisible();
 	});
 
 	test("scenario 3: Resume INTERPRETING — hiện spinner", async ({ page }) => {
@@ -125,17 +127,20 @@ test.describe("Tarot Session Flow", () => {
 		});
 
 		// Polling wait
-		await page.route("**/api/v1/readings/sessions/1/interpret", async (route) => {
-			await route.fulfill({
-				json: {
-					statusCode: 200,
-					data: {
-						interpretation: null,
-						session: { status: "INTERPRETING", sessionId: 1 },
+		await page.route(
+			"**/api/v1/readings/sessions/1/interpret",
+			async (route) => {
+				await route.fulfill({
+					json: {
+						statusCode: 200,
+						data: {
+							aiInterpretation: null,
+							session: { status: "INTERPRETING", sessionId: 1 },
+						},
 					},
-				},
-			});
-		});
+				});
+			},
+		);
 
 		await sessionPage.goto(1);
 
@@ -170,66 +175,84 @@ test.describe("Tarot Session Flow", () => {
 		await expect(sessionPage.cardDrawArea).toBeVisible({ timeout: 10000 });
 	});
 
-	test("scenario 6: Timeout 60s — warning + Thử lại button", async ({ page }) => {
+	test("scenario 6: Timeout 60s — warning + Thử lại button", async ({
+		page,
+	}) => {
 		await page.clock.install();
 		const sessionPage = new TarotSessionPage(page);
 
 		await page.route("**/api/v1/readings/sessions/1", async (route) => {
 			await route.fulfill({
-				json: { statusCode: 200, data: { sessionId: 1, status: "INTERPRETING" } },
-			});
-		});
-
-		await page.route("**/api/v1/readings/sessions/1/interpret", async (route) => {
-			await route.fulfill({
 				json: {
 					statusCode: 200,
-					data: { session: { status: "INTERPRETING", sessionId: 1 } },
+					data: { sessionId: 1, status: "INTERPRETING" },
 				},
 			});
 		});
+
+		await page.route(
+			"**/api/v1/readings/sessions/1/interpret",
+			async (route) => {
+				await route.fulfill({
+					json: {
+						statusCode: 200,
+						data: { session: { status: "INTERPRETING", sessionId: 1 } },
+					},
+				});
+			},
+		);
 
 		await sessionPage.goto(1);
 
 		await expect(sessionPage.spinner).toBeVisible();
-		
+
 		// Advance clock by 61 seconds
 		await page.clock.fastForward(61000);
 
 		await expect(sessionPage.retryButton).toBeVisible();
-		await expect(page.locator("text=Việc giải bài đang mất thời gian")).toBeVisible();
+		await expect(
+			page.locator("text=Việc giải bài đang mất thời gian"),
+		).toBeVisible();
 	});
 
-	test("scenario 7: Max retries — sau 2 retries -> Về trang Tarot", async ({ page }) => {
+	test("scenario 7: Max retries — sau 2 retries -> Về trang Tarot", async ({
+		page,
+	}) => {
 		await page.clock.install();
 		const sessionPage = new TarotSessionPage(page);
 
 		await page.route("**/api/v1/readings/sessions/1", async (route) => {
 			await route.fulfill({
-				json: { statusCode: 200, data: { sessionId: 1, status: "INTERPRETING" } },
-			});
-		});
-
-		await page.route("**/api/v1/readings/sessions/1/interpret", async (route) => {
-			await route.fulfill({
 				json: {
 					statusCode: 200,
-					data: { session: { status: "INTERPRETING", sessionId: 1 } },
+					data: { sessionId: 1, status: "INTERPRETING" },
 				},
 			});
 		});
 
+		await page.route(
+			"**/api/v1/readings/sessions/1/interpret",
+			async (route) => {
+				await route.fulfill({
+					json: {
+						statusCode: 200,
+						data: { session: { status: "INTERPRETING", sessionId: 1 } },
+					},
+				});
+			},
+		);
+
 		await sessionPage.goto(1);
 		// Wait for React to mount and useEffect to set the timer
-		await page.waitForTimeout(500); 
+		await page.waitForTimeout(500);
 
 		await page.clock.fastForward(61000);
 		// Wait a tiny bit for React state update to propagate to DOM
-		await page.waitForTimeout(100); 
+		await page.waitForTimeout(100);
 		await expect(sessionPage.retryButton).toBeVisible();
 		await sessionPage.retryButton.click();
 		// Wait for React to reset and set new timer
-		await page.waitForTimeout(500); 
+		await page.waitForTimeout(500);
 
 		// Second timeout
 		await page.clock.fastForward(61000);
@@ -237,7 +260,7 @@ test.describe("Tarot Session Flow", () => {
 		await expect(sessionPage.retryButton).toBeVisible();
 		await sessionPage.retryButton.click();
 		// Wait for React to reset and set new timer
-		await page.waitForTimeout(500); 
+		await page.waitForTimeout(500);
 
 		// Third timeout -> Max Retries
 		await page.clock.fastForward(61000);
@@ -247,7 +270,9 @@ test.describe("Tarot Session Flow", () => {
 		await expect(sessionPage.retryButton).not.toBeVisible();
 	});
 
-	test("scenario 8: isReversed card — có class rotate-180 trong DOM", async ({ page }) => {
+	test("scenario 8: isReversed card — có class rotate-180 trong DOM", async ({
+		page,
+	}) => {
 		const sessionPage = new TarotSessionPage(page);
 
 		await page.route("**/api/v1/readings/sessions/1", async (route) => {
@@ -257,7 +282,7 @@ test.describe("Tarot Session Flow", () => {
 					data: {
 						sessionId: 1,
 						status: "COMPLETED",
-						drawnCards: [
+						readingCards: [
 							{
 								readingCardId: 101,
 								cardTemplate: {
@@ -271,7 +296,7 @@ test.describe("Tarot Session Flow", () => {
 								isReversed: true,
 							},
 						],
-						interpretation: "Test",
+						aiInterpretation: "Test",
 					},
 				},
 			});
@@ -316,7 +341,7 @@ test.describe("Tarot Session Flow", () => {
 		await expect(sessionPage.historyPanel).toBeVisible();
 		const historyItemBlock = page.locator("[data-testid='history-item-2']");
 		await expect(historyItemBlock).toBeVisible();
-		
+
 		const pendingItemBlock = page.locator("[data-testid='history-item-3']");
 		await expect(pendingItemBlock).not.toBeVisible();
 	});
@@ -336,6 +361,8 @@ test.describe("Tarot Session Flow", () => {
 		await page.goto("/tarot");
 
 		await expect(sessionPage.historyPanel).toBeVisible();
-		await expect(page.locator("text=Bạn chưa có lịch sử đọc bài nào được hoàn thành.")).toBeVisible();
+		await expect(
+			page.locator("text=Bạn chưa có lịch sử đọc bài nào được hoàn thành."),
+		).toBeVisible();
 	});
 });

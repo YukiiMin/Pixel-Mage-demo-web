@@ -9,21 +9,21 @@ import { useTarotInterpret } from "@/features/tarot/hooks/use-tarot-interpret";
 
 interface InterpretPanelProps {
 	sessionId: number;
+	status: string;
 	onComplete: () => void;
 }
 
 const MAX_RETRIES = 2;
 const TIMEOUT_MS = 60_000;
 
-export function InterpretPanel({ sessionId, onComplete }: InterpretPanelProps) {
+export function InterpretPanel({ sessionId, status, onComplete }: InterpretPanelProps) {
 	const router = useRouter();
 	const [retryCount, setRetryCount] = useState(0);
 	const [showTimeout, setShowTimeout] = useState(false);
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const { data, isError } = useTarotInterpret(sessionId);
-	const status = data?.session?.status;
-	const interpretation = data?.interpretation;
+	const aiInterpretation = data?.aiInterpretation;
 
 	useEffect(() => {
 		// Clear existing timer on any change to dependencies
@@ -52,7 +52,7 @@ export function InterpretPanel({ sessionId, onComplete }: InterpretPanelProps) {
 		setRetryCount((c) => c + 1);
 	};
 
-	if (status === "COMPLETED" && interpretation) {
+	if (status === "COMPLETED" || aiInterpretation) {
 		return (
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
@@ -61,13 +61,16 @@ export function InterpretPanel({ sessionId, onComplete }: InterpretPanelProps) {
 				className="space-y-6"
 				data-testid="interpret-panel"
 			>
-				<h2 className="text-center font-(--font-heading) text-2xl   text-foreground">
-					<Sparkles className="mr-2 inline h-5 w-5 text-primary" />
-					Divine Interpretation
+				<h2 className="text-center font-(--font-heading) text-2xl" style={{ color: "hsl(270 40% 80%)" }}>
+					<Sparkles className="mr-2 inline h-5 w-5" style={{ color: "hsl(270 40% 80%)" }} />
+					Thông Điệp Từ Vũ Trụ
 				</h2>
 				<div className="glass-card mx-auto min-h-50 max-w-2xl rounded-2xl p-6 md:p-8">
-					<pre className="whitespace-pre-wrap font-(--font-body) text-sm leading-relaxed text-[#c4a9eb]">
-						{interpretation}
+					<pre 
+						className="whitespace-pre-wrap font-(--font-body) text-sm leading-relaxed"
+						style={{ color: "hsl(270 40% 80%)" }}
+					>
+						{aiInterpretation}
 					</pre>
 				</div>
 			</motion.div>
@@ -137,10 +140,10 @@ export function InterpretPanel({ sessionId, onComplete }: InterpretPanelProps) {
 						<Sparkles className="h-8 w-8 text-secondary" />
 					</div>
 					<div className="space-y-2">
-						<h3 className="font-(--font-heading) text-2xl   text-foreground text-gold-shimmer">
+						<h3 className="font-(--font-heading) text-2xl" style={{ color: "hsl(270 40% 80%)" }}>
 							Vũ Trụ Đang Giải Mã...
 						</h3>
-						<p className="text-secondary/80">
+						<p style={{ color: "hsl(270 40% 80% / 0.8)" }}>
 							Xin hãy kiên nhẫn chờ đợi thông điệp
 						</p>
 					</div>

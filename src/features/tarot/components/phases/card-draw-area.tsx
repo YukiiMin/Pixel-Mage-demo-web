@@ -14,20 +14,20 @@ interface CardDrawAreaProps {
 export function CardDrawArea({ sessionId, onConfirm }: CardDrawAreaProps) {
   const [isDrawing, setIsDrawing] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const setDrawnCards = useTarotSessionStore((state) => state.setDrawnCards)
+  const setReadingCards = useTarotSessionStore((state) => state.setReadingCards)
 
   const handleDraw = async () => {
     try {
       setIsDrawing(true)
       setError(null)
-      const response = await apiRequest<{ cards: ReadingCard[] }>(
+      const response = await apiRequest<{ drawnCards: ReadingCard[] }>(
         API_ENDPOINTS.tarotReadings.draw(sessionId),
         {
           method: 'POST',
           body: JSON.stringify({}),
         }
       )
-      setDrawnCards(response.data.cards)
+      setReadingCards(response.data.drawnCards)
       onConfirm()
     } catch (err: any) {
       console.error('Failed to draw cards:', err)
