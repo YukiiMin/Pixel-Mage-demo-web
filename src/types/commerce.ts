@@ -1,6 +1,32 @@
 export type ProductCategory = "deck" | "booster" | "collectible";
 
-export type ProductRarity = "common" | "rare" | "epic" | "legendary";
+export type Rarity = "COMMON" | "RARE" | "LEGENDARY";
+export type CollectionType = "STANDARD" | "LIMITED" | "HIDDEN";
+
+export type PackStatus = "STOCKED" | "RESERVED" | "SOLD";
+
+export interface Pack {
+	packId: number;
+	name: string;
+	description: string;
+	price: number;
+	status: PackStatus;
+	cardCount: number;
+	isLimited: boolean;
+	imageUrl?: string;
+	createdAt: string;
+	collectionType?: CollectionType;
+}
+
+export interface DropRateEntry {
+	rarity: Rarity;
+	percentage: number;
+}
+
+export interface SlotDropRate {
+	slot: number;
+	entries: DropRateEntry[];
+}
 
 export interface MarketplaceProduct {
 	id: string;
@@ -8,7 +34,7 @@ export interface MarketplaceProduct {
 	description: string;
 	price: number;
 	category: ProductCategory;
-	rarity: ProductRarity;
+	rarity: Rarity;
 	isLimited: boolean;
 	releaseDate: string;
 	imageEmoji: string;
@@ -19,7 +45,7 @@ export interface MyCardItem {
 	name: string;
 	description: string;
 	quantity: number;
-	rarity: ProductRarity;
+	rarity: Rarity;
 	status: string;
 	updatedAt: string;
 }

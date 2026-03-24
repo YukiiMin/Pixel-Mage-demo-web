@@ -5,12 +5,8 @@ const nextConfig: NextConfig = {
 	async rewrites() {
 		return [
 			{
-				source: "/api/:path*",
-				destination: "http://localhost:8080/api/:path*",
-			},
-			{
 				source: "/oauth2/:path*",
-				destination: "http://localhost:8080/oauth2/:path*",
+				destination: `${(process.env.BACKEND_URL_NGROK || process.env.BACKEND_URL || "http://localhost:8080").replace(/\/$/, "")}/oauth2/:path*`,
 			},
 		];
 	},

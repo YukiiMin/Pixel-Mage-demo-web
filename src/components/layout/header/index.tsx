@@ -4,16 +4,12 @@ import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-	AUTH_SESSION_CHANGED_EVENT,
-	clearStoredAuthSession,
-	hasStoredAuthSession,
-} from "@/lib/api-config";
+import { clearStoredAuthSession, hasStoredAuthSession } from "@/lib/api-config";
 import { getInitials, resolveSectionHref, sectionLinks } from "./_config";
-import DesktopActions from "./DesktopActions";
-import DesktopNav from "./DesktopNav";
-import HeaderLogo from "./HeaderLogo";
-import MobileMenu from "./MobileMenu";
+import DesktopActions from "./desktop-actions";
+import DesktopNav from "./desktop-nav";
+import HeaderLogo from "./header-logo";
+import MobileMenu from "./mobile-menu";
 
 const Header = () => {
 	const pathname = usePathname();
@@ -33,16 +29,9 @@ const Header = () => {
 		const authed = hasStoredAuthSession();
 		setIsAuth(authed);
 		if (authed) {
-			setUserName(
-				window.sessionStorage.getItem("name") ??
-					window.localStorage.getItem("name") ??
-					"",
-			);
-			setUserEmail(
-				window.sessionStorage.getItem("email") ??
-					window.localStorage.getItem("email") ??
-					"",
-			);
+			// REMOVED: Name and email are no longer in sessionStorage
+			setUserName("");
+			setUserEmail("");
 		} else {
 			setUserName("");
 			setUserEmail("");
@@ -64,10 +53,8 @@ const Header = () => {
 	useEffect(() => {
 		syncAuthState();
 		window.addEventListener("storage", syncAuthState);
-		window.addEventListener(AUTH_SESSION_CHANGED_EVENT, syncAuthState);
 		return () => {
 			window.removeEventListener("storage", syncAuthState);
-			window.removeEventListener(AUTH_SESSION_CHANGED_EVENT, syncAuthState);
 		};
 	}, [syncAuthState]);
 

@@ -1,10 +1,11 @@
-import { MyCardsPage } from "@/components/customer/my-cards/my-cards-page";
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
-import StarBackground from "@/components/ui/star-background";
+"use client";
 
-export default function MyCardsRoutePage() {
-	return (
+import Footer from "@/components/layout/footer";
+import Header from "@/components/layout/header";
+import StarBackground from "@/components/ui/star-background";
+import { MyCardsPage } from "@/features/inventory/components/my-cards-page";
+
+export default function MyCardsRoutePage() {	return (
 		<div className="relative min-h-screen overflow-x-hidden">
 			<StarBackground />
 			<Header />

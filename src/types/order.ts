@@ -1,25 +1,44 @@
-export interface OrderListItem {
-	id: string;
-	status: string;
-	paymentStatus: string;
-	paymentMethod: string;
+import type { Pack } from "./commerce";
+
+export type OrderStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED";
+export type PaymentStatus = "PENDING" | "PAID" | "FAILED";
+
+export interface CreateOrderRequest {
+	packId: number;
+	quantity: number;
+	note?: string;
+}
+
+export interface CreateOrderResponse {
+	orderId: number;
+	status: OrderStatus;
 	totalAmount: number;
-	orderDate: string;
-	shippingAddress?: string;
-	notes?: string;
+}
+
+export interface InitiatePaymentRequest {
+	orderId: number;
+	amount: number;
+	currency: string;
+}
+
+export interface InitiatePaymentResponse {
+	paymentUrl: string;
+	isRedirect: boolean;
 }
 
 export interface OrderItem {
-	id: string;
-	packId?: string;
-	packName?: string;
+	id: number;
+	pack: Pack;
 	quantity: number;
 	unitPrice: number;
-	subtotal: number;
 }
 
-export interface OrderDetail extends OrderListItem {
-	updatedAt?: string;
-	customerId?: string;
-	items: OrderItem[];
+export interface OrderDetail {
+	orderId: number;
+	status: OrderStatus;
+	paymentStatus: PaymentStatus;
+	totalAmount: number;
+	orderItems: OrderItem[];
+	createdAt: string;
+	note?: string;
 }

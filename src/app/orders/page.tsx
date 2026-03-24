@@ -1,7 +1,7 @@
-import { OrdersPage } from "@/components/customer/orders/orders-page";
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/footer";
+import Header from "@/components/layout/header";
 import StarBackground from "@/components/ui/star-background";
+import { OrdersPage } from "@/features/orders/components/orders-page";
 
 export default function OrdersRoute() {
 	return (
