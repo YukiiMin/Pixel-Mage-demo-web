@@ -1,11 +1,26 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-const BE_BASE_URL = (
-	process.env.API_BASE_URL ??
-	process.env.BACKEND_BASE_URL ??
-	process.env.NEXT_PUBLIC_API_BASE_URL ??
-	"http://localhost:8080"
-).replace(/\/$/, "");
+const LOCAL_BE = (process.env.BACKEND_URL || "http://localhost:8080").replace(/\/$/, "");
+const NGROK_BE = (process.env.BACKEND_URL_NGROK || "").replace(/\/$/, "");
+
+function getBeBaseUrl(request: NextRequest): string {
+	const selector = request.cookies.get("pm_backend_selector")?.value;
+
+	if (selector === "ngrok" && NGROK_BE) {
+		return NGROK_BE;
+	}
+	if (selector === "local") {
+		return LOCAL_BE;
+	}
+
+	// Default fallback priority
+	return (
+		process.env.API_BASE_URL ??
+		process.env.BACKEND_BASE_URL ??
+		NGROK_BE ??
+		LOCAL_BE
+	).replace(/\/$/, "");
+}
 
 const UPSTREAM_TIMEOUT_MS = 15000;
 
@@ -49,7 +64,8 @@ async function attemptRefresh(request: NextRequest): Promise<string | null> {
 	const refreshToken = request.cookies.get("pm_refresh_token")?.value;
 	if (!refreshToken) return null;
 
-	const targetUrl = `${BE_BASE_URL}/api/accounts/auth/refresh?refreshToken=${encodeURIComponent(refreshToken)}`;
+	const beBaseUrl = getBeBaseUrl(request);
+	const targetUrl = `${beBaseUrl}/api/accounts/auth/refresh?refreshToken=${encodeURIComponent(refreshToken)}`;
 	const controller = new AbortController();
 	const timeoutId = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
 
@@ -100,9 +116,10 @@ async function forwardRequest(
 		return NextResponse.json({ message: "Invalid API path." }, { status: 400 });
 	}
 
+	const beBaseUrl = getBeBaseUrl(request);
 	const bePathname = `/api/${segments.join("/")}`;
 	const search = request.nextUrl.search;
-	const targetUrl = `${BE_BASE_URL}${bePathname}${search}`;
+	const targetUrl = `${beBaseUrl}${bePathname}${search}`;
 
 	const method = request.method.toUpperCase();
 
@@ -205,6 +222,10 @@ async function forwardRequest(
 			"cache-control": "no-store",
 		},
 	});
+
+	nextResponse.headers.set("X-Backend-URL", beBaseUrl);
+	nextResponse.headers.set("X-Proxy-Status", "active");
+	nextResponse.headers.set("Access-Control-Expose-Headers", "X-Backend-URL, X-Proxy-Status");
 
 	if (newAccessTokenConfigured) {
 		nextResponse.cookies.set({
