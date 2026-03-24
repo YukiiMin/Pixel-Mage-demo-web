@@ -1,7 +1,7 @@
 'use client'
 
-import Footer from '@/components/layout/footer'
-import Header from '@/components/layout/header'
+import Footer from '@/components/layout/footer1'
+import Header from '@/components/layout/header1/index'
 import StarBackground from '@/components/ui/star-background'
 import { MyCardsPage } from '@/features/inventory/components/my-cards-page'
 

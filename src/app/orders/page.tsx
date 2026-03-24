@@ -1,5 +1,5 @@
-import Footer from '@/components/layout/footer'
-import Header from '@/components/layout/header'
+import Footer from '@/components/layout/footer1'
+import Header from '@/components/layout/header1/index'
 import StarBackground from '@/components/ui/star-background'
 import { OrdersPage } from '@/features/orders/components/orders-page'
 
