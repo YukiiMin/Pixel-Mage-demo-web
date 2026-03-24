@@ -3,7 +3,6 @@
 import { PackageOpen } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { useAuthGuard } from "@/features/auth/hooks/use-auth-guard";
 import { CardGrid } from "@/features/inventory/components/card-grid";
 import { CollectionProgress } from "@/features/inventory/components/collection-progress";
 import { useCollectionProgress } from "@/features/inventory/hooks/use-collection-progress";
@@ -12,7 +11,6 @@ import { getStoredUserId } from "@/lib/api-config";
 import type { MyCardItem } from "@/types/commerce";
 
 export function MyCardsPage() {
-	const { checking } = useAuthGuard("authenticated-only", "/login");
 	const userId = getStoredUserId();
 
 	const [rarityFilter, setRarityFilter] = useState<
@@ -27,7 +25,7 @@ export function MyCardsPage() {
 	const { data: progress = [], isLoading: isLoadingProgress } =
 		useCollectionProgress(userId);
 
-	const isLoading = checking || isLoadingCards || isLoadingProgress;
+	const isLoading = isLoadingCards || isLoadingProgress;
 
 	const stats = useMemo(() => {
 		const totalCards = cards.reduce((sum, item) => sum + item.quantity, 0);

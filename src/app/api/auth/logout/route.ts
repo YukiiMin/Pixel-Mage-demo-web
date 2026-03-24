@@ -67,6 +67,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 	clearCookie(response, USER_ID_COOKIE);
 	clearCookie(response, EMAIL_COOKIE);
 	clearCookie(response, NAME_COOKIE);
+	clearCookie(response, "pm_user_role");
 
 	return response;
 }

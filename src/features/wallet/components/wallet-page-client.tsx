@@ -2,7 +2,6 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useAuthGuard } from "@/features/auth/hooks/use-auth-guard";
 import { getStoredUserId } from "@/lib/api-config";
 import { ExchangeButton } from "./exchange-button";
 import { VoucherInput } from "./voucher-input";
@@ -10,7 +9,6 @@ import { VoucherList } from "./voucher-list";
 import { WalletBalance } from "./wallet-balance";
 
 export function WalletPageClient() {
-	const { checking } = useAuthGuard("authenticated-only", "/login");
 	const [userId, setUserId] = useState<number | null>(null);
 	const prefersReduced = useReducedMotion();
 
@@ -18,7 +16,7 @@ export function WalletPageClient() {
 		setUserId(getStoredUserId());
 	}, []);
 
-	if (checking || !userId) return null;
+	if (!userId) return null;
 
 	return (
 		<div className="container py-8 max-w-4xl mx-auto space-y-8">

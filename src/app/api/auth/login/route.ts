@@ -54,11 +54,12 @@ function extractFromJwt(token: string): {
 	userId: number | null;
 	email: string | null;
 	name: string | null;
+	role: string | null;
 } {
 	try {
 		const payloadPart = token.split(".")[1];
 		if (!payloadPart) {
-			return { userId: null, email: null, name: null };
+			return { userId: null, email: null, name: null, role: null };
 		}
 		const base64 = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
 		const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
@@ -86,9 +87,23 @@ function extractFromJwt(token: string): {
 			String(jwtPayload.email ?? jwtPayload.sub ?? "").trim() || null;
 		const name =
 			String(jwtPayload.name ?? jwtPayload.fullName ?? "").trim() || null;
-		return { userId, email, name };
+
+		let role = null;
+		const rawRole =
+			jwtPayload.role ??
+			jwtPayload.Role ??
+			jwtPayload[
+				"http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+			];
+		if (Array.isArray(rawRole)) {
+			role = String(rawRole[0]).toUpperCase();
+		} else if (rawRole) {
+			role = String(rawRole).toUpperCase();
+		}
+
+		return { userId, email, name, role };
 	} catch {
-		return { userId: null, email: null, name: null };
+		return { userId: null, email: null, name: null, role: null };
 	}
 }
 
@@ -98,6 +113,7 @@ function normalizeLoginPayload(payload: unknown): {
 	userId: number | null;
 	email: string | null;
 	name: string | null;
+	role: string | null;
 } {
 	const raw = pickRecord(payload) ?? {};
 	const data = pickRecord(raw.data);
@@ -132,8 +148,23 @@ function normalizeLoginPayload(payload: unknown): {
 			account?.name ?? account?.fullName ?? raw.name ?? data?.name ?? "",
 		).trim() || null;
 
+	let role = null;
+	const accountRole = pickRecord(account?.role) ?? account?.role;
+	if (accountRole && typeof accountRole === "object") {
+		const rec = accountRole as Record<string, unknown>;
+		role =
+			String(rec.roleName ?? "")
+				.trim()
+				.toUpperCase() || null;
+	} else if (accountRole || raw.role || data?.role) {
+		role =
+			String(accountRole ?? raw.role ?? data?.role)
+				.trim()
+				.toUpperCase() || null;
+	}
+
 	const tokenStr = token;
-	if (tokenStr && (!userId || !email)) {
+	if (tokenStr && (!userId || !email || !role)) {
 		const jwtInfo = extractFromJwt(tokenStr);
 		if (!userId && jwtInfo.userId) {
 			userId = jwtInfo.userId;
@@ -144,6 +175,9 @@ function normalizeLoginPayload(payload: unknown): {
 		if (!name && jwtInfo.name) {
 			name = jwtInfo.name;
 		}
+		if (!role && jwtInfo.role) {
+			role = jwtInfo.role;
+		}
 	}
 
 	return {
@@ -152,6 +186,7 @@ function normalizeLoginPayload(payload: unknown): {
 		userId,
 		email,
 		name,
+		role,
 	};
 }
 
@@ -281,6 +316,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 			name: NAME_COOKIE,
 			value: encodeURIComponent(normalized.name),
 			httpOnly: true,
+			secure: isProd(),
+			sameSite: "lax",
+			path: "/",
+			maxAge: COOKIE_MAX_AGE_SECONDS,
+		});
+	}
+	if (normalized.role) {
+		response.cookies.set({
+			name: "pm_user_role",
+			value: normalized.role,
+			httpOnly: false,
 			secure: isProd(),
 			sameSite: "lax",
 			path: "/",

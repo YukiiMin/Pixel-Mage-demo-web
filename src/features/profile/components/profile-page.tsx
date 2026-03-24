@@ -20,13 +20,11 @@ import {
 	useProfile,
 	useUpdateProfile,
 } from "@/features/auth/hooks/use-auth";
-import { useAuthGuard } from "@/features/auth/hooks/use-auth-guard";
 import { ReadingHistory } from "@/features/tarot/components/reading-history";
 import { getStoredUserId } from "@/lib/api-config";
 
 export function ProfilePage() {
 	const router = useRouter();
-	const { checking } = useAuthGuard("authenticated-only", "/login");
 	const { logout } = useAuth();
 
 	const [userId, setUserId] = useState<number | null>(null);
@@ -144,7 +142,7 @@ export function ProfilePage() {
 	};
 
 	const displayProfile = localProfile ?? profile;
-	if (checking || status === "loading") {
+	if (status === "loading") {
 		return (
 			<div className="container mx-auto max-w-4xl px-6 pb-20">
 				<div className="glass-card rounded-2xl border border-border/50 p-8 text-center">

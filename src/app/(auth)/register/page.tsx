@@ -4,7 +4,6 @@ import { ArrowLeft, LoaderCircle } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { RegisterForm } from "@/features/auth/components/register-form";
-import { useAuthGuard } from "@/features/auth/hooks/use-auth-guard";
 
 const StarBackground = dynamic(
 	() => import("@/components/ui/star-background"),
@@ -12,8 +11,6 @@ const StarBackground = dynamic(
 );
 
 export default function RegisterRoute() {
-	const { checking } = useAuthGuard("guest-only", "/");
-
 	return (
 		<div className="relative min-h-screen flex items-center justify-center overflow-hidden">
 			<StarBackground />
@@ -29,13 +26,7 @@ export default function RegisterRoute() {
 			<div className="pointer-events-none absolute bottom-1/4 left-1/4 h-72 w-72 rounded-full bg-primary/10 blur-[100px]" />
 
 			<div className="relative z-10 w-full max-w-md px-6 py-24">
-				{checking ? (
-					<div className="glass-card rounded-2xl border border-border/50 p-8 text-center">
-						<LoaderCircle className="mx-auto h-6 w-6 animate-spin text-primary" />
-					</div>
-				) : (
-					<RegisterForm />
-				)}
+				<RegisterForm />
 			</div>
 		</div>
 	);
