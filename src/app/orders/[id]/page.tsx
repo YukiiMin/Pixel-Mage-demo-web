@@ -1,25 +1,25 @@
-import Footer from "@/components/layout/footer";
-import Header from "@/components/layout/header";
-import StarBackground from "@/components/ui/star-background";
-import { OrderDetail } from "@/features/orders/components/order-detail";
+import Footer from '@/components/layout/footer'
+import Header from '@/components/layout/header'
+import StarBackground from '@/components/ui/star-background'
+import { OrderDetail } from '@/features/orders/components/order-detail'
 
 interface OrderDetailRouteProps {
-	params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>
 }
 
 export default async function OrderDetailRoute({
-	params,
+  params,
 }: OrderDetailRouteProps) {
-	const { id } = await params;
+  const { id } = await params
 
-	return (
-		<div className="relative min-h-screen overflow-x-hidden">
-			<StarBackground />
-			<Header />
-			<main className="relative z-10 pb-20 pt-28">
-				<OrderDetail orderId={id} />
-			</main>
-			<Footer />
-		</div>
-	);
+  return (
+    <div className="relative min-h-screen overflow-x-hidden">
+      <StarBackground />
+      <Header />
+      <main className="relative z-10 pb-20 pt-28">
+        <OrderDetail orderId={id} />
+      </main>
+      <Footer />
+    </div>
+  )
 }
