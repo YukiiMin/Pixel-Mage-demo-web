@@ -63,17 +63,17 @@ const DownloadSection = dynamic(
 );
 
 export default function HomePage() {
-	return (
-		<div className="relative min-h-screen overflow-x-hidden">
-			<StarBackground />
-			<Header />
-			<main className="relative z-10">
-				<HeroSection />
-				<FeaturedSection />
-				<HowItWorks />
-				<DownloadSection />
-			</main>
-			<Footer />
-		</div>
-	);
+  return (
+    <div className="relative min-h-screen overflow-x-hidden">
+      <StarBackground />
+      <Header />
+      <main className="relative z-10">
+        <HeroSection />
+        <FeaturedSection />
+        <HowItWorks />
+        <DownloadSection />
+      </main>
+      <Footer />
+    </div>
+  )
 }
