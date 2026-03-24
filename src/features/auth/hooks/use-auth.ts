@@ -6,8 +6,7 @@ import {
 	API_ENDPOINTS,
 	apiRequest,
 	clearStoredAuthSession,
-	ensureStoredUserId,
-	setStoredAuthSession,
+	getStoredUserId,
 } from "@/lib/api-config";
 import { getApiErrorMessage } from "@/types/api";
 import type {
@@ -148,11 +147,6 @@ export function useAuth() {
 				).trim() ||
 					normalizedPayload.email);
 
-			setStoredAuthSession({
-				userId: userIdFromSession,
-				email: emailFromSession,
-				name: nameFromSession,
-			});
 
 			return result;
 		} catch (error) {
@@ -236,7 +230,7 @@ export function useUpdateProfile() {
 		async (payload: UpdateProfilePayload): Promise<UserProfile | null> => {
 			setLoading(true);
 			setErrorMessage("");
-			const userId = await ensureStoredUserId();
+			const userId = getStoredUserId();
 			if (!userId) {
 				setErrorMessage("Chưa xác định được tài khoản hiện tại.");
 				setLoading(false);
@@ -271,7 +265,7 @@ export function useChangePassword() {
 		async (payload: ChangePasswordPayload): Promise<boolean> => {
 			setLoading(true);
 			setErrorMessage("");
-			const userId = await ensureStoredUserId();
+			const userId = getStoredUserId();
 			if (!userId) {
 				setErrorMessage("Chưa xác định được tài khoản hiện tại.");
 				setLoading(false);

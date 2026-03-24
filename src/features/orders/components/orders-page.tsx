@@ -2,7 +2,10 @@
 
 import { ReceiptText } from "lucide-react";
 import Link from "next/link";
+import { useMemo } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useOrders } from "@/features/orders/hooks/use-orders";
+import { getStoredUserId } from "@/lib/api-config";
 
 function formatVnd(amount: number): string {
 	return new Intl.NumberFormat("vi-VN", {
@@ -13,8 +16,15 @@ function formatVnd(amount: number): string {
 }
 
 export function OrdersPage() {
-	const { orders, status, statusMessage, stats } = useOrders();
-	const isReady = status === "ready";
+	const userId = getStoredUserId();
+	const { data: orders = [], isLoading, isError, error } = useOrders(userId);
+
+	const stats = useMemo(() => {
+		const totalPaid = orders
+			.filter((order) => order.paymentStatus.toUpperCase() === "PAID")
+			.reduce((sum, order) => sum + order.totalAmount, 0);
+		return { totalOrders: orders.length, totalPaid };
+	}, [orders]);
 
 	return (
 		<div className="container mx-auto max-w-6xl px-6 pb-20">
@@ -50,63 +60,103 @@ export function OrdersPage() {
 
 			<div className="mb-5 flex items-center gap-2 text-sm text-muted-foreground">
 				<ReceiptText className="h-4 w-4 text-primary" />
-				{status === "loading"
+				{isLoading
 					? "Đang đồng bộ Orders từ BE..."
 					: "Lịch sử đơn hàng và trạng thái cập nhật theo dữ liệu backend."}
 			</div>
 
-			{!isReady ? (
-				<div className="glass-card mb-6 rounded-2xl border border-amber-300/30 bg-amber-300/5 p-5">
+			{isError ? (
+				<div
+					className="glass-card mb-6 rounded-2xl border border-amber-300/30 bg-amber-300/5 p-5 flex flex-col items-center justify-center min-h-[200px]"
+					data-testid="error-state"
+				>
 					<p className="text-sm font-semibold text-amber-200">
-						{statusMessage || "Chức năng Orders chưa cập nhật."}
+						{error?.message || "Không thể tải Orders từ hệ thống."}
 					</p>
 				</div>
 			) : null}
 
-			{isReady ? (
-				<section className="space-y-3">
-					{orders.map((order) => (
-						<article
-							key={order.id}
-							className="glass-card rounded-2xl border border-border/50 p-5"
-						>
-							<div className="flex flex-wrap items-center justify-between gap-3">
-								<div>
-									<p className="text-sm text-muted-foreground">
-										Đơn #{order.id}
-									</p>
-									<p className="text-lg font-semibold text-foreground">
-										{order.status}
-									</p>
+			{isLoading ? (
+				<div className="space-y-3" data-testid="orders-list">
+					<Skeleton
+						className="h-32 w-full rounded-2xl"
+						data-testid="card-skeleton"
+					/>
+					<Skeleton
+						className="h-32 w-full rounded-2xl"
+						data-testid="card-skeleton"
+					/>
+					<Skeleton
+						className="h-32 w-full rounded-2xl"
+						data-testid="card-skeleton"
+					/>
+				</div>
+			) : !isError && orders.length === 0 ? (
+				<div
+					className="glass-card mb-6 rounded-2xl border border-border/40 bg-card/60 p-8 text-center"
+					data-testid="empty-state"
+				>
+					<p className="text-sm text-muted-foreground">
+						Bạn chưa có đơn hàng nào.
+					</p>
+				</div>
+			) : !isError ? (
+				<section className="space-y-3" data-testid="orders-list">
+					{orders.map((order) => {
+						let badgeClass =
+							"bg-muted/40 text-muted-foreground border-border/40";
+						if (order.status === "PENDING") {
+							badgeClass = "bg-amber-500/10 text-amber-500 border-amber-500/20";
+						} else if (order.status === "PROCESSING") {
+							badgeClass = "bg-blue-500/10 text-blue-500 border-blue-500/20";
+						} else if (order.status === "COMPLETED") {
+							badgeClass = "bg-green-500/10 text-green-500 border-green-500/20";
+						} else if (order.status === "CANCELLED") {
+							badgeClass =
+								"bg-destructive/10 text-destructive border-destructive/20";
+						}
+
+						return (
+							<article
+								key={order.orderId}
+								className="glass-card rounded-2xl border border-border/50 p-5"
+								data-testid={`order-card-${order.orderId}`}
+							>
+								<div className="flex flex-wrap items-center justify-between gap-3">
+									<div>
+										<p className="text-sm text-muted-foreground">
+											Đơn #{order.orderId}
+										</p>
+										<p
+											className={`mt-1 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${badgeClass}`}
+											data-testid={`order-status-${order.orderId}`}
+										>
+											{order.status}
+										</p>
+									</div>
+									<div className="text-right">
+										<p className="text-sm text-muted-foreground">
+											{order.paymentStatus}
+										</p>
+										<p className="font-stats text-xl font-bold text-primary">
+											{formatVnd(order.totalAmount)}
+										</p>
+									</div>
 								</div>
-								<div className="text-right">
-									<p className="text-sm text-muted-foreground">
-										{order.paymentStatus}
-									</p>
-									<p className="font-stats text-xl font-bold text-primary">
-										{formatVnd(order.totalAmount)}
-									</p>
-								</div>
-							</div>
-							<p className="mt-2 text-sm text-muted-foreground">
-								Thanh toán: {order.paymentMethod} • Ngày:{" "}
-								{new Date(order.orderDate).toLocaleString("vi-VN")}
-							</p>
-							{order.shippingAddress ? (
-								<p className="mt-1 text-sm text-muted-foreground">
-									Giao tới: {order.shippingAddress}
+								<p className="mt-3 text-sm text-muted-foreground">
+									Ngày: {new Date(order.createdAt).toLocaleString("vi-VN")}
 								</p>
-							) : null}
-							<div className="mt-3 flex justify-end">
-								<Link
-									href={`/orders/${order.id}`}
-									className="text-xs font-medium text-primary transition-colors hover:underline"
-								>
-									Xem chi tiết →
-								</Link>
-							</div>
-						</article>
-					))}
+								<div className="mt-3 flex justify-end">
+									<Link
+										href={`/orders/${order.orderId}`}
+										className="text-xs font-medium text-primary transition-colors hover:underline"
+									>
+										Xem chi tiết →
+									</Link>
+								</div>
+							</article>
+						);
+					})}
 				</section>
 			) : null}
 		</div>

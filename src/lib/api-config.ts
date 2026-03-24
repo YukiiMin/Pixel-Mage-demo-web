@@ -14,22 +14,6 @@ export const API_CONFIG = {
 	},
 } as const;
 
-export const AUTH_SESSION_CHANGED_EVENT = "auth-session-changed";
-
-let authSyncChannel: BroadcastChannel | null = null;
-if (typeof window !== "undefined" && "BroadcastChannel" in window) {
-	authSyncChannel = new BroadcastChannel("auth_sync_channel");
-	authSyncChannel.onmessage = (event) => {
-		if (event.data === "login") {
-			// Re-fetch session from backend quietly if another tab logs in
-			getAuthSession({ syncStorage: true, broadcast: false }).catch(() => {});
-		} else if (event.data === "logout") {
-			// Clear locally without broadcasting back
-			clearStoredAuthSession({ broadcast: false });
-		}
-	};
-}
-
 export const API_ENDPOINTS = {
 	accountManagement: {
 		registration: "/api/accounts/auth/registration",
@@ -132,6 +116,10 @@ export const API_ENDPOINTS = {
 		detachPaymentMethod: (paymentMethodId: string) =>
 			`/api/payments/detach-payment-method/${paymentMethodId}`,
 	},
+	paymentManagement: {
+		initiate: "/api/payments/initiate",
+		byOrder: (orderId: number | string) => `/api/payments/order/${orderId}`,
+	},
 	vnPay: {
 		createPayment: "/api/vnpay/create-payment",
 		paymentReturn: "/api/vnpay/payment-return",
@@ -188,6 +176,7 @@ export const API_ENDPOINTS = {
 		draw: (id: number | string) => `/api/v1/readings/sessions/${id}/draw`,
 		interpret: (id: number | string) =>
 			`/api/v1/readings/sessions/${id}/interpret`,
+		sessionById: (id: number | string) => `/api/v1/readings/sessions/${id}`,
 	},
 	wallet: {
 		balance: "/api/wallet/balance",
@@ -232,129 +221,28 @@ export function getStoredAccessToken(): string | null {
 	return null;
 }
 
-export function setStoredAuthSession(
-	payload: {
-		token?: string | null;
-		userId?: number | null;
-		email?: string | null;
-		name?: string | null;
-	},
-	options: { broadcast?: boolean } = {},
-): void {
+export function clearStoredAuthSession(): void {
 	if (typeof window === "undefined") {
 		return;
 	}
 
-	const broadcast = options.broadcast ?? true;
-
-	const localKeys = [
-		"token",
-		"accessToken",
-		"jwt",
-		"authToken",
-		"userId",
-		"accountId",
-		"customerId",
-		"email",
-		"name",
-	];
-	for (const key of localKeys) {
-		window.localStorage.removeItem(key);
-	}
-
-	const sessionKeys = ["userId", "accountId", "customerId", "email", "name"];
-	for (const key of sessionKeys) {
-		window.sessionStorage.removeItem(key);
-	}
-
-	if (payload.userId && payload.userId > 0) {
-		window.sessionStorage.setItem("userId", String(payload.userId));
-		window.sessionStorage.setItem("accountId", String(payload.userId));
-		window.sessionStorage.setItem("customerId", String(payload.userId));
-	}
-	if (payload.email) {
-		window.sessionStorage.setItem("email", payload.email);
-	}
-	if (payload.name) {
-		window.sessionStorage.setItem("name", payload.name);
-	}
-	window.dispatchEvent(new Event(AUTH_SESSION_CHANGED_EVENT));
-
-	if (broadcast && authSyncChannel) {
-		authSyncChannel.postMessage("login");
-	}
-}
-
-export function clearStoredAuthSession(
-	options: { broadcast?: boolean } = {},
-): void {
-	if (typeof window === "undefined") {
-		return;
-	}
-
-	const broadcast = options.broadcast ?? true;
-
-	const keys = [
-		"token",
-		"accessToken",
-		"jwt",
-		"authToken",
-		"userId",
-		"accountId",
-		"customerId",
-		"email",
-		"name",
-	];
-	for (const key of keys) {
-		window.localStorage.removeItem(key);
-		window.sessionStorage.removeItem(key);
-	}
-	document.cookie = `${AUTH_LOGIN_MARKER_COOKIE}=; Max-Age=0; Path=/; SameSite=Lax`;
-	document.cookie = "pm_user_id=; Max-Age=0; Path=/; SameSite=Lax";
-	window.dispatchEvent(new Event(AUTH_SESSION_CHANGED_EVENT));
-
-	if (broadcast && authSyncChannel) {
-		authSyncChannel.postMessage("logout");
-	}
+	try {
+		// biome-ignore lint/suspicious/noDocumentCookie: intentional cookie expiry — only way to delete a cookie client-side
+		document.cookie = `${AUTH_LOGIN_MARKER_COOKIE}=; Max-Age=0; Path=/; SameSite=Lax`;
+		// biome-ignore lint/suspicious/noDocumentCookie: intentional cookie expiry — only way to delete a cookie client-side
+		document.cookie = "pm_user_id=; Max-Age=0; Path=/; SameSite=Lax";
+	} catch (_e) {}
 }
 
 export function getStoredUserId(): number | null {
-	if (typeof window === "undefined") {
-		return null;
-	}
-
-	// 1. Check sessionStorage / localStorage (fastest, in-memory)
-	const idKeys = ["userId", "accountId", "customerId"];
-	for (const key of idKeys) {
-		const rawValue =
-			window.sessionStorage.getItem(key) ?? window.localStorage.getItem(key);
-		if (!rawValue) {
-			continue;
-		}
-
-		const parsedValue = Number(rawValue);
-		if (Number.isInteger(parsedValue) && parsedValue > 0) {
-			return parsedValue;
-		}
-	}
-
-	// 2. Read pm_user_id cookie (non-HttpOnly, set by BFF login route)
-	const cookieMatch = document.cookie
+	if (typeof window === "undefined") return null;
+	const match = document.cookie
 		.split(";")
-		.map((part) => part.trim())
-		.find((part) => part.startsWith("pm_user_id="));
-	if (cookieMatch) {
-		const cookieId = Number(cookieMatch.split("=")[1]);
-		if (Number.isInteger(cookieId) && cookieId > 0) {
-			// Sync back into sessionStorage so future calls skip this cookie read.
-			window.sessionStorage.setItem("userId", String(cookieId));
-			window.sessionStorage.setItem("accountId", String(cookieId));
-			window.sessionStorage.setItem("customerId", String(cookieId));
-			return cookieId;
-		}
-	}
-
-	return null;
+		.map((p) => p.trim())
+		.find((p) => p.startsWith("pm_user_id="));
+	if (!match) return null;
+	const id = Number(match.split("=")[1]);
+	return Number.isInteger(id) && id > 0 ? id : null;
 }
 
 function readCookieValue(name: string): string | null {
@@ -372,137 +260,11 @@ function readCookieValue(name: string): string | null {
 		return null;
 	}
 
-	return match.slice(key.length) || null;
-}
-
-function writeSessionProfile(profile: {
-	userId?: number | null;
-	email?: string | null;
-	name?: string | null;
-}): void {
-	if (typeof window === "undefined") {
-		return;
-	}
-
-	const keys = ["userId", "accountId", "customerId", "email", "name"];
-	for (const key of keys) {
-		window.sessionStorage.removeItem(key);
-	}
-
-	if (profile.userId && profile.userId > 0) {
-		const id = String(profile.userId);
-		window.sessionStorage.setItem("userId", id);
-		window.sessionStorage.setItem("accountId", id);
-		window.sessionStorage.setItem("customerId", id);
-	}
-	if (profile.email) {
-		window.sessionStorage.setItem("email", profile.email);
-	}
-	if (profile.name) {
-		window.sessionStorage.setItem("name", profile.name);
-	}
-}
-
-export interface AuthSessionSnapshot {
-	authenticated: boolean;
-	userId: number | null;
-	email: string | null;
-	name: string | null;
-}
-
-export async function getAuthSession(
-	options: { syncStorage?: boolean; broadcast?: boolean } = {},
-): Promise<AuthSessionSnapshot | null> {
-	const syncStorage = options.syncStorage ?? true;
-	const broadcast = options.broadcast ?? false;
-
-	if (typeof window === "undefined") {
-		return null;
-	}
-
-	const storedId = getStoredUserId();
-	console.log("[getAuthSession] StoredId found:", storedId);
-	if (!storedId) {
-		return null;
-	}
-
 	try {
-		console.log(
-			"[getAuthSession] Requesting account details for ID:",
-			storedId,
-		);
-		// Call a REAL backend endpoint that requires authentication.
-		// This will hit the [...proxy] which handles 401 retries and refreshes.
-		const response = await apiRequest<any>(
-			API_ENDPOINTS.accountManagement.byId(storedId),
-			{
-				method: "GET",
-				cache: "no-store",
-			},
-		);
-
-		const raw = response.data;
-		console.log("[getAuthSession] Response data received:", !!raw);
-		if (!raw || typeof raw !== "object") {
-			return null;
-		}
-
-		// The backend returns an Account object. We normalize it to our session format.
-		const userIdRaw = Number(
-			raw.id ?? raw.userId ?? raw.accountId ?? raw.customerId ?? 0,
-		);
-		const userId =
-			Number.isInteger(userIdRaw) && userIdRaw > 0 ? userIdRaw : null;
-		const email = String(raw.email ?? "").trim() || null;
-		const name = String(raw.name ?? "").trim() || null;
-
-		if (syncStorage) {
-			// Optimization: Check for differences before writing and jumping into a re-render cycle
-			const oldUserId = Number(
-				window.sessionStorage.getItem("userId") ||
-					window.localStorage.getItem("userId") ||
-					0,
-			);
-			const oldEmail =
-				window.sessionStorage.getItem("email") ||
-				window.localStorage.getItem("email") ||
-				"";
-
-			const currentUserId = userId || 0;
-
-			if (currentUserId !== oldUserId || email !== oldEmail) {
-				writeSessionProfile({ userId, email, name });
-				window.dispatchEvent(new Event(AUTH_SESSION_CHANGED_EVENT));
-			}
-		}
-
-		return {
-			authenticated: true,
-			userId,
-			email,
-			name,
-		};
+		return match.slice(key.length) || null;
 	} catch {
 		return null;
 	}
-}
-
-export async function ensureStoredUserId(): Promise<number | null> {
-	const existing = getStoredUserId();
-	if (existing) {
-		return existing;
-	}
-
-	if (typeof window === "undefined") {
-		return null;
-	}
-
-	const session = await getAuthSession({ syncStorage: true });
-	if (session?.userId) {
-		return session.userId;
-	}
-
-	return null;
 }
 
 export function hasStoredAuthSession(): boolean {

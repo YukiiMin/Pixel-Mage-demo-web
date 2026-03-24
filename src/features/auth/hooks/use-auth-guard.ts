@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { getAuthSession, hasStoredAuthSession } from "@/lib/api-config";
+import { hasStoredAuthSession } from "@/lib/api-config";
 
 export type AuthGuardMode = "guest-only" | "authenticated-only";
 
@@ -33,9 +33,8 @@ export function useAuthGuard(mode: AuthGuardMode, redirectTo: string) {
 				}
 
 				// 2. Full session check
-				console.log("[AuthGuard] Performing getAuthSession...");
-				const session = await getAuthSession({ syncStorage: true });
-				const isAuthenticated = Boolean(session?.authenticated);
+				console.log("[AuthGuard] Performing hasStoredAuthSession...");
+				const isAuthenticated = hasStoredAuthSession();
 				console.log("[AuthGuard] IsAuthenticated:", isAuthenticated);
 
 				if (!active) {

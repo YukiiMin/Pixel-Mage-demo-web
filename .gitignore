@@ -60,3 +60,9 @@ next-env.d.ts
 
 debug.spec.ts
 skills-lock.json
+
+#PlayRight test/report
+/playwright-report
+/test-results
+/playwright-report/index.html
+/test-results/index.html

@@ -5,11 +5,7 @@ import type { Pack, ProductCategory, Rarity } from "@/types/commerce";
 import { usePacks } from "./use-packs";
 
 export type ProductSort = "newest" | "price-asc" | "price-desc";
-export type MarketplaceStatus =
-	| "idle"
-	| "loading"
-	| "ready"
-	| "error";
+export type MarketplaceStatus = "idle" | "loading" | "ready" | "error";
 
 export function useMarketplace() {
 	const { data: packs = [], isLoading, isError, error } = usePacks();

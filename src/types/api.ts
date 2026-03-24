@@ -32,6 +32,13 @@ export class ApiHttpError extends Error {
 		this.status = status;
 		this.data = data;
 	}
+
+	get response() {
+		return {
+			status: this.status,
+			data: this.data,
+		};
+	}
 }
 
 export function isApiHttpError(error: unknown): error is ApiHttpError {

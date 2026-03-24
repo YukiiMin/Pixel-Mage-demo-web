@@ -1,31 +1,79 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { AlertTriangle, ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { useMyCards } from "@/features/inventory/hooks/use-my-cards";
+import { useAccountProfile } from "@/features/profile/hooks/use-account-profile";
+import { ActiveSessionBanner } from "@/features/tarot/components/active-session-banner";
+import { GuestReadingBanner } from "@/features/tarot/components/guest-reading-banner";
 import { ReadingHistory } from "@/features/tarot/components/reading-history";
 import { SpreadSelector } from "@/features/tarot/components/spread-selector";
+import { getStoredUserId } from "@/lib/api-config";
 import { fadeInUp, staggerContainer } from "@/lib/motion-variants";
 import { TOPICS } from "@/lib/tarot-data";
+import { isSameDay } from "@/lib/utils";
 import { useTarotSessionStore } from "@/stores/use-tarot-session-store";
+import type { ApiHttpError } from "@/types/api";
+import { useCreateSession } from "../hooks/use-create-session";
 
 const STEPS = ["Chọn Chủ Đề", "Câu Hỏi", "Kiểu Trải Bài"];
 
 export function TarotSetupPage() {
+	const shouldReduceMotion = useReducedMotion();
 	const [step, setStep] = useState(0);
 	const router = useRouter();
-	const setup = useTarotSessionStore((state) => state.setup);
-	const setTopic = useTarotSessionStore((state) => state.setTopic);
-	const setQuestion = useTarotSessionStore((state) => state.setQuestion);
 
-	const canContinue = step === 0 ? Boolean(setup.topic) : true;
+	const selectedSpreadId = useTarotSessionStore((s) => s.selectedSpreadId);
+	const mainQuestion = useTarotSessionStore((s) => s.mainQuestion);
+	const setMainQuestion = useTarotSessionStore((s) => s.setMainQuestion);
 
-	const handleStart = () => {
-		const sessionId = Date.now().toString(36);
-		router.push(`/tarot/session/${sessionId}`);
+	// Local state for step 0 since it's not needed in BE request, just a UI wizard step
+	const [topic, setTopic] = useState<string | null>(null);
+
+	const [userId, setUserId] = useState<number | null>(null);
+	useEffect(() => {
+		setUserId(getStoredUserId());
+	}, []);
+
+	const { data: inventory } = useMyCards(userId);
+	const { data: account } = useAccountProfile(userId);
+
+	const hasCards = (inventory ?? []).length > 0;
+	const usedGuestToday =
+		account?.guestReadingUsedAt !== null &&
+		account?.guestReadingUsedAt !== undefined &&
+		isSameDay(new Date(account.guestReadingUsedAt), new Date());
+
+	const canStart = hasCards || (!hasCards && !usedGuestToday);
+
+	const createSession = useCreateSession(userId);
+	const [activeSessionBannerData, setActiveSessionBannerData] = useState<
+		number | null
+	>(null);
+
+	const canContinue =
+		step === 0 ? Boolean(topic) : step === 2 ? Boolean(selectedSpreadId) : true;
+
+	const handleStart = async () => {
+		if (!selectedSpreadId) return;
+		try {
+			const session = await createSession.mutateAsync({
+				spreadId: selectedSpreadId,
+				mainQuestion: mainQuestion.trim(),
+				mode: "EXPLORE", // LUÔN LUÔN
+			});
+			router.push(`/tarot/session/${session.sessionId}`);
+		} catch (error) {
+			if ((error as ApiHttpError).status === 409) {
+				const activeSessionId = (error as any).response?.data?.data
+					?.activeSessionId;
+				setActiveSessionBannerData(activeSessionId || null);
+			}
+		}
 	};
 
 	return (
@@ -59,36 +107,39 @@ export function TarotSetupPage() {
 				{step === 0 && (
 					<motion.div
 						key="topic"
-						variants={staggerContainer}
-						initial="hidden"
+						variants={shouldReduceMotion ? {} : staggerContainer}
+						initial={shouldReduceMotion ? { opacity: 1 } : "hidden"}
 						animate="visible"
-						exit={{ opacity: 0, x: -60 }}
+						exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -60 }}
 						className="space-y-6"
 					>
 						<motion.h2
-							variants={fadeInUp}
+							variants={shouldReduceMotion ? {} : fadeInUp}
 							className="text-center text-3xl font-bold"
 						>
 							Bạn muốn hỏi về{" "}
 							<span className="gradient-gold-purple">điều gì?</span>
 						</motion.h2>
-						<motion.div variants={fadeInUp} className="grid grid-cols-2 gap-4">
-							{TOPICS.map((topic) => (
+						<motion.div
+							variants={shouldReduceMotion ? {} : fadeInUp}
+							className="grid grid-cols-2 gap-4"
+						>
+							{TOPICS.map((t) => (
 								<button
 									type="button"
-									key={topic.key}
-									onClick={() => setTopic(topic.key)}
-									className={`glass-card group rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 ${
-										setup.topic === topic.key
+									key={t.key}
+									onClick={() => setTopic(t.key)}
+									className={`glass-card group rounded-2xl p-6 text-center transition-all duration-300 ${!shouldReduceMotion && "hover:scale-105"} ${
+										topic === t.key
 											? "ring-2 ring-primary glow-gold"
 											: "hover:border-primary/30"
 									}`}
 								>
 									<span className="mb-3 block text-4xl transition-transform group-hover:scale-110">
-										{topic.emoji}
+										{t.emoji}
 									</span>
 									<span className="font-semibold text-foreground">
-										{topic.label}
+										{t.label}
 									</span>
 								</button>
 							))}
@@ -99,34 +150,34 @@ export function TarotSetupPage() {
 				{step === 1 && (
 					<motion.div
 						key="question"
-						variants={staggerContainer}
-						initial="hidden"
+						variants={shouldReduceMotion ? {} : staggerContainer}
+						initial={shouldReduceMotion ? { opacity: 1 } : "hidden"}
 						animate="visible"
-						exit={{ opacity: 0, x: -60 }}
+						exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -60 }}
 						className="space-y-6"
 					>
 						<motion.h2
-							variants={fadeInUp}
+							variants={shouldReduceMotion ? {} : fadeInUp}
 							className="text-center text-3xl font-bold"
 						>
 							Bạn muốn hỏi <span className="gradient-gold-purple">câu gì?</span>
 						</motion.h2>
 						<motion.p
-							variants={fadeInUp}
+							variants={shouldReduceMotion ? {} : fadeInUp}
 							className="text-center text-sm text-muted-foreground"
 						>
 							Tùy chọn — bạn có thể bỏ qua nếu muốn đọc bài tổng quát
 						</motion.p>
-						<motion.div variants={fadeInUp}>
+						<motion.div variants={shouldReduceMotion ? {} : fadeInUp}>
 							<Textarea
-								value={setup.question}
-								onChange={(event) => setQuestion(event.target.value)}
+								value={mainQuestion}
+								onChange={(event) => setMainQuestion(event.target.value)}
 								placeholder="Ví dụ: Mối quan hệ hiện tại của tôi sẽ đi về đâu?"
 								className="min-h-30 resize-none rounded-xl border-border/50 bg-card/60 text-foreground placeholder:text-muted-foreground/60"
 								maxLength={500}
 							/>
 							<p className="mt-1 text-right text-xs text-muted-foreground">
-								{setup.question.length}/500
+								{mainQuestion.length}/500
 							</p>
 						</motion.div>
 					</motion.div>
@@ -134,6 +185,14 @@ export function TarotSetupPage() {
 
 				{step === 2 && <SpreadSelector />}
 			</AnimatePresence>
+
+			{step === 2 && activeSessionBannerData !== null && (
+				<ActiveSessionBanner sessionId={activeSessionBannerData} />
+			)}
+
+			{step === 2 && !canStart && activeSessionBannerData === null && (
+				<GuestReadingBanner />
+			)}
 
 			<div className="mt-10 flex justify-between">
 				<Button
@@ -155,9 +214,16 @@ export function TarotSetupPage() {
 				) : (
 					<Button
 						onClick={handleStart}
-						className="gradient-gold-purple-bg rounded-full px-8 font-semibold text-primary-foreground glow-gold transition-transform hover:scale-105"
+						disabled={
+							!canStart ||
+							activeSessionBannerData !== null ||
+							createSession.isPending ||
+							!selectedSpreadId
+						}
+						className="gradient-gold-purple-bg rounded-full px-8 font-semibold text-primary-foreground glow-gold transition-transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
 					>
-						<Sparkles className="mr-1 h-4 w-4" /> Bắt Đầu Đọc Bài
+						<Sparkles className="mr-1 h-4 w-4" />{" "}
+						{createSession.isPending ? "Đang Bắt Đầu..." : "Bắt Đầu Đọc Bài"}
 					</Button>
 				)}
 			</div>
@@ -179,7 +245,9 @@ export function TarotSetupPage() {
 				</div>
 			</motion.div>
 
-			<ReadingHistory />
+			<div id="reading-history">
+				<ReadingHistory />
+			</div>
 		</div>
 	);
 }

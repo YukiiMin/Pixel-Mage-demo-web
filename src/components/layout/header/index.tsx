@@ -5,7 +5,6 @@ import { Menu, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-	AUTH_SESSION_CHANGED_EVENT,
 	clearStoredAuthSession,
 	hasStoredAuthSession,
 } from "@/lib/api-config";
@@ -33,16 +32,9 @@ const Header = () => {
 		const authed = hasStoredAuthSession();
 		setIsAuth(authed);
 		if (authed) {
-			setUserName(
-				window.sessionStorage.getItem("name") ??
-					window.localStorage.getItem("name") ??
-					"",
-			);
-			setUserEmail(
-				window.sessionStorage.getItem("email") ??
-					window.localStorage.getItem("email") ??
-					"",
-			);
+			// REMOVED: Name and email are no longer in sessionStorage
+			setUserName("");
+			setUserEmail("");
 		} else {
 			setUserName("");
 			setUserEmail("");
@@ -64,10 +56,8 @@ const Header = () => {
 	useEffect(() => {
 		syncAuthState();
 		window.addEventListener("storage", syncAuthState);
-		window.addEventListener(AUTH_SESSION_CHANGED_EVENT, syncAuthState);
 		return () => {
 			window.removeEventListener("storage", syncAuthState);
-			window.removeEventListener(AUTH_SESSION_CHANGED_EVENT, syncAuthState);
 		};
 	}, [syncAuthState]);
 

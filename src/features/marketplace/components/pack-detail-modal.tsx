@@ -2,6 +2,7 @@
 
 import { CreditCard, Loader2, X } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import {
 	Dialog,
 	DialogContent,
@@ -11,6 +12,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatVnd } from "@/features/marketplace/hooks/use-marketplace";
 import { usePackDetail } from "@/features/marketplace/hooks/use-pack-detail";
+import { SepayQrScreen } from "@/features/orders/components/sepay-qr-screen";
+import { useCreateOrder } from "@/features/orders/hooks/use-create-order";
+import { useInitiatePayment } from "@/features/orders/hooks/use-initiate-payment";
 import { DropRateTable } from "./drop-rate-table";
 
 interface PackDetailModalProps {
@@ -25,17 +29,68 @@ export function PackDetailModal({
 	onClose,
 }: PackDetailModalProps) {
 	const { data: pack, isLoading, isError } = usePackDetail(packId);
-	const [isCheckingOut, setIsCheckingOut] = useState(false);
+	const [checkoutState, setCheckoutState] = useState<
+		"idle" | "creating_order" | "initiating_payment" | "qr_ready"
+	>("idle");
 	const [quantity, setQuantity] = useState<number>(1);
+	const createOrder = useCreateOrder();
+	const initiatePayment = useInitiatePayment();
+	const [checkoutData, setCheckoutData] = useState<{
+		orderId: number;
+		paymentUrl: string | null;
+		totalAmount: number;
+	} | null>(null);
 
 	const handleCheckout = () => {
-		setIsCheckingOut(true);
-		// Flow đúng: Mua ngay -> POST /api/orders trực tiếp
-		// Mock logic tạm thời chờ Phase 2 fetch thật
-		setTimeout(() => {
-			setIsCheckingOut(false);
-			onClose(); // Optional success close
-		}, 1000);
+		if (!pack || pack.status !== "STOCKED") return;
+		setCheckoutState("creating_order");
+
+		createOrder.mutate(
+			{ packId: pack.packId, quantity, note: "Mua từ Marketplace" },
+			{
+				onSuccess: (orderData) => {
+					setCheckoutState("initiating_payment");
+					initiatePayment.mutate(
+						{
+							orderId: orderData.orderId,
+							amount: orderData.totalAmount,
+							currency: "VND",
+						},
+						{
+							onSuccess: (paymentData) => {
+								setCheckoutData({
+									orderId: orderData.orderId,
+									paymentUrl: paymentData.paymentUrl,
+									totalAmount: orderData.totalAmount,
+								});
+								setCheckoutState("qr_ready");
+							},
+							onError: (err: any) => {
+								toast.error(err.message || "Lỗi khởi tạo cổng thanh toán");
+								setCheckoutState("idle");
+							},
+						},
+					);
+				},
+				onError: (err: any) => {
+					if (err.status === 409) toast.error("Pack đã hết hàng");
+					else if (err.status === 503)
+						toast.error("Hệ thống tạm gián đoạn, thử lại sau");
+					else toast.error(err.message || "Lỗi tạo đơn hàng");
+					setCheckoutState("idle");
+				},
+			},
+		);
+	};
+
+	const resetCheckout = () => {
+		setCheckoutState("idle");
+		setCheckoutData(null);
+	};
+
+	const handleClose = () => {
+		resetCheckout();
+		onClose();
 	};
 
 	// Prevent accessing if dialog is not somewhat loaded
@@ -49,7 +104,7 @@ export function PackDetailModal({
 		glowColor = "rgba(168, 85, 247, 0.15)";
 
 	return (
-		<Dialog open={open} onOpenChange={(val) => !val && onClose()}>
+		<Dialog open={open} onOpenChange={(val) => !val && handleClose()}>
 			{/* glass-heavy style with blur 24px and opacity 0.85 approx via Tailwind or custom CSS */}
 			<DialogContent
 				className="glass-heavy max-h-[90vh] max-w-lg overflow-y-auto border-border/50 bg-background/85 p-0 backdrop-blur-2xl"
@@ -63,7 +118,7 @@ export function PackDetailModal({
 
 				{/* Close Button manually tailored for glass modal */}
 				<button
-					onClick={onClose}
+					onClick={handleClose}
 					className="absolute right-4 top-4 z-50 rounded-full bg-background/50 p-2 text-muted-foreground backdrop-blur-md transition-colors hover:bg-muted hover:text-foreground"
 					data-testid="pack-detail-close"
 				>
@@ -85,7 +140,19 @@ export function PackDetailModal({
 					</div>
 				)}
 
-				{showContent && (
+				{showContent && checkoutState === "qr_ready" && checkoutData && (
+					<div className="p-6">
+						<SepayQrScreen
+							orderId={checkoutData.orderId}
+							paymentUrl={checkoutData.paymentUrl}
+							totalAmount={checkoutData.totalAmount}
+							onRetry={handleCheckout}
+							onClose={handleClose}
+						/>
+					</div>
+				)}
+
+				{showContent && checkoutState !== "qr_ready" && (
 					<>
 						{/* Header section (image or styling placeholder) */}
 						<div className="relative h-32 overflow-hidden bg-muted">
@@ -118,7 +185,7 @@ export function PackDetailModal({
 							<div className="mb-6">
 								<p className="text-sm font-medium text-muted-foreground">Giá</p>
 								<p
-									className="font-stats text-3xl font-bold text-foreground mt-1"
+									className="font-stats mt-1 text-3xl font-bold text-foreground"
 									style={{ fontFamily: "Space Grotesk, var(--font-heading)" }}
 								>
 									{formatVnd(pack.price)}
@@ -142,7 +209,9 @@ export function PackDetailModal({
 										defaultValue={1}
 										className="h-10 w-20 rounded-lg border border-border/50 bg-background/50 px-3 text-center text-sm focus:outline-hidden focus:ring-2 focus:ring-primary"
 										onChange={(e) =>
-											setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+											setQuantity(
+												Math.max(1, Number.parseInt(e.target.value) || 1),
+											)
 										}
 									/>
 								</div>
@@ -150,11 +219,13 @@ export function PackDetailModal({
 								<button
 									type="button"
 									onClick={handleCheckout}
-									disabled={isCheckingOut || pack.status !== "STOCKED"}
+									disabled={
+										checkoutState !== "idle" || pack.status !== "STOCKED"
+									}
 									className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-base font-bold text-primary-foreground shadow-lg transition-all hover:bg-primary/90 focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50"
 									data-testid="checkout-btn"
 								>
-									{isCheckingOut ? (
+									{checkoutState !== "idle" ? (
 										<Loader2 className="h-5 w-5 animate-spin" />
 									) : (
 										<>

@@ -2,6 +2,7 @@
 import { create } from "zustand";
 import type {
 	DeckMode,
+	ReadingCard,
 	SelectedSlot,
 	SessionPhase,
 	SpreadType,
@@ -10,15 +11,25 @@ import type {
 } from "@/types/tarot";
 
 interface TarotSessionState {
-	// Setup
+	// --- MỚI (Tương lai) ---
+	selectedSpreadId: number | null;
+	mainQuestion: string;
+	activeSessionId: number | null;
+	drawnCards: ReadingCard[];
+	setSelectedSpread: (spreadId: number) => void;
+	setMainQuestion: (q: string) => void;
+	setActiveSession: (sessionId: number) => void;
+	setDrawnCards: (cards: ReadingCard[]) => void;
+	clearSession: () => void;
+
+	// --- CŨ (Hiện tại đang dùng) ---
 	setup: TarotSetup;
 	setTopic: (t: TarotTopic) => void;
 	setQuestion: (q: string) => void;
 	setSpreadType: (s: SpreadType) => void;
 	setDeckMode: (m: DeckMode) => void;
 
-	// Session
-	phase: SessionPhase;
+	phase: SessionPhase; // Dùng kiểu cũ tạm chờ refactor
 	setPhase: (p: SessionPhase) => void;
 	selectedCards: SelectedSlot[];
 	addCard: (slot: SelectedSlot) => void;
@@ -27,7 +38,6 @@ interface TarotSessionState {
 	interpretation: string;
 	setInterpretation: (t: string) => void;
 
-	// Helpers
 	requiredCards: () => number;
 	reset: () => void;
 }
@@ -39,7 +49,23 @@ const initialSetup: TarotSetup = {
 	deckMode: "EXPLORE",
 };
 
+const initialState = {
+	selectedSpreadId: null,
+	mainQuestion: "",
+	activeSessionId: null,
+	drawnCards: [],
+};
+
 export const useTarotSessionStore = create<TarotSessionState>((set, get) => ({
+	...initialState,
+	setSelectedSpread: (spreadId) => set({ selectedSpreadId: spreadId }),
+	setMainQuestion: (q) => set({ mainQuestion: q }),
+	setActiveSession: (sessionId) => set({ activeSessionId: sessionId }),
+	setDrawnCards: (cards) => set({ drawnCards: cards }),
+	clearSession: () =>
+		set({ activeSessionId: null, drawnCards: [], phase: "SHUFFLING" }),
+
+	// --- CŨ ---
 	setup: { ...initialSetup },
 	setTopic: (t) => set((s) => ({ setup: { ...s.setup, topic: t } })),
 	setQuestion: (q) => set((s) => ({ setup: { ...s.setup, question: q } })),
@@ -66,6 +92,7 @@ export const useTarotSessionStore = create<TarotSessionState>((set, get) => ({
 
 	reset: () =>
 		set({
+			...initialState,
 			setup: { ...initialSetup },
 			phase: "SHUFFLING",
 			selectedCards: [],
