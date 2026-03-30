@@ -199,7 +199,7 @@ export function RegisterForm() {
 						className="h-12 w-full border-border/40 glass-card transition-colors duration-300 hover:bg-white/5"
 						onClick={() => {
 							const baseUrl =
-								process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+								process.env.NEXT_PUBLIC_BACKEND_BASE_URL || "http://localhost:8080";
 							window.location.href = `${baseUrl}/api/accounts/auth/google`;
 						}}
 					>
