@@ -16,10 +16,9 @@ function getBeBaseUrl(request: NextRequest): string {
     return LOCAL_BE
   }
 
-  // Default fallback priority
+  // Default fallback priority: Railway (prod) → Ngrok → Local
   return (
-    process.env.API_BASE_URL ??
-    process.env.BACKEND_BASE_URL ??
+    process.env.NEXT_PUBLIC_BACKEND_BASE_URL ??
     NGROK_BE ??
     LOCAL_BE
   ).replace(/\/$/, '')
