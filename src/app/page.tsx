@@ -1,7 +1,7 @@
 'use client'
 
 import Footer from '@/components/layout/footer'
-import Header from '@/components/layout/header'
+import Header from '@/components/layout/header/index'
 import { Skeleton } from '@/components/ui/skeleton'
 import HeroSection from '@/features/landing/components/hero-section'
 import dynamic from 'next/dynamic'

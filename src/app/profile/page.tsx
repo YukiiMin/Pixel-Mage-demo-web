@@ -1,5 +1,5 @@
 import Footer from '@/components/layout/footer'
-import Header from '@/components/layout/header'
+import Header from '@/components/layout/header/index'
 import StarBackground from '@/components/ui/star-background'
 import { ProfilePage } from '@/features/profile/components/profile-page'
 
