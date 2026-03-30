@@ -21,7 +21,7 @@ export function useMarketplace() {
 	if (isLoading) {
 		statusMessage = "Đang tải sản phẩm từ hệ thống...";
 	} else if (isError) {
-		const errObj = error as any;
+		const errObj = error as { status?: number };
 		if (errObj && errObj.status === 401) {
 			statusMessage = "Bạn cần đăng nhập để truy cập ưu đãi.";
 		} else if (errObj && errObj.status === 403) {

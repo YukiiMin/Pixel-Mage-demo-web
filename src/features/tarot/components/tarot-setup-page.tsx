@@ -68,9 +68,10 @@ export function TarotSetupPage() {
 			});
 			router.push(`/tarot/session/${session.sessionId}`);
 		} catch (error) {
-			if ((error as ApiHttpError).status === 409) {
-				const activeSessionId = (error as any).response?.data?.data
-					?.activeSessionId;
+			const err = error as ApiHttpError;
+			if (err.status === 409) {
+				const resData = err.data as { data?: { activeSessionId?: number } };
+				const activeSessionId = resData?.data?.activeSessionId;
 				setActiveSessionBannerData(activeSessionId || null);
 			}
 		}

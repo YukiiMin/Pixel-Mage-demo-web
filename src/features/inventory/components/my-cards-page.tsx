@@ -119,7 +119,7 @@ export function MyCardsPage() {
 							key={r}
 							type="button"
 							data-testid={`filter-${r}`}
-							onClick={() => setRarityFilter(r as any)}
+							onClick={() => setRarityFilter(r as "ALL" | MyCardItem["rarity"])}
 							className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
 								rarityFilter === r
 									? "bg-primary text-primary-foreground"

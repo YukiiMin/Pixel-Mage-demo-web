@@ -37,6 +37,11 @@ export const API_ENDPOINTS = {
     changePassword: (id: number | string) => `/api/accounts/${id}/password`,
     forgotPassword: '/api/accounts/auth/forgot-password',
     resetPassword: '/api/accounts/auth/reset-password',
+    /** Mobile → Web handoff: issue short-lived checkout token */
+    checkoutToken: '/api/accounts/auth/checkout-token',
+    /** Web App: verify + consume checkout token */
+    verifyCheckoutToken: (ct: string) =>
+      `/api/accounts/auth/verify-checkout-token?ct=${encodeURIComponent(ct)}`,
   },
   roleManagement: {
     list: '/api/roles',
