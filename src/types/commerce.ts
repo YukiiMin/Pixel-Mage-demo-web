@@ -71,6 +71,7 @@ export interface ProductResponse {
 	description: string;
 	price: number;
 	stockCount: number;
+	imageUrl?: string;
 	collectionType?: CollectionType;
 	isLimited?: boolean;
 	poolPreview: CardTemplateSummaryResponse[];
