@@ -4,6 +4,7 @@ import { ShoppingBag } from "lucide-react";
 import { useState } from "react";
 import { PackDetailModal } from "@/features/marketplace/components/pack-detail-modal";
 import { PackGrid } from "@/features/marketplace/components/pack-grid";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ProductFilter } from "@/features/marketplace/components/product-filter";
 import { useMarketplace } from "@/features/marketplace/hooks/use-marketplace";
 
@@ -69,7 +70,7 @@ export function MarketplacePage() {
 					: "Gợi ý tốt nhất hôm nay dành cho người mới và người sưu tầm lâu năm."}
 			</div>
 
-			{!canUseMarketplace ? (
+			{!canUseMarketplace && status !== "loading" ? (
 				<div className="glass-card mb-6 rounded-2xl border border-amber-300/30 bg-amber-300/5 p-5">
 					<p className="text-sm font-semibold text-amber-200">
 						{statusMessage || "Chức năng chưa cập nhật."}
@@ -77,7 +78,34 @@ export function MarketplacePage() {
 				</div>
 			) : null}
 
-			{canUseMarketplace ? (
+			{status === "loading" ? (
+				<div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+					{[1, 2, 3, 4, 5, 6].map((i) => (
+						<div key={i} className="glass-card flex h-60 flex-col justify-between rounded-2xl border border-border/50 p-5">
+							<div>
+								<div className="mb-3 flex justify-between">
+									<Skeleton className="h-6 w-32 rounded-md" />
+									<Skeleton className="h-5 w-16 rounded-full" />
+								</div>
+								<Skeleton className="mb-2 h-4 w-full rounded-md" />
+								<Skeleton className="mb-4 h-4 w-2/3 rounded-md" />
+								<div className="flex -space-x-2">
+									{[1, 2, 3].map((j) => (
+										<Skeleton key={j} className="h-10 w-10 rounded-full border-2 border-background" />
+									))}
+								</div>
+							</div>
+							<div className="mt-4 flex items-end justify-between border-t border-border/50 pt-4">
+								<div>
+									<Skeleton className="mb-1 h-3 w-8" />
+									<Skeleton className="h-6 w-24 rounded-md" />
+								</div>
+								<Skeleton className="h-9 w-28 rounded-lg" />
+							</div>
+						</div>
+					))}
+				</div>
+			) : canUseMarketplace ? (
 				<>
 					<ProductFilter
 						searchTerm={searchTerm}

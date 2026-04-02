@@ -3,12 +3,15 @@
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import tarotCard from "@/assets/tarot-the-fool.png";
 import {
 	fadeInLeft,
 	fadeInRight,
 	staggerContainer,
 } from "@/lib/motion-variants";
+
+// ✅ Ảnh nhóm thật từ Cloudinary (thay the-fool cũ)
+const HERO_IMAGE_URL =
+	"https://res.cloudinary.com/yukiimin-cloud/image/upload/v1775123777/00_e9wsbz.png";
 
 const CounterStat = ({ end, label }: { end: string; label: string }) => {
 	const ref = useRef<HTMLDivElement>(null);
@@ -17,14 +20,16 @@ const CounterStat = ({ end, label }: { end: string; label: string }) => {
 
 	useEffect(() => {
 		if (!inView) return;
-		const num = parseInt(end.replace(/[^0-9]/g, "10"));
-		const suffix = end.replace(/[0-9]/g, "");
+		const raw = end.replace(/[^0-9.]/g, "");
+		const num = parseFloat(raw) || 0;
+		const suffix = end.replace(/[0-9.]/g, "");
 		const duration = 1200;
 		const start = performance.now();
 		const tick = (now: number) => {
 			const p = Math.min((now - start) / duration, 1);
 			const eased = 1 - (1 - p) ** 3;
-			setVal(Math.round(num * eased) + suffix);
+			const current = num < 10 ? (num * eased).toFixed(1) : Math.round(num * eased).toString();
+			setVal(current + suffix);
 			if (p < 1) requestAnimationFrame(tick);
 		};
 		requestAnimationFrame(tick);
@@ -53,7 +58,7 @@ const FloatingBadge = ({
 		initial={{ opacity: 0, scale: 0.7 }}
 		animate={{ opacity: 1, scale: 1 }}
 		transition={{ delay, duration: 0.5, ease: "easeOut" }}
-		className={`glass-card rounded-xl px-3 py-2 text-xs font-medium text-foreground absolute animate-orbit ${className}`}
+		className={`glass-card rounded-xl px-3 py-2 text-xs font-medium text-foreground absolute z-20 animate-orbit whitespace-nowrap ${className}`}
 		style={{ animationDelay: `${delay}s` }}
 	>
 		{children}
@@ -67,14 +72,14 @@ const HeroSection = () => {
 			className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden"
 		>
 			{/* Gold radial glow */}
-			<div className="absolute right-[10%] top-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
+			<div className="absolute right-[10%] top-1/2 -translate-y-1/2 w-125 h-125 rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
 
-			<div className="container mx-auto px-6">
+			<div className="container mx-auto px-4 sm:px-6">
 				<motion.div
 					variants={staggerContainer}
 					initial="hidden"
 					animate="visible"
-					className="grid lg:grid-cols-[55%_45%] gap-12 items-center"
+					className="grid lg:grid-cols-[55%_45%] gap-10 items-center"
 				>
 					{/* LEFT */}
 					<motion.div variants={fadeInLeft} className="space-y-6">
@@ -108,7 +113,7 @@ const HeroSection = () => {
 						{/* CTAs */}
 						<div className="flex flex-wrap gap-4">
 							<a
-								href="/"
+								href="/tarot"
 								className="gradient-gold-purple-bg text-primary-foreground font-semibold rounded-full px-7 py-3 glow-gold transition-transform hover:scale-105"
 							>
 								🔮 Bắt Đầu Đọc Bài
@@ -141,7 +146,7 @@ const HeroSection = () => {
 							</div>
 						</div>
 
-						{/* Stats */}
+						{/* ✅ Stats được làm sạch — số thật */}
 						<div className="flex gap-8 pt-4">
 							<CounterStat end="78" label="Lá Bài" />
 							<div className="w-px bg-border" />
@@ -151,33 +156,42 @@ const HeroSection = () => {
 						</div>
 					</motion.div>
 
-					{/* RIGHT — 3D Card */}
+					{/* RIGHT — Group image with floating badges */}
 					<motion.div
 						variants={fadeInRight}
-						className="relative flex justify-center"
+						className="relative flex justify-center items-center"
 					>
+						{/* Glow behind image */}
+						<div className="absolute inset-0 rounded-full bg-primary/15 blur-[80px] pointer-events-none" />
+
+						{/* ✅ Ảnh thật của nhóm */}
 						<motion.div
 							className="relative z-10"
-							whileHover={{ rotateY: 12, rotateX: -5 }}
+							whileHover={{ rotateY: 8, rotateX: -4 }}
 							transition={{ type: "spring", stiffness: 200 }}
 							style={{ perspective: 800, transformStyle: "preserve-3d" }}
 						>
 							<Image
-								src={tarotCard}
-								alt="The Fool Tarot Card"
-								className="w-64 md:w-72 lg:w-80 rounded-2xl shadow-2xl h-auto"
+								src={HERO_IMAGE_URL}
+								alt="PixelMage — The Fool Card"
+								width={320}
+								height={480}
+								className="w-56 sm:w-64 md:w-72 lg:w-80 rounded-2xl shadow-2xl h-auto object-cover"
 								priority
+								unoptimized
 							/>
+							{/* Gradient overlay bottom */}
+							<div className="absolute inset-x-0 bottom-0 h-20 rounded-b-2xl bg-linear-to-t from-background/40 to-transparent pointer-events-none" />
 						</motion.div>
 
-						{/* Floating badges */}
-						<FloatingBadge className="top-8 -right-4 md:right-4" delay={2}>
+						{/* ✅ Floating badges với z-index cao hơn ảnh, đủ khoảng cách */}
+						<FloatingBadge className="top-8 right-0 lg:-right-6" delay={2}>
 							✨ +1 The Moon
 						</FloatingBadge>
-						<FloatingBadge className="bottom-24 -left-4 md:left-0" delay={3}>
+						<FloatingBadge className="bottom-20 left-0 lg:-left-6" delay={3}>
 							🔮 AI Interpretation
 						</FloatingBadge>
-						<FloatingBadge className="top-1/3 -left-8 md:-left-4" delay={4}>
+						<FloatingBadge className="top-1/3 left-0 lg:-left-8" delay={4}>
 							📱 NFC Linked!
 						</FloatingBadge>
 					</motion.div>

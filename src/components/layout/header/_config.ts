@@ -1,4 +1,4 @@
-import { CreditCard, LayoutGrid, Package, User } from "lucide-react";
+import { BarChart3, CreditCard, LayoutDashboard, LayoutGrid, Link2Off, Package, User, Users } from "lucide-react";
 
 export const sectionLinks = [
 	{ label: "Trang chủ", hash: "/" },
@@ -21,8 +21,18 @@ export const authDropdownLinks = [
 	{ label: "Hồ sơ", href: "/profile", icon: User },
 ];
 
+/** Links for STAFF role (cả STAFF lẫn ADMIN đều thấy) */
 export const staffNavLinks = [
-	{ label: "Gacha Management", href: "/staff/products", icon: Package },
+	{ label: "Gacha Products", href: "/staff/products", icon: Package },
+	{ label: "Unlink Requests", href: "/staff/unlink-requests", icon: Link2Off },
+];
+
+/** Links chỉ dành cho ADMIN */
+export const adminNavLinks = [
+	{ label: "Dashboard", href: "/staff/admin", icon: LayoutDashboard },
+	{ label: "Accounts", href: "/staff/admin/accounts", icon: Users },
+	{ label: "Card Manager", href: "/staff/admin/cards", icon: CreditCard },
+	{ label: "Analytics", href: "/staff/admin/analytics", icon: BarChart3 },
 ];
 
 export const authAvatarIcon = LayoutGrid;
@@ -41,3 +51,4 @@ export function getInitials(name: string): string {
 		.join("")
 		.toUpperCase();
 }
+

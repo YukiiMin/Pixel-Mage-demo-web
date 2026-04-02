@@ -10,7 +10,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authDropdownLinks, resolveSectionHref, staffNavLinks } from "./_config";
+import { adminNavLinks, authDropdownLinks, resolveSectionHref, staffNavLinks } from "./_config";
 
 interface DesktopActionsProps {
 	pathname: string;
@@ -46,7 +46,7 @@ const DesktopActions = ({
 						<ChevronDown size={14} className="text-muted-foreground" />
 					</button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent align="end" className="w-52">
+				<DropdownMenuContent align="end" className="w-56">
 					<DropdownMenuLabel className="flex flex-col gap-0.5">
 						<span className="font-semibold truncate">{displayName}</span>
 						{userEmail && (
@@ -56,15 +56,15 @@ const DesktopActions = ({
 						)}
 					</DropdownMenuLabel>
 					<DropdownMenuSeparator />
-					{(userRole === "STAFF" || userRole === "ADMIN") && (
+
+					{/* Admin-only links */}
+					{userRole === "ADMIN" && (
 						<>
-							{staffNavLinks.map((item) => (
+							{adminNavLinks.map((item) => (
 								<DropdownMenuItem key={item.href} asChild>
 									<Link
 										href={item.href}
-										className={`flex items-center gap-2 ${
-											pathname === item.href ? "text-primary" : ""
-										}`}
+										className={`flex items-center gap-2 ${pathname === item.href ? "text-primary" : ""}`}
 									>
 										<item.icon size={15} />
 										{item.label}
@@ -74,13 +74,30 @@ const DesktopActions = ({
 							<DropdownMenuSeparator />
 						</>
 					)}
+
+					{/* Staff + Admin shared links */}
+					{(userRole === "STAFF" || userRole === "ADMIN") && (
+						<>
+							{staffNavLinks.map((item) => (
+								<DropdownMenuItem key={item.href} asChild>
+									<Link
+										href={item.href}
+										className={`flex items-center gap-2 ${pathname === item.href ? "text-primary" : ""}`}
+									>
+										<item.icon size={15} />
+										{item.label}
+									</Link>
+								</DropdownMenuItem>
+							))}
+							<DropdownMenuSeparator />
+						</>
+					)}
+
 					{authDropdownLinks.map((item) => (
 						<DropdownMenuItem key={item.href} asChild>
 							<Link
 								href={item.href}
-								className={`flex items-center gap-2 ${
-									pathname === item.href ? "text-primary" : ""
-								}`}
+								className={`flex items-center gap-2 ${pathname === item.href ? "text-primary" : ""}`}
 							>
 								<item.icon size={15} />
 								{item.label}

@@ -62,7 +62,19 @@ export interface CardTemplateSummaryResponse {
 	cardTemplateId: number;
 	name: string;
 	imagePath: string;
-	rarity: "COMMON" | "RARE" | "LEGENDARY";
+	rarity: Rarity;
+}
+
+/** Full card template as returned by GET /api/card-templates/{id} */
+export interface CardTemplate {
+	cardTemplateId: number;
+	name: string;
+	cardCode?: string;
+	description?: string;
+	imagePath?: string;
+	rarity: Rarity;
+	createdAt?: string;
+	updatedAt?: string;
 }
 
 export interface ProductResponse {

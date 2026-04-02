@@ -1,7 +1,9 @@
+import { StaffShell } from "@/features/staff/components/staff-shell";
+
 export default function StaffLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
-	return <>{children}</>;
+	return <StaffShell>{children}</StaffShell>;
 }

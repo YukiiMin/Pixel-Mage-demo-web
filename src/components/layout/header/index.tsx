@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { clearStoredAuthSession, getStoredUserRole, hasStoredAuthSession } from "@/lib/api-config";
+import { clearStoredAuthSession, getStoredUserRole, getStoredUserId, hasStoredAuthSession } from "@/lib/api-config";
+import { useProfile } from "@/features/auth/hooks/use-auth";
 import { getInitials, resolveSectionHref, sectionLinks } from "./_config";
 import DesktopActions from "./desktop-actions";
 import DesktopNav from "./desktop-nav";
@@ -21,9 +22,11 @@ const Header = () => {
 	const [activeHash, setActiveHash] = useState("");
 	const [isAuth, setIsAuth] = useState(false);
 	const [userRole, setUserRole] = useState<string | null>(null);
-	const [userName, setUserName] = useState("");
-	const [userEmail, setUserEmail] = useState("");
+	const [userId, setUserId] = useState<number | null>(null);
 	const lastYRef = useRef(0);
+
+	// Fetch real profile for name/email display
+	const { data: profileData } = useProfile(isAuth ? userId : null);
 
 	// --- Auth sync ---
 	const syncAuthState = useCallback(() => {
@@ -31,13 +34,10 @@ const Header = () => {
 		setIsAuth(authed);
 		if (authed) {
 			setUserRole(getStoredUserRole());
-			// REMOVED: Name and email are no longer in sessionStorage
-			setUserName("");
-			setUserEmail("");
+			setUserId(getStoredUserId());
 		} else {
 			setUserRole(null);
-			setUserName("");
-			setUserEmail("");
+			setUserId(null);
 		}
 	}, []);
 
@@ -108,8 +108,10 @@ const Header = () => {
 		[pathname],
 	);
 
-	const displayName = userName || "Người dùng";
-	const initials = getInitials(displayName);
+	// ✅ Dùng tên/email thật từ profile API
+	const displayName = profileData?.name || profileData?.email || "";
+	const userEmail = profileData?.email || "";
+	const initials = displayName ? getInitials(displayName) : "??";
 
 	return (
 		<>
