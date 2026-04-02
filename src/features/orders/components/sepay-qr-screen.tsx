@@ -49,7 +49,7 @@ export function SepayQrScreen({
 	}, [countdown, isExpired]);
 
 	useEffect(() => {
-		if (order?.paymentStatus === "PAID") {
+		if (order?.paymentStatus === "SUCCEEDED") {
 			toast.success("Thanh toán thành công!");
 			router.push(`/orders/${orderId}`);
 		}

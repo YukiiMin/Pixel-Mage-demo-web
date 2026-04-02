@@ -278,7 +278,7 @@ export function ProfilePage() {
 						<p className="text-muted-foreground">
 							Role ID:{" "}
 							<span className="text-foreground">
-								{displayProfile?.role?.roleName ?? "N/A"}
+								{displayProfile?.role ?? "N/A"}
 							</span>
 						</p>
 						<p className="text-muted-foreground">

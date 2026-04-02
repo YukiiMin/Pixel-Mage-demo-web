@@ -18,7 +18,7 @@ export function WalletBalance({ className }: WalletBalanceProps) {
 	if (!userId) return null;
 
 	if (isLoading) {
-		return <Skeleton className="h-24 w-full md:w-[300px] rounded-xl" />;
+		return <Skeleton className="h-24 w-full md:w-75 rounded-xl" />;
 	}
 
 	if (isError) {
@@ -33,7 +33,7 @@ export function WalletBalance({ className }: WalletBalanceProps) {
 		);
 	}
 
-	const balance = data?.pmPoint ?? 0;
+	const balance = data?.balance ?? 0;
 
 	return (
 		<Card

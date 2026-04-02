@@ -42,14 +42,6 @@ export function useMarketplace() {
 	const filteredPacks = useMemo(() => {
 		const normalizedSearch = searchTerm.trim().toLowerCase();
 		const result = packs.filter((pack) => {
-			// Typically packs don't have a category mapped directly like products,
-			// but if they do via collectionType we can match. For now, category filter usually
-			// doesn't apply to packs. If we wanted, we could map it.
-
-			// Since Packs don't have direct rarity yet (it's inside drops), we might
-			// need to ignore rarity filter or map it. Let's ignore it for packs unless specified.
-			// Or if name includes it loosely. For now, just apply search and limited.
-
 			const matchLimited = !limitedOnly || pack.isLimited;
 			const matchSearch =
 				normalizedSearch.length === 0 ||
@@ -66,7 +58,7 @@ export function useMarketplace() {
 			if (sortBy === "price-desc") {
 				return b.price - a.price;
 			}
-			return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+			return b.productId - a.productId;
 		});
 
 		return sorted;

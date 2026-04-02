@@ -18,8 +18,8 @@ function getBeBaseUrl(request: NextRequest): string {
 
   // Default fallback priority: Railway (prod) → Ngrok → Local
   return (
-    process.env.NEXT_PUBLIC_BACKEND_BASE_URL ??
-    NGROK_BE ??
+    process.env.NEXT_PUBLIC_BACKEND_BASE_URL ||
+    NGROK_BE ||
     LOCAL_BE
   ).replace(/\/$/, '')
 }
@@ -155,13 +155,14 @@ async function forwardRequest(
 
   const body = NO_BODY_METHODS.has(method)
     ? undefined
-    : await request.text().then((t) => t || undefined)
+    : await request.arrayBuffer()
 
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS)
 
   let beResponse: Response
   try {
+    console.log(`[PROXY DEBUG] Forwarding ${method} to ${targetUrl}`);
     beResponse = await fetch(targetUrl, {
       method,
       headers: baseHeaders,
@@ -213,16 +214,21 @@ async function forwardRequest(
     }
   }
 
-  const responseText = await finalResponse.text()
-  const contentType =
-    finalResponse.headers.get('content-type') ?? 'application/json'
+  const responseBody = await finalResponse.arrayBuffer()
 
-  const nextResponse = new NextResponse(responseText, {
+  const nextResponse = new NextResponse(responseBody, {
     status: finalResponse.status,
     headers: {
-      'content-type': contentType,
       'cache-control': 'no-store',
     },
+  })
+
+  // Safely forward headers from backend to frontend
+  finalResponse.headers.forEach((value, key) => {
+    const lowerKey = key.toLowerCase()
+    if (!['set-cookie', 'content-encoding', 'transfer-encoding'].includes(lowerKey)) {
+      nextResponse.headers.set(key, value)
+    }
   })
 
   nextResponse.headers.set('X-Backend-URL', beBaseUrl)

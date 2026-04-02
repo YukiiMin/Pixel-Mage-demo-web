@@ -6,14 +6,10 @@ export interface UserProfile {
 	avatarUrl?: string;
 	emailVerified?: boolean;
 	authProvider?: string;
-	providerId?: string;
 	createdAt?: string;
 	updatedAt?: string;
 	isActive?: boolean;
-	role?: {
-		roleId: number;
-		roleName: string;
-	};
+	role?: "USER" | "STAFF" | "ADMIN";
 }
 
 export interface RegisterPayload {

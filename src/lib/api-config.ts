@@ -216,14 +216,19 @@ export const API_ENDPOINTS = {
 } as const
 
 export function buildApiUrl(path: string): string {
-  if (path.startsWith('/api/')) {
+  if (!path || typeof path !== 'string') return ''
+
+  // If already absolute, return as is
+  if (path.startsWith('http://') || path.startsWith('https://')) {
     return path
   }
 
-  if (!path.startsWith('/')) {
-    return `${API_CONFIG.baseUrl}/${path}`
-  }
-  return `${API_CONFIG.baseUrl}${path}`
+  const baseUrl = API_CONFIG.baseUrl.replace(/\/$/, '')
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+
+  // We MUST use the local relative path to hit the Next.js proxy (/api/[...proxy]/route.ts)
+  // This ensures HttpOnly cookies are correctly attached and CORS is avoided.
+  return normalizedPath
 }
 
 export function getStoredAccessToken(): string | null {
@@ -236,11 +241,21 @@ export function clearStoredAuthSession(): void {
   }
 
   try {
-    // biome-ignore lint/suspicious/noDocumentCookie: intentional cookie expiry — only way to delete a cookie client-side
     document.cookie = `${AUTH_LOGIN_MARKER_COOKIE}=; Max-Age=0; Path=/; SameSite=Lax`
-    // biome-ignore lint/suspicious/noDocumentCookie: intentional cookie expiry — only way to delete a cookie client-side
     document.cookie = 'pm_user_id=; Max-Age=0; Path=/; SameSite=Lax'
+    document.cookie = 'pm_user_role=; Max-Age=0; Path=/; SameSite=Lax'
   } catch (_e) {}
+}
+
+export function setStoredAuthSession(userId: number, role?: string): void {
+  if (typeof window === 'undefined') return
+  
+  const expiry = 60 * 60 * 24 * 7 // 7 days
+  document.cookie = `${AUTH_LOGIN_MARKER_COOKIE}=1; Max-Age=${expiry}; Path=/; SameSite=Lax`
+  document.cookie = `pm_user_id=${userId}; Max-Age=${expiry}; Path=/; SameSite=Lax`
+  if (role) {
+    document.cookie = `pm_user_role=${role}; Max-Age=${expiry}; Path=/; SameSite=Lax`
+  }
 }
 
 export function getStoredUserId(): number | null {
@@ -252,6 +267,11 @@ export function getStoredUserId(): number | null {
   if (!match) return null
   const id = Number(match.split('=')[1])
   return Number.isInteger(id) && id > 0 ? id : null
+}
+
+export function getStoredUserRole(): string | null {
+  if (typeof window === 'undefined') return null
+  return readCookieValue('pm_user_role')
 }
 
 function readCookieValue(name: string): string | null {

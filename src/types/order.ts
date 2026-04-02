@@ -1,18 +1,21 @@
 import type { Pack } from "./commerce";
 
 export type OrderStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED";
-export type PaymentStatus = "PENDING" | "PAID" | "FAILED";
+export type PaymentStatus = "PENDING" | "SUCCEEDED" | "FAILED" | "CANCELED" | "REQUIRES_ACTION";
 
 export interface CreateOrderRequest {
-	packId: number;
-	quantity: number;
-	note?: string;
+	packIds: number[];
+	shippingAddress: string;
+	paymentMethod: "SEPAY" | "STRIPE" | "VNPAY";
+	voucherCode?: string;
+	notes?: string;
 }
 
 export interface CreateOrderResponse {
 	orderId: number;
 	status: OrderStatus;
 	totalAmount: number;
+	paymentQrUrl?: string;
 }
 
 export interface InitiatePaymentRequest {

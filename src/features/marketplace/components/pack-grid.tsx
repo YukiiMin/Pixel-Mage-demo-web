@@ -2,10 +2,10 @@
 
 import { Package } from "lucide-react";
 import { formatVnd } from "@/features/marketplace/hooks/use-marketplace";
-import type { Pack } from "@/types/commerce";
+import type { ProductResponse } from "@/types/commerce";
 
 interface PackGridProps {
-	packs: Pack[];
+	packs: ProductResponse[];
 	onSelectPack: (packId: number) => void;
 }
 
@@ -36,7 +36,7 @@ export function PackGrid({ packs, onSelectPack }: PackGridProps) {
 				const delay = Math.min(index, 5);
 				return (
 					<div
-						key={pack.packId}
+						key={pack.productId}
 						data-testid={`pack-card-${pack.name}`}
 						className="glass-card animate-fog-in group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border/50 bg-card/40 p-5 transition-all hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_8px_30px_-12px_rgba(var(--primary),0.3)]"
 						style={{
@@ -55,7 +55,7 @@ export function PackGrid({ packs, onSelectPack }: PackGridProps) {
 									</h3>
 									<div className="mt-1 flex gap-2">
 										<span className="inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
-											{pack.cardCount} Cards
+											Kho: {pack.stockCount}
 										</span>
 										{pack.isLimited && (
 											<span className="inline-flex rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-500">
@@ -68,6 +68,24 @@ export function PackGrid({ packs, onSelectPack }: PackGridProps) {
 							<p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
 								{pack.description}
 							</p>
+
+							{/* Gacha Pool Preview */}
+							{pack.poolPreview && pack.poolPreview.length > 0 && (
+								<div className="mb-4 space-y-2">
+									<p className="text-xs font-semibold text-muted-foreground">Có thể nhận được:</p>
+									<div className="flex -space-x-3 overflow-hidden p-1">
+										{pack.poolPreview.slice(0, 5).map((preview, i) => (
+											<img 
+												key={preview.cardTemplateId}
+												src={preview.imagePath || "https://placehold.co/150x210?text=Card"} 
+												alt={preview.name}
+												className="inline-block h-12 w-12 rounded-full border-2 border-background object-cover shadow-xs transition-transform hover:z-20 hover:-translate-y-1 hover:scale-110"
+												title={`${preview.name} (${preview.rarity})`}
+											/>
+										))}
+									</div>
+								</div>
+							)}
 						</div>
 
 						<div className="relative z-10 mt-auto flex items-end justify-between border-t border-border/50 pt-4">
@@ -83,8 +101,8 @@ export function PackGrid({ packs, onSelectPack }: PackGridProps) {
 
 							<button
 								type="button"
-								onClick={() => onSelectPack(pack.packId)}
-								className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:bg-primary/90 focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50"
+								onClick={() => onSelectPack(pack.productId)}
+								className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:bg-primary/90 focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 cursor-pointer"
 							>
 								Xem chi tiết
 							</button>

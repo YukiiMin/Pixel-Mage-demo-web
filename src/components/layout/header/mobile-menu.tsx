@@ -7,6 +7,7 @@ import {
 	authDropdownLinks,
 	publicNavLinks,
 	resolveSectionHref,
+	staffNavLinks,
 } from "./_config";
 
 interface MobileMenuProps {
@@ -14,6 +15,7 @@ interface MobileMenuProps {
 	onClose: () => void;
 	pathname: string;
 	isAuth: boolean;
+	userRole: string | null;
 	displayName: string;
 	userEmail: string;
 	initials: string;
@@ -26,6 +28,7 @@ const MobileMenu = ({
 	onClose,
 	pathname,
 	isAuth,
+	userRole,
 	displayName,
 	userEmail,
 	initials,
@@ -109,6 +112,25 @@ const MobileMenu = ({
 					{isAuth ? (
 						<>
 							<div className="h-px w-32 bg-border/50" />
+							{(userRole === "STAFF" || userRole === "ADMIN") && (
+								<>
+									{staffNavLinks.map((item) => (
+										<Link
+											key={item.href}
+											href={item.href}
+											onClick={onClose}
+											className={`text-2xl font-heading transition-colors hover:text-primary ${
+												pathname === item.href
+													? "text-primary"
+													: "text-foreground"
+											}`}
+										>
+											{item.label}
+										</Link>
+									))}
+									<div className="h-px w-32 bg-border/50" />
+								</>
+							)}
 							{authDropdownLinks.map((item) => (
 								<Link
 									key={item.href}

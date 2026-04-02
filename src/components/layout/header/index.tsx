@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { clearStoredAuthSession, hasStoredAuthSession } from "@/lib/api-config";
+import { clearStoredAuthSession, getStoredUserRole, hasStoredAuthSession } from "@/lib/api-config";
 import { getInitials, resolveSectionHref, sectionLinks } from "./_config";
 import DesktopActions from "./desktop-actions";
 import DesktopNav from "./desktop-nav";
@@ -20,6 +20,7 @@ const Header = () => {
 	const [mobileOpen, setMobileOpen] = useState(false);
 	const [activeHash, setActiveHash] = useState("");
 	const [isAuth, setIsAuth] = useState(false);
+	const [userRole, setUserRole] = useState<string | null>(null);
 	const [userName, setUserName] = useState("");
 	const [userEmail, setUserEmail] = useState("");
 	const lastYRef = useRef(0);
@@ -29,10 +30,12 @@ const Header = () => {
 		const authed = hasStoredAuthSession();
 		setIsAuth(authed);
 		if (authed) {
+			setUserRole(getStoredUserRole());
 			// REMOVED: Name and email are no longer in sessionStorage
 			setUserName("");
 			setUserEmail("");
 		} else {
+			setUserRole(null);
 			setUserName("");
 			setUserEmail("");
 		}
@@ -127,6 +130,7 @@ const Header = () => {
 					<DesktopActions
 						pathname={pathname}
 						isAuth={isAuth}
+						userRole={userRole}
 						displayName={displayName}
 						userEmail={userEmail}
 						initials={initials}
@@ -154,6 +158,7 @@ const Header = () => {
 				onClose={() => setMobileOpen(false)}
 				pathname={pathname}
 				isAuth={isAuth}
+				userRole={userRole}
 				displayName={displayName}
 				userEmail={userEmail}
 				initials={initials}

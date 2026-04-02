@@ -6,6 +6,7 @@ import {
 	API_ENDPOINTS,
 	apiRequest,
 	clearStoredAuthSession,
+	setStoredAuthSession,
 	getStoredUserId,
 } from "@/lib/api-config";
 import { getApiErrorMessage } from "@/types/api";
@@ -33,21 +34,15 @@ function normalizeUser(payload: unknown): UserProfile | null {
 		return null;
 	}
 
-	const role = pickRecord(raw.role);
+	const role = String(raw.role ?? "").trim() || undefined;
 
 	return {
 		customerId: id,
 		email,
 		name,
 		phoneNumber: String(raw.phoneNumber ?? "") || undefined,
-		role: role
-			? {
-					roleId: Number(role.roleId ?? role.id ?? 0),
-					roleName: String(role.roleName ?? role.name ?? ""),
-				}
-			: undefined,
+		role: role as "USER" | "STAFF" | "ADMIN" | undefined,
 		authProvider: String(raw.authProvider ?? raw.provider ?? "") || undefined,
-		providerId: String(raw.providerId ?? "") || undefined,
 		avatarUrl: String(raw.avatarUrl ?? "") || undefined,
 		emailVerified: Boolean(raw.emailVerified ?? false),
 		createdAt: String(raw.createdAt ?? "") || undefined,
@@ -146,6 +141,10 @@ export function useAuth() {
 					(response.data as Record<string, unknown>)?.name ?? "",
 				).trim() ||
 					normalizedPayload.email);
+
+			if (userIdFromSession) {
+				setStoredAuthSession(userIdFromSession, result?.user?.role);
+			}
 
 			return result;
 		} catch (error) {

@@ -42,11 +42,11 @@ export function PackDetailModal({
 	} | null>(null);
 
 	const handleCheckout = () => {
-		if (!pack || pack.status !== "STOCKED") return;
+		if (!pack || pack.stockCount <= 0) return;
 		setCheckoutState("creating_order");
 
 		createOrder.mutate(
-			{ packId: pack.packId, quantity, note: "Mua từ Marketplace" },
+			{ packIds: [pack.productId], paymentMethod: "SEPAY", shippingAddress: "Default Web Address", notes: "Mua từ Marketplace" },
 			{
 				onSuccess: (orderData) => {
 					setCheckoutState("initiating_payment");
@@ -168,7 +168,7 @@ export function PackDetailModal({
 
 							<div className="mb-4 flex flex-wrap gap-2">
 								<span className="inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-									{pack.cardCount} Cards
+									Kho: {pack.stockCount}
 								</span>
 								{pack.isLimited && (
 									<span className="inline-flex rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-500">
@@ -220,7 +220,7 @@ export function PackDetailModal({
 									type="button"
 									onClick={handleCheckout}
 									disabled={
-										checkoutState !== "idle" || pack.status !== "STOCKED"
+										checkoutState !== "idle" || pack.stockCount <= 0
 									}
 									className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-base font-bold text-primary-foreground shadow-lg transition-all hover:bg-primary/90 focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50"
 									data-testid="checkout-btn"
@@ -230,11 +230,9 @@ export function PackDetailModal({
 									) : (
 										<>
 											<CreditCard className="h-5 w-5" />
-											{pack.status === "STOCKED"
+											{pack.stockCount > 0
 												? "Mua ngay"
-												: pack.status === "SOLD"
-													? "Đã bán"
-													: "Đã đặt trước"}
+												: "Hết hàng"}
 										</>
 									)}
 								</button>

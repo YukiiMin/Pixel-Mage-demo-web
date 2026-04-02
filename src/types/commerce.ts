@@ -57,3 +57,21 @@ export interface CollectionProgressItem {
 	totalItems: number;
 	completionRate: number;
 }
+
+export interface CardTemplateSummaryResponse {
+	cardTemplateId: number;
+	name: string;
+	imagePath: string;
+	rarity: "COMMON" | "RARE" | "LEGENDARY";
+}
+
+export interface ProductResponse {
+	productId: number;
+	name: string;
+	description: string;
+	price: number;
+	stockCount: number;
+	collectionType?: CollectionType;
+	isLimited?: boolean;
+	poolPreview: CardTemplateSummaryResponse[];
+}

@@ -8,13 +8,21 @@ export const sectionLinks = [
 ];
 
 // Always visible in nav bar (not auth-gated)
-export const publicNavLinks = [{ label: "Marketplace", href: "/marketplace" }];
+export const publicNavLinks = [
+	{ label: "Marketplace", href: "/marketplace" },
+	{ label: "Explore Deck", href: "/tarot" },
+];
 
-// Only shown in auth dropdown
+// Only shown for authenticated users in dropdown
 export const authDropdownLinks = [
+	{ label: "My Reading", href: "/tarot", icon: LayoutGrid },
 	{ label: "My Cards", href: "/my-cards", icon: CreditCard },
 	{ label: "Đơn hàng", href: "/orders", icon: Package },
 	{ label: "Hồ sơ", href: "/profile", icon: User },
+];
+
+export const staffNavLinks = [
+	{ label: "Gacha Management", href: "/staff/products", icon: Package },
 ];
 
 export const authAvatarIcon = LayoutGrid;

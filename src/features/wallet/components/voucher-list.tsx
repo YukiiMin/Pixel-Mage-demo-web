@@ -71,11 +71,11 @@ export function VoucherList({ userId, className }: VoucherListProps) {
 			)}
 		>
 			{vouchers.map((voucher) => {
-				const isActive = voucher.status === "ACTIVE";
+				const isActive = !voucher.isUsed && !voucher.isExpired;
 				return (
 					<Card
-						key={voucher.id}
-						data-testid={`voucher-item-${voucher.code}`}
+						key={voucher.voucherId}
+						data-testid={`voucher-item-${voucher.voucherId}`}
 						className={cn(
 							"relative overflow-hidden transition-all duration-300",
 							isActive
@@ -98,22 +98,22 @@ export function VoucherList({ userId, className }: VoucherListProps) {
 							<div>
 								<div className="flex items-center justify-between gap-2 mb-1">
 									<p className="font-stats font-bold text-lg text-primary tracking-wide">
-										{voucher.code}
+										VOUCHER #{voucher.voucherId}
 									</p>
 									{!isActive && (
 										<span className="text-xs uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-											{voucher.status === "USED" ? "Đã dùng" : "Hết hạn"}
+											{voucher.isUsed ? "Đã dùng" : "Hết hạn"}
 										</span>
 									)}
 								</div>
 								<p className="text-xl font-heading font-semibold">
-									{voucher.discountPercentage
-										? `Giảm ${voucher.discountPercentage}%`
-										: `Giảm ${voucher.discountAmount?.toLocaleString() || 0}đ`}
+									{voucher.discountPct
+										? `Giảm ${voucher.discountPct}%`
+										: `Giảm giá`}
 								</p>
-								{voucher.minOrderTotal ? (
+								{voucher.maxDiscountVnd !== null ? (
 									<p className="text-xs text-muted-foreground mt-1">
-										Đơn tối thiểu {voucher.minOrderTotal.toLocaleString()}đ
+										Tối đa {voucher.maxDiscountVnd.toLocaleString("vi-VN")}đ
 									</p>
 								) : null}
 							</div>
@@ -124,8 +124,8 @@ export function VoucherList({ userId, className }: VoucherListProps) {
 										<Clock className="w-3.5 h-3.5 text-primary/70" />
 										<span>
 											HSD:{" "}
-											{voucher.validUntil
-												? new Date(voucher.validUntil).toLocaleDateString(
+											{voucher.expiresAt
+												? new Date(voucher.expiresAt).toLocaleDateString(
 														"vi-VN",
 													)
 												: "Không giới hạn"}

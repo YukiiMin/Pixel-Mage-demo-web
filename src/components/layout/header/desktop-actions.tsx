@@ -10,11 +10,12 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authDropdownLinks, resolveSectionHref } from "./_config";
+import { authDropdownLinks, resolveSectionHref, staffNavLinks } from "./_config";
 
 interface DesktopActionsProps {
 	pathname: string;
 	isAuth: boolean;
+	userRole: string | null;
 	displayName: string;
 	userEmail: string;
 	initials: string;
@@ -24,6 +25,7 @@ interface DesktopActionsProps {
 const DesktopActions = ({
 	pathname,
 	isAuth,
+	userRole,
 	displayName,
 	userEmail,
 	initials,
@@ -54,6 +56,24 @@ const DesktopActions = ({
 						)}
 					</DropdownMenuLabel>
 					<DropdownMenuSeparator />
+					{(userRole === "STAFF" || userRole === "ADMIN") && (
+						<>
+							{staffNavLinks.map((item) => (
+								<DropdownMenuItem key={item.href} asChild>
+									<Link
+										href={item.href}
+										className={`flex items-center gap-2 ${
+											pathname === item.href ? "text-primary" : ""
+										}`}
+									>
+										<item.icon size={15} />
+										{item.label}
+									</Link>
+								</DropdownMenuItem>
+							))}
+							<DropdownMenuSeparator />
+						</>
+					)}
 					{authDropdownLinks.map((item) => (
 						<DropdownMenuItem key={item.href} asChild>
 							<Link

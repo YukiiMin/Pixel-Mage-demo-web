@@ -2,6 +2,7 @@
 
 import { motion, type Variants } from "framer-motion";
 import { Eye, EyeOff, LoaderCircle, Sparkles, UserPlus } from "lucide-react";
+import { PrivacyPolicyDialog, TermsOfServiceDialog } from "@/components/shared/legal-modals";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -148,6 +149,30 @@ export function RegisterForm() {
 						</button>
 					</motion.div>
 				</div>
+
+				<motion.div variants={itemVariants} className="mt-6 flex items-start space-x-3">
+					<input
+						type="checkbox"
+						id="terms"
+						required
+						className="mt-1 h-4 w-4 rounded border-border/50 bg-background/50 accent-primary focus:ring-2 focus:ring-primary/50"
+					/>
+					<label htmlFor="terms" className="text-sm text-muted-foreground leading-tight">
+						Tôi đồng ý với{" "}
+						<TermsOfServiceDialog>
+							<button type="button" className="text-primary hover:underline font-medium focus:outline-none">
+								Điều khoản dịch vụ
+							</button>
+						</TermsOfServiceDialog>
+						{" "}và{" "}
+						<PrivacyPolicyDialog>
+							<button type="button" className="text-primary hover:underline font-medium focus:outline-none">
+								Chính sách bảo mật
+							</button>
+						</PrivacyPolicyDialog>
+						{" "}của PixelMage.
+					</label>
+				</motion.div>
 
 				{errorMessage ? (
 					<motion.p

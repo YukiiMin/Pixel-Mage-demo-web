@@ -8,7 +8,7 @@ import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
 import { useCreateOrder } from "@/features/orders/hooks/use-create-order";
 import { useInitiatePayment } from "@/features/orders/hooks/use-initiate-payment";
 import { useOrderStatusPoll } from "@/features/orders/hooks/use-order-status-poll";
-import type { Pack } from "@/types/commerce";
+import type { ProductResponse } from "@/types/commerce";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -53,7 +53,7 @@ export function CheckoutPage({ packId }: Props) {
 
   const [step, setStep] = useState<CheckoutStep>("verifying");
   const [userInfo, setUserInfo] = useState<VerifyCtResponse | null>(null);
-  const [pack, setPack] = useState<Pack | null>(null);
+  const [pack, setPack] = useState<ProductResponse | null>(null);
   const [orderId, setOrderId] = useState<number | null>(null);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -95,7 +95,7 @@ export function CheckoutPage({ packId }: Props) {
     if (step !== "loading_pack") return;
     (async () => {
       try {
-        const res = await apiRequest<Pack>(API_ENDPOINTS.packManagement.byId(packId));
+        const res = await apiRequest<ProductResponse>(API_ENDPOINTS.productManagement.byId(packId));
         setPack(res.data);
         setStep("confirmed");
       } catch {
@@ -109,7 +109,7 @@ export function CheckoutPage({ packId }: Props) {
   useEffect(() => {
     if (!orderStatus || step !== "polling") return;
 
-    if (orderStatus.paymentStatus === "PAID") {
+    if (orderStatus.paymentStatus === "SUCCEEDED") {
       setStep("success");
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       // Give user 2 seconds to see success state then bounce back
@@ -125,7 +125,7 @@ export function CheckoutPage({ packId }: Props) {
     if (!pack || !userInfo) return;
     setStep("ordering");
     try {
-      const order = await createOrder.mutateAsync({ packId: pack.packId, quantity: 1 });
+      const order = await createOrder.mutateAsync({ packIds: [pack.productId], paymentMethod: "SEPAY", shippingAddress: "Default Web Address" });
       const payment = await initiatePayment.mutateAsync({
         orderId: order.orderId,
         amount: pack.price,
@@ -192,10 +192,10 @@ export function CheckoutPage({ packId }: Props) {
         <div className="space-y-6">
           {/* Pack summary card */}
           <div className="glass-card rounded-2xl border border-border/40 p-6">
-            {pack.imageUrl && (
+            {pack.poolPreview && pack.poolPreview.length > 0 && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={pack.imageUrl}
+                src={pack.poolPreview[0]?.imagePath || "https://placehold.co/800x400?text=Product"}
                 alt={pack.name}
                 className="mb-4 h-48 w-full rounded-xl object-cover"
               />
