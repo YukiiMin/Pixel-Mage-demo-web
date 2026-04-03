@@ -7,6 +7,24 @@ export interface ApiEnvelope<T> {
 	path?: string;
 }
 
+export interface PageResponse<T> {
+	content: T[];
+	totalElements: number;
+	totalPages: number;
+	number: number;
+	size: number;
+	first: boolean;
+	last: boolean;
+	empty: boolean;
+	numberOfElements: number;
+}
+
+export interface ResponseBase<T> {
+	code: number;
+	message: string;
+	data: T;
+}
+
 export interface ApiErrorPayload {
 	message?: string;
 	code?: string;

@@ -10,6 +10,7 @@ export interface UserProfile {
 	updatedAt?: string;
 	isActive?: boolean;
 	role?: "USER" | "STAFF" | "ADMIN";
+	guestReadingUsedToday?: boolean;
 }
 
 export interface RegisterPayload {

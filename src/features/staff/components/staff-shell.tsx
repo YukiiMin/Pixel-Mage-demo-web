@@ -1,17 +1,23 @@
 "use client";
 
 import {
+	Award,
 	BarChart3,
+	BookOpen,
 	ChevronLeft,
 	ChevronRight,
 	CreditCard,
 	LayoutDashboard,
 	Link2Off,
 	LogOut,
+	NfcIcon,
 	Package,
 	Settings,
 	Sparkles,
+	Ticket,
+	Trophy,
 	Users,
+	Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -36,7 +42,12 @@ const staffLinks = [
 const adminOnlyLinks = [
 	{ label: "Dashboard", href: "/staff/admin", icon: LayoutDashboard },
 	{ label: "Accounts", href: "/staff/admin/accounts", icon: Users },
+	{ label: "Wallet Management", href: "/staff/admin/wallet", icon: Wallet },
 	{ label: "Card Management", href: "/staff/admin/cards", icon: CreditCard },
+	{ label: "Physical Cards", href: "/staff/admin/physical-cards", icon: NfcIcon },
+	{ label: "Collections", href: "/staff/admin/collections", icon: BookOpen },
+	{ label: "Vouchers", href: "/staff/admin/vouchers", icon: Ticket },
+	{ label: "Achievements", href: "/staff/admin/achievements", icon: Trophy },
 	{ label: "Analytics", href: "/staff/admin/analytics", icon: BarChart3 },
 ];
 
@@ -70,6 +81,13 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
 	const displayName = profile?.name || profile?.email || "...";
 	const initials = displayName !== "..." ? getInitials(displayName) : "??";
 
+	// --- Sync role if profile returns a different one ---
+	useEffect(() => {
+		if (profile?.role && profile.role !== role) {
+			setRole(profile.role);
+		}
+	}, [profile, role]);
+
 	const handleLogout = () => {
 		clearStoredAuthSession();
 		router.push("/login");
@@ -90,7 +108,12 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
 		icon: React.ElementType;
 		label: string;
 	}) => {
-		const active = pathname === href || pathname.startsWith(href + "/");
+		// Fix: don't highlight Dashboard if we are in a sub-item like /accounts
+		const isRootAdmin = href === "/staff/admin";
+		const active = isRootAdmin 
+			? pathname === href 
+			: (pathname === href || pathname.startsWith(href + "/"));
+
 		return (
 			<Link
 				href={href}

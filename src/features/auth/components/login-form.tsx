@@ -11,6 +11,8 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/features/auth/hooks/use-auth";
+import { ApiHttpError } from "@/types/api";
+import { toast } from "sonner";
 
 const loginSchema = z.object({
 	email: z.string().email("Email không hợp lệ"),
@@ -55,8 +57,11 @@ export function LoginForm() {
 			} else {
 				router.replace("/");
 			}
-		} catch {
-			// useAuth sets errorMessage
+		} catch (error) {
+			if (error instanceof ApiHttpError && error.status === 429) {
+				toast.error("Tài khoản tạm thời bị khóa do thử quá nhiều lần. Vui lòng thử lại sau 15 phút.");
+			}
+			// useAuth sets errorMessage internally
 		}
 	};
 
@@ -182,9 +187,9 @@ export function LoginForm() {
 					variants={itemVariants}
 					className="mt-5 flex items-center gap-3 text-xs font-medium uppercase tracking-wider text-muted-foreground"
 				>
-					<span className="h-[1px] w-full bg-gradient-to-r from-transparent via-border/60 to-transparent" />
+				<span className="h-px w-full bg-linear-to-r from-transparent via-border/60 to-transparent" />
 					<span>hoặc</span>
-					<span className="h-[1px] w-full bg-gradient-to-l from-transparent via-border/60 to-transparent" />
+					<span className="h-px w-full bg-linear-to-l from-transparent via-border/60 to-transparent" />
 				</motion.div>
 
 				{/* Google */}

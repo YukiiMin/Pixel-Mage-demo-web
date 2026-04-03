@@ -157,18 +157,18 @@ export function UnlinkRequestTable({
 									<TableCell>
 										<div>
 											<p className="text-sm text-foreground font-medium">
-												{req.userName}
+												{req.userName ?? <span className="text-muted-foreground italic">Chưa có tên</span>}
 											</p>
 											<p className="text-xs text-[hsl(220_10%_55%)]">
-												{req.userEmail}
+												{req.userEmail ?? "—"}
 											</p>
 										</div>
 									</TableCell>
-									<TableCell className="text-sm text-foreground">
-										{req.cardName}
+									<TableCell className="font-mono text-xs text-foreground/80">
+										{req.cardName ?? req.nfcUid ?? "—"}
 									</TableCell>
 									<TableCell className="text-sm text-[hsl(220_10%_65%)] font-stats">
-										{new Date(req.requestedAt).toLocaleDateString("vi-VN")}
+										{new Date(req.createdAt ?? req.requestedAt ?? Date.now()).toLocaleDateString("vi-VN")}
 									</TableCell>
 									<TableCell>
 										<StatusBadge status={req.status} />

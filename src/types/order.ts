@@ -3,6 +3,15 @@ import type { Pack } from "./commerce";
 export type OrderStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED";
 export type PaymentStatus = "PENDING" | "SUCCEEDED" | "FAILED" | "CANCELED" | "REQUIRES_ACTION";
 
+export interface OrderResponse {
+    orderId: number;
+    accountName?: string;
+    customerName?: string; // in case BE uses it
+    finalAmount: number;
+    status: OrderStatus;
+    createdAt?: string;
+}
+
 export interface CreateOrderRequest {
 	packIds: number[];
 	shippingAddress: string;

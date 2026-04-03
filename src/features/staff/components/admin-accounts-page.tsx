@@ -94,11 +94,7 @@ export function AdminAccountsPage() {
 	const handleToggleActive = async (account: AccountRow) => {
 		setActionLoading(account.id);
 		try {
-			const endpoint = account.active
-				? `${API_ENDPOINTS.accountManagement.byId(account.id)}/deactivate`
-				: `${API_ENDPOINTS.accountManagement.byId(account.id)}/activate`;
-
-			await apiRequest(endpoint, { method: "PATCH" });
+			await apiRequest(API_ENDPOINTS.accountManagement.toggleStatus(account.id), { method: "PATCH" });
 			toast.success(
 				account.active
 					? `Đã vô hiệu hoá ${account.email}`
@@ -326,11 +322,9 @@ export function AdminAccountsPage() {
 			</div>
 
 			<div className="rounded-xl border border-amber-300/20 bg-amber-300/5 p-4">
-				<p className="mb-1 text-xs font-semibold text-amber-300">📡 BE endpoints cần bổ sung</p>
-				<pre className="whitespace-pre-wrap text-xs text-muted-foreground">{`PATCH /api/accounts/{id}/deactivate  → Vô hiệu hoá
-PATCH /api/accounts/{id}/activate    → Kích hoạt lại
-GET   /api/accounts?role=STAFF&page=0 → Lọc + phân trang
-POST  /api/admin/accounts/staff       → Tạo staff account`}</pre>
+				<p className="mb-1 text-xs font-semibold text-amber-300">📡 BE endpoints cần cập nhật</p>
+				<pre className="whitespace-pre-wrap text-xs text-muted-foreground">{`PATCH /api/accounts/{id}/status  → Toggle kích hoạt/vô hiệu
+POST  /api/accounts/staff       → Tạo staff account`}</pre>
 			</div>
 		</div>
 	);

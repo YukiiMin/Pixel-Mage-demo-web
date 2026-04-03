@@ -1,9 +1,11 @@
 "use client";
-
+import { useState, useEffect } from "react";
+import { apiRequest, API_ENDPOINTS } from "@/lib/api-config";
 import {
 	CreditCard,
 	Package,
 	ShoppingBag,
+	Sparkles,
 	TrendingUp,
 	Users,
 } from "lucide-react";
@@ -19,6 +21,8 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
+import { toast } from "sonner";
+import { Trash2 } from "lucide-react";
 
 // ────────────────────────────────
 // MOCK DATA (replace with real BE endpoint when ready)
@@ -48,71 +52,33 @@ import {
  * FE chỉ render, không tính toán.
  */
 
-const MOCK_STATS = {
-	totalUsers: 1234,
-	totalOrders: 456,
-	totalRevenue: 12_500_000,
-	totalCards: 78,
+// Use these as Fallbacks (if BE fails to return the full payload)
+const DEFAULT_STATS = {
+	totalUsers: 0,
+	totalOrders: 0,
+	totalRevenue: 0,
+	totalCards: 0,
 };
-
-const MOCK_REVENUE_BY_DAY = [
-	{ date: "25/3", revenue: 800000, orders: 3 },
-	{ date: "26/3", revenue: 1200000, orders: 5 },
-	{ date: "27/3", revenue: 950000, orders: 4 },
-	{ date: "28/3", revenue: 1800000, orders: 7 },
-	{ date: "29/3", revenue: 600000, orders: 2 },
-	{ date: "30/3", revenue: 2200000, orders: 9 },
-	{ date: "31/3", revenue: 1100000, orders: 5 },
-	{ date: "1/4", revenue: 1700000, orders: 6 },
-	{ date: "2/4", revenue: 900000, orders: 4 },
-];
-
-const MOCK_BY_PACK = [
-	{ name: "Starter Pack", value: 4500000 },
-	{ name: "Mystic Bundle", value: 3200000 },
-	{ name: "Premium Arc", value: 2800000 },
-	{ name: "Limited Edition", value: 2000000 },
-];
 
 const PIE_COLORS = ["#c9a227", "#7c3aed", "#2563eb", "#059669"];
 
-const MOCK_RECENT_ORDERS = [
-	{
-		orderId: 112,
-		customerName: "Nguyễn Minh",
-		amount: 200000,
-		status: "PAID",
-		createdAt: "2/4/2026",
-	},
-	{
-		orderId: 111,
-		customerName: "Trần Bảo",
-		amount: 500000,
-		status: "PAID",
-		createdAt: "2/4/2026",
-	},
-	{
-		orderId: 110,
-		customerName: "Lê Hương",
-		amount: 150000,
-		status: "PENDING",
-		createdAt: "1/4/2026",
-	},
-	{
-		orderId: 109,
-		customerName: "Phạm Quang",
-		amount: 350000,
-		status: "CANCELLED",
-		createdAt: "1/4/2026",
-	},
-	{
-		orderId: 108,
-		customerName: "Đỗ Thảo",
-		amount: 200000,
-		status: "PAID",
-		createdAt: "31/3/2026",
-	},
-];
+export interface AdminStatsResponse {
+	totalUsers: number;
+	totalOrders: number;
+	totalRevenue: number;
+	/** BE field name is totalCardTemplates (not totalCards) */
+	totalCardTemplates: number;
+	revenueByDay: { date: string; revenue: number }[];
+	/** BE field: `packName` (not `name`) */
+	revenueByPackType: { packName: string; revenue: number }[];
+	recentOrders: {
+		orderId: number;
+		customerName: string;
+		amount: number;
+		status: string;
+		createdAt: string;
+	}[];
+}
 
 // ────────────────────────────────
 // Components
@@ -158,9 +124,14 @@ function StatCard({
 function StatusBadge({ status }: { status: string }) {
 	const map: Record<string, string> = {
 		PAID: "bg-green-500/10 text-green-400 border-green-500/20",
+		SUCCEEDED: "bg-green-500/10 text-green-400 border-green-500/20",
+		COMPLETED: "bg-green-500/10 text-green-400 border-green-500/20",
 		PENDING: "bg-amber-500/10 text-amber-400 border-amber-500/20",
 		CANCELLED: "bg-destructive/10 text-destructive border-destructive/20",
+		CANCELED: "bg-destructive/10 text-destructive border-destructive/20",
 		PROCESSING: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+		FAILED: "bg-red-600/10 text-red-400 border-red-600/20",
+		REQUIRES_ACTION: "bg-orange-500/10 text-orange-400 border-orange-500/20",
 	};
 	return (
 		<span
@@ -174,6 +145,52 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export function AdminDashboard() {
+	const [stats, setStats] = useState<AdminStatsResponse | null>(null);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		apiRequest(API_ENDPOINTS.adminDashboard.stats)
+			.then((res) => {
+				setStats(res.data as AdminStatsResponse);
+			})
+			.catch((err) => {
+				console.error("Dashboard Stats Error:", err);
+			})
+			.finally(() => {
+				setLoading(false);
+			});
+	}, []);
+
+	const handleClearCache = async () => {
+		if (!confirm("Xác nhận xoá sạch Redis Cache? Tất cả dữ liệu đệm sẽ bị huỷ và tải lại từ Database.")) return;
+		
+		const id = toast.loading("Đang xoá cache...");
+		try {
+			// Using DELETE as requested by USER
+			await apiRequest(API_ENDPOINTS.adminCache.clear, { method: "DELETE" });
+			toast.success("Đã xoá cache thành công!", { id });
+			// Optionally refresh stats
+			window.location.reload();
+		} catch (err) {
+			console.error("Clear Cache Error:", err);
+			toast.error("Không thể xoá cache. Vui lòng kiểm tra quyền Admin.", { id });
+		}
+	};
+
+	if (loading) {
+		return <div className="flex justify-center p-12 text-muted-foreground">Đang tải biểu đồ dữ liệu...</div>;
+	}
+
+	const safeStats = stats || {
+		totalUsers: 0,
+		totalOrders: 0,
+		totalRevenue: 0,
+		totalCardTemplates: 0,
+		revenueByDay: [],
+		revenueByPackType: [],
+		recentOrders: [],
+	};
+
 	return (
 		<div className="space-y-6">
 			{/* Header */}
@@ -187,41 +204,63 @@ export function AdminDashboard() {
 						Dashboard
 					</h1>
 					<p className="mt-1 text-sm text-muted-foreground">
-						Dữ liệu mock — chờ BE expose{" "}
-						<code className="rounded bg-muted/30 px-1 py-0.5 text-xs">GET /api/admin/stats</code>
+						Tổng quan hệ thống
 					</p>
 				</div>
+				<button
+					type="button"
+					onClick={handleClearCache}
+					className="flex items-center gap-2 rounded-xl bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive transition-all hover:bg-destructive hover:text-destructive-foreground border border-destructive/20"
+				>
+					<Trash2 className="h-4 w-4" />
+					Xoá Redis Cache
+				</button>
 			</div>
 
 			{/* Stats cards */}
-			<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
 				<StatCard
 					icon={Users}
 					label="Tổng người dùng"
-					value={MOCK_STATS.totalUsers.toLocaleString("vi-VN")}
-					sub="↑ 12% so với tháng trước"
+					value={safeStats.totalUsers.toLocaleString("vi-VN")}
+					sub="Tổng số đăng ký"
 					iconClass="text-blue-400"
 				/>
 				<StatCard
 					icon={ShoppingBag}
 					label="Tổng đơn hàng"
-					value={MOCK_STATS.totalOrders.toLocaleString("vi-VN")}
-					sub="↑ 8% so với tháng trước"
+					value={safeStats.totalOrders.toLocaleString("vi-VN")}
+					sub="Đơn hàng đã đặt"
 					iconClass="text-purple-400"
 				/>
 				<StatCard
 					icon={TrendingUp}
 					label="Doanh thu"
-					value={formatVnd(MOCK_STATS.totalRevenue)}
-					sub="Tháng 3/2026"
+					value={formatVnd(safeStats.totalRevenue)}
+					sub="Thời gian chạy"
 					iconClass="text-primary"
 				/>
 				<StatCard
 					icon={CreditCard}
 					label="Loại thẻ"
-					value={String(MOCK_STATS.totalCards)}
-					sub="Templates đang hoạt động"
+					value={String(safeStats.totalCardTemplates)}
+					sub="Loại thẻ hiện có"
 					iconClass="text-emerald-400"
+				/>
+				{/* NEW STATS (Pending BE update) */}
+				<StatCard
+					icon={Sparkles}
+					label="Thẻ vật lý"
+					value="0"
+					sub="Tổng card đã mint"
+					iconClass="text-amber-400"
+				/>
+				<StatCard
+					icon={Package}
+					label="Tổng sản phẩm"
+					value="0"
+					sub="Số loại pack/bộ"
+					iconClass="text-rose-400"
 				/>
 			</div>
 
@@ -234,7 +273,7 @@ export function AdminDashboard() {
 					</h2>
 					<ResponsiveContainer width="100%" height={220}>
 						<AreaChart
-							data={MOCK_REVENUE_BY_DAY}
+							data={safeStats.revenueByDay}
 							margin={{ top: 5, right: 10, left: 0, bottom: 0 }}
 						>
 							<defs>
@@ -285,17 +324,17 @@ export function AdminDashboard() {
 					<ResponsiveContainer width="100%" height={160}>
 						<PieChart>
 							<Pie
-								data={MOCK_BY_PACK}
+								data={safeStats.revenueByPackType}
 								cx="50%"
 								cy="50%"
 								innerRadius={45}
 								outerRadius={70}
 								paddingAngle={3}
-								dataKey="value"
+								dataKey="revenue"
 							>
-								{MOCK_BY_PACK.map((entry, index) => (
+								{safeStats.revenueByPackType.map((entry, index) => (
 									<Cell
-										key={entry.name}
+										key={entry.packName}
 										fill={PIE_COLORS[index % PIE_COLORS.length]}
 									/>
 								))}
@@ -312,15 +351,15 @@ export function AdminDashboard() {
 						</PieChart>
 					</ResponsiveContainer>
 					<ul className="mt-2 space-y-1.5">
-						{MOCK_BY_PACK.map((item, i) => (
-							<li key={item.name} className="flex items-center gap-2 text-xs text-muted-foreground">
+						{safeStats.revenueByPackType.map((item, i) => (
+							<li key={item.packName} className="flex items-center gap-2 text-xs text-muted-foreground">
 								<span
 									className="h-2 w-2 shrink-0 rounded-full"
 									style={{ background: PIE_COLORS[i % PIE_COLORS.length] }}
 								/>
-								<span className="truncate flex-1">{item.name}</span>
+								<span className="truncate flex-1">{item.packName}</span>
 								<span className="font-stats font-semibold text-foreground">
-									{formatVnd(item.value)}
+									{formatVnd(item.revenue)}
 								</span>
 							</li>
 						))}
@@ -345,7 +384,7 @@ export function AdminDashboard() {
 							</tr>
 						</thead>
 						<tbody>
-							{MOCK_RECENT_ORDERS.map((order) => (
+							{safeStats.recentOrders.map((order) => (
 								<tr
 									key={order.orderId}
 									className="border-b border-border/20 text-sm last:border-0"
@@ -368,16 +407,7 @@ export function AdminDashboard() {
 				</div>
 			</div>
 
-			{/* API Spec Note */}
-			<div className="rounded-xl border border-amber-300/20 bg-amber-300/5 p-4">
-				<p className="text-xs font-semibold text-amber-300 mb-1">📡 API cần BE implement</p>
-				<pre className="text-xs text-muted-foreground whitespace-pre-wrap">{`GET /api/admin/stats
-Response: { totalUsers, totalOrders, totalRevenue, totalCards,
-  revenueByDay: [{ date, revenue, orders }],
-  revenueByPackType: [{ name, value }],
-  recentOrders: [{ orderId, customerName, amount, status, createdAt }]
-}`}</pre>
-			</div>
+
 		</div>
 	);
 }

@@ -14,7 +14,7 @@ export const API_CONFIG = {
     DEFAULT_API_BASE_URL,
   timeoutMs: 15000,
   defaultHeaders: {
-    'Content-Type': 'application/json',
+    Accept: 'application/json',
   },
 } as const
 
@@ -24,7 +24,9 @@ export const API_ENDPOINTS = {
     login: '/api/accounts/auth/login',
     refresh: '/api/accounts/auth/refresh',
     verifyEmail: '/api/accounts/auth/verify',
-    list: '/api/accounts',
+    list: '/api/accounts/list',
+    toggleStatus: (id: number | string) => `/api/accounts/${id}/status`,
+    createStaff: '/api/accounts/staff',
     byId: (id: number | string) => `/api/accounts/${id}`,
     byEmail: (email: string) =>
       `/api/accounts/email/${encodeURIComponent(email)}`,
@@ -68,6 +70,14 @@ export const API_ENDPOINTS = {
     list: '/api/card-templates',
     create: '/api/card-templates',
     byId: (id: number | string) => `/api/card-templates/${id}`,
+    byRarity: (rarity: string) => `/api/card-templates/by-rarity/${rarity}`,
+    byArcana: (arcanaType: string) => `/api/card-templates/by-arcana/${arcanaType}`,
+  },
+  adminDashboard: {
+    stats: '/api/admin/stats',
+  },
+  adminCache: {
+    clear: '/api/admin/cache/clear',
   },
   cardManagement: {
     list: '/api/cards/list',
@@ -81,7 +91,13 @@ export const API_ENDPOINTS = {
     list: '/api/card-contents',
     create: '/api/card-contents',
     byId: (id: number | string) => `/api/card-contents/${id}`,
-    byCard: (cardId: number | string) => `/api/card-contents/card/${cardId}`,
+    /** Public: active contents for a template */
+    byTemplate: (templateId: number | string) => `/api/card-contents/template/${templateId}`,
+    /** Admin/Staff: ALL contents for a template (including hidden) */
+    adminByTemplate: (templateId: number | string) => `/api/card-contents/admin/template/${templateId}`,
+    /** Admin/Staff: overview all card contents across all templates */
+    adminList: '/api/card-contents/admin',
+    toggleActive: (id: number | string) => `/api/card-contents/${id}/toggle-active`,
   },
   nfcManagement: {
     scan: '/api/nfc/scan',
@@ -112,21 +128,16 @@ export const API_ENDPOINTS = {
     byPack: (packId: number | string) => `/api/order-items/pack/${packId}`,
   },
   payments: {
-    createPaymentIntent: '/api/payments/create-payment-intent',
-    confirmPayment: (paymentIntentId: string) =>
-      `/api/payments/confirm-payment/${paymentIntentId}`,
-    createSetupIntent: '/api/payments/create-setup-intent',
-    savedMethods: (customerId: number | string) =>
-      `/api/payments/saved-payment-methods/${customerId}`,
-    payWithSavedCard: '/api/payments/pay-with-saved-card',
+    /** POST /api/payments/initiate — initiate a payment (gateway param optional) */
+    initiate: '/api/payments/initiate',
+    /** POST /api/payments/confirm-payment */
+    confirmPayment: '/api/payments/confirm-payment',
     byOrder: (orderId: number | string) => `/api/payments/order/${orderId}`,
-    history: (customerId: number | string) =>
-      `/api/payments/history/${customerId}`,
-    detachPaymentMethod: (paymentMethodId: string) =>
-      `/api/payments/detach-payment-method/${paymentMethodId}`,
+    history: (customerId: number | string) => `/api/payments/history/${customerId}`,
   },
   paymentManagement: {
     initiate: '/api/payments/initiate',
+    confirmPayment: '/api/payments/confirm-payment',
     byOrder: (orderId: number | string) => `/api/payments/order/${orderId}`,
   },
   vnPay: {
@@ -190,16 +201,32 @@ export const API_ENDPOINTS = {
   wallet: {
     balance: '/api/wallet/balance',
     exchange: '/api/wallet/exchange',
+    history: '/api/wallet/history',
+    adminList: '/api/admin/wallets',
+    adminById: (userId: number | string) => `/api/admin/wallets/${userId}`,
   },
   vouchers: {
     my: '/api/vouchers/my',
     validate: '/api/vouchers/validate',
   },
+  adminVouchers: {
+    list: '/api/admin/vouchers',
+    create: '/api/admin/vouchers',
+    byId: (id: number | string) => `/api/admin/vouchers/${id}`,
+    toggle: (id: number | string) => `/api/admin/vouchers/${id}/toggle`,
+  },
   achievements: {
     list: '/api/achievements',
     my: '/api/achievements/my',
   },
+  adminAchievements: {
+    list: '/api/admin/achievements',
+    create: '/api/admin/achievements',
+    byId: (id: number | string) => `/api/admin/achievements/${id}`,
+    toggle: (id: number | string) => `/api/admin/achievements/${id}/toggle`,
+  },
   unlinkRequests: {
+    create: '/api/unlink-requests',
     verify: '/api/unlink-requests/verify',
   },
   staffUnlinkRequests: {
@@ -363,14 +390,44 @@ export async function apiRequest<T>(
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
 
   try {
+    const baseHeaders = createApiHeaders(options.token)
+    const mergedHeaders = {
+      ...baseHeaders,
+      ...(options.headers ?? {}),
+    }
+
+    // Bind body intelligently:
+    // - No body → strip Content-Type (avoid text/plain on DELETE etc.)
+    // - FormData → let browser set Content-Type with boundary automatically
+    // - string → assume JSON string, set Content-Type: application/json
+    // - object → stringify and set Content-Type: application/json
+    let finalBody = options.body
+    if (!finalBody) {
+      delete (mergedHeaders as Record<string, string>)['Content-Type']
+      delete (mergedHeaders as Record<string, string>)['content-type']
+    } else if (finalBody instanceof FormData) {
+      // Let browser handle Content-Type with correct multipart boundary
+      delete (mergedHeaders as Record<string, string>)['Content-Type']
+      delete (mergedHeaders as Record<string, string>)['content-type']
+    } else {
+      // string or object body → treat as JSON
+      if (typeof finalBody === 'object') {
+        finalBody = JSON.stringify(finalBody)
+      }
+      const hasContentType =
+        (mergedHeaders as Record<string, string>)['Content-Type'] ||
+        (mergedHeaders as Record<string, string>)['content-type']
+      if (!hasContentType) {
+        ;(mergedHeaders as Record<string, string>)['Content-Type'] = 'application/json'
+      }
+    }
+
     const response = await fetch(buildApiUrl(path), {
       ...options,
+      body: finalBody,
       credentials: options.credentials ?? 'same-origin',
       referrerPolicy: options.referrerPolicy ?? 'no-referrer',
-      headers: {
-        ...createApiHeaders(options.token),
-        ...(options.headers ?? {}),
-      },
+      headers: mergedHeaders as HeadersInit,
       signal: controller.signal,
     })
 

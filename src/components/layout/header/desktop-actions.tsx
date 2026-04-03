@@ -10,6 +10,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { NotificationBell } from "@/features/notifications/components/notification-bell";
 import { adminNavLinks, authDropdownLinks, resolveSectionHref, staffNavLinks } from "./_config";
 
 interface DesktopActionsProps {
@@ -33,7 +34,9 @@ const DesktopActions = ({
 }: DesktopActionsProps) => (
 	<div className="hidden md:flex items-center gap-3">
 		{isAuth ? (
-			<DropdownMenu>
+			<>
+				<NotificationBell userRole={userRole || undefined} />
+				<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<button
 						type="button"
@@ -114,6 +117,7 @@ const DesktopActions = ({
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
+			</>
 		) : (
 			<>
 				<Link

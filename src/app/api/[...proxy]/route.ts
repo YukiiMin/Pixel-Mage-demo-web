@@ -26,7 +26,7 @@ function getBeBaseUrl(request: NextRequest): string {
 
 const UPSTREAM_TIMEOUT_MS = 15000
 
-const NO_BODY_METHODS = new Set(['GET', 'HEAD'])
+const NO_BODY_METHODS = new Set(['GET', 'HEAD', 'DELETE'])
 
 function toAuthorizationValue(token: string): string {
   const trimmed = token.trim()

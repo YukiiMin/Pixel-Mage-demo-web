@@ -1,4 +1,5 @@
 // Staff domain types
+// Aligned with BE: UnlinkRequestResponse (PixelMage API Contract)
 
 export type UnlinkRequestStatus =
 	| "PENDING"
@@ -6,17 +7,30 @@ export type UnlinkRequestStatus =
 	| "APPROVED"
 	| "REJECTED";
 
+/**
+ * Matches BE's `UnlinkRequestResponse`:
+ * { id, nfcUid, status, createdAt, resolvedAt, staffNote }
+ *
+ * Legacy UI fields (userName, userEmail, cardName, requestedAt) are kept as
+ * optional so existing table renders gracefully until BE enriches the DTO.
+ */
 export interface UnlinkRequest {
+	// ── Core BE fields ──────────────────────────────────────────
 	id: number;
-	userId: number;
-	userName: string;
-	userEmail: string;
-	cardId: number;
-	cardName: string;
-	requestedAt: string; // ISO datetime
+	nfcUid: string;
 	status: UnlinkRequestStatus;
-	staffNote: string | null;
-	processedAt: string | null;
+	createdAt: string;   // ISO datetime — use this as requestedAt
+	resolvedAt?: string | null;
+	staffNote?: string | null;
+
+	// ── Optional enriched fields (not in current BE DTO) ────────
+	userName?: string;
+	userEmail?: string;
+	cardName?: string;
+	/** @deprecated use createdAt */
+	requestedAt?: string;
+	/** @deprecated use resolvedAt */
+	processedAt?: string | null;
 }
 
 export interface RejectUnlinkPayload {
