@@ -92,22 +92,23 @@ export function RejectModal({ request, open, onOpenChange }: RejectModalProps) {
 				</div>
 
 				<DialogFooter className="gap-2">
-					<Button
-						variant="outline"
+					<button
+						type="button"
 						onClick={() => handleOpenChange(false)}
 						disabled={rejectMutation.isPending}
-						className="border-[hsl(230_20%_22%)] text-[hsl(220_10%_65%)] hover:bg-[hsl(230_15%_20%)]"
+						className="rounded-lg border border-[hsl(230_20%_22%)] bg-transparent px-4 py-2 text-sm font-medium text-[hsl(220_10%_65%)] transition-colors hover:bg-[hsl(230_15%_20%)] hover:text-foreground"
 					>
 						Huỷ
-					</Button>
-					<Button
+					</button>
+					<button
+						type="button"
 						onClick={handleSubmit}
 						disabled={isSubmitDisabled}
 						data-testid="reject-submit-btn"
-						className="bg-[hsl(0_70%_50%)] hover:bg-[hsl(0_70%_42%)] text-white disabled:opacity-50"
+						className="rounded-lg bg-[hsl(0_70%_50%)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[hsl(0_70%_42%)] disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						{rejectMutation.isPending ? "Đang xử lý..." : "Từ chối"}
-					</Button>
+					</button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { webSocketService } from "@/lib/websocket";
 import { toast } from "sonner";
+import { webSocketService } from "@/lib/websocket";
 
 export interface NotificationMsg {
 	id: string;
@@ -35,28 +35,29 @@ export function useNotifications(role?: string, userId?: number | null) {
 					const payload = data?.payload ?? {};
 
 					// Map event types to human-readable Vietnamese messages
-					const messageMap: Record<string, { title: string; message: string }> = {
-						NEW_USER_REGISTERED: {
-							title: "Người dùng mới",
-							message: `${payload.name ?? "Ai đó"} (${payload.email ?? ""}) vừa đăng ký.`,
-						},
-						ORDER_STATUS_CHANGED: {
-							title: "Cập nhật đơn hàng",
-							message: `Đơn #${payload.orderId} chuyển trạng thái: ${payload.status ?? ""}`,
-						},
-						PAYMENT_CONFIRMED: {
-							title: "Thanh toán thành công",
-							message: `Đơn #${payload.orderId} đã được thanh toán.`,
-						},
-						TAROT_SESSION_STARTED: {
-							title: "Phiên Tarot bắt đầu",
-							message: `Phiên #${payload.sessionId} — ${payload.spreadName ?? ""} (${payload.mode ?? ""})`,
-						},
-						TAROT_SESSION_COMPLETED: {
-							title: "Phiên Tarot hoàn thành",
-							message: `Phiên #${payload.sessionId} đã hoàn thành.`,
-						},
-					};
+					const messageMap: Record<string, { title: string; message: string }> =
+						{
+							NEW_USER_REGISTERED: {
+								title: "Người dùng mới",
+								message: `${payload.name ?? "Ai đó"} (${payload.email ?? ""}) vừa đăng ký.`,
+							},
+							ORDER_STATUS_CHANGED: {
+								title: "Cập nhật đơn hàng",
+								message: `Đơn #${payload.orderId} chuyển trạng thái: ${payload.status ?? ""}`,
+							},
+							PAYMENT_CONFIRMED: {
+								title: "Thanh toán thành công",
+								message: `Đơn #${payload.orderId} đã được thanh toán.`,
+							},
+							TAROT_SESSION_STARTED: {
+								title: "Phiên Tarot bắt đầu",
+								message: `Phiên #${payload.sessionId} — ${payload.spreadName ?? ""} (${payload.mode ?? ""})`,
+							},
+							TAROT_SESSION_COMPLETED: {
+								title: "Phiên Tarot hoàn thành",
+								message: `Phiên #${payload.sessionId} đã hoàn thành.`,
+							},
+						};
 
 					const display = messageMap[eventType] ?? {
 						title: data?.title ?? "Thông báo mới",

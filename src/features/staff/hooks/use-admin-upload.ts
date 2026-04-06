@@ -5,7 +5,10 @@ export function useAdminUpload() {
 	const [isUploading, setIsUploading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const uploadImage = async (file: File, folder = "general"): Promise<string | null> => {
+	const uploadImage = async (
+		file: File,
+		folder = "general",
+	): Promise<string | null> => {
 		setIsUploading(true);
 		setError(null);
 		try {

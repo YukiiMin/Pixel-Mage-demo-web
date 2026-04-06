@@ -6,7 +6,9 @@ export function usePacks(): UseQueryResult<ProductResponse[]> {
 	return useQuery({
 		queryKey: ["packs"],
 		queryFn: () =>
-			apiRequest<ProductResponse[]>(API_ENDPOINTS.marketplace.catalog[1]).then((r) => r.data),
+			apiRequest<ProductResponse[]>(API_ENDPOINTS.marketplace.catalog[1]).then(
+				(r) => r.data,
+			),
 		staleTime: 60_000,
 	});
 }

@@ -1,7 +1,9 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
+import { Loader2, Search, Wallet } from "lucide-react";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 import {
 	Table,
 	TableBody,
@@ -10,9 +12,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { Loader2, Wallet, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
 import type { WalletBalance } from "@/types/wallet";
 
 interface AdminWallet extends WalletBalance {
@@ -24,22 +24,47 @@ interface AdminWallet extends WalletBalance {
 export function AdminWalletPage() {
 	const [search, setSearch] = useState("");
 
-	const { data: wallets = [], isLoading, error } = useQuery({
+	const {
+		data: wallets = [],
+		isLoading,
+		error,
+	} = useQuery({
 		queryKey: ["admin-wallets"],
 		queryFn: async () => {
-			const result = await apiRequest<AdminWallet[]>(API_ENDPOINTS.wallet.adminList);
-			return result.data ?? [];
+			try {
+				const result = await apiRequest<AdminWallet[]>(
+					API_ENDPOINTS.wallet.adminList,
+				);
+				return result.data ?? [];
+			} catch {
+				// Fallback for current BE: only exposes current-user wallet balance
+				const me = await apiRequest<WalletBalance>(
+					API_ENDPOINTS.wallet.balance,
+				);
+				return [
+					{
+						userId: 0,
+						email: "current-admin@local",
+						name: "Current Admin",
+						...(me.data ?? { balance: 0, pointsToNextVoucher: 0 }),
+					},
+				];
+			}
 		},
 	});
 
-	const filtered = wallets.filter((w) => 
-		!search || 
-		w.email?.toLowerCase().includes(search.toLowerCase()) || 
-		w.name?.toLowerCase().includes(search.toLowerCase())
+	const filtered = wallets.filter(
+		(w) =>
+			!search ||
+			w.email?.toLowerCase().includes(search.toLowerCase()) ||
+			w.name?.toLowerCase().includes(search.toLowerCase()),
 	);
 
 	const totalBalance = wallets.reduce((sum, w) => sum + (w.balance ?? 0), 0);
-	const totalPointsToNext = wallets.reduce((sum, w) => sum + (w.pointsToNextVoucher ?? 0), 0);
+	const totalPointsToNext = wallets.reduce(
+		(sum, w) => sum + (w.pointsToNextVoucher ?? 0),
+		0,
+	);
 
 	return (
 		<div className="space-y-6">
@@ -61,7 +86,9 @@ export function AdminWalletPage() {
 						<p className="font-stats text-xl font-semibold text-foreground leading-none">
 							{wallets.length}
 						</p>
-						<p className="text-xs text-muted-foreground mt-0.5 truncate">Tổng số ví đang hoạt động</p>
+						<p className="text-xs text-muted-foreground mt-0.5 truncate">
+							Tổng số ví đang hoạt động
+						</p>
 					</div>
 				</div>
 				<div className="glass-card rounded-xl px-4 py-3 flex items-center gap-3">
@@ -72,7 +99,9 @@ export function AdminWalletPage() {
 						<p className="font-stats text-xl font-semibold text-foreground leading-none">
 							{totalBalance.toLocaleString("vi-VN")}
 						</p>
-						<p className="text-xs text-muted-foreground mt-0.5 truncate">Tổng PM lưu hành</p>
+						<p className="text-xs text-muted-foreground mt-0.5 truncate">
+							Tổng PM lưu hành
+						</p>
 					</div>
 				</div>
 				<div className="glass-card rounded-xl px-4 py-3 flex items-center gap-3">
@@ -83,7 +112,9 @@ export function AdminWalletPage() {
 						<p className="font-stats text-xl font-semibold text-foreground leading-none">
 							{totalPointsToNext.toLocaleString("vi-VN")}
 						</p>
-						<p className="text-xs text-muted-foreground mt-0.5 truncate">Tổng điểm chờ đổi Voucher</p>
+						<p className="text-xs text-muted-foreground mt-0.5 truncate">
+							Tổng điểm chờ đổi Voucher
+						</p>
 					</div>
 				</div>
 			</div>
@@ -132,7 +163,10 @@ export function AdminWalletPage() {
 						<TableBody>
 							{filtered.length === 0 ? (
 								<TableRow>
-									<TableCell colSpan={3} className="text-center py-12 text-muted-foreground">
+									<TableCell
+										colSpan={3}
+										className="text-center py-12 text-muted-foreground"
+									>
 										<Wallet className="h-8 w-8 mx-auto mb-2 opacity-30" />
 										<p>Không tìm thấy ví phù hợp.</p>
 									</TableCell>
@@ -144,8 +178,12 @@ export function AdminWalletPage() {
 										className="border-border transition-colors duration-150 hover:bg-white/3"
 									>
 										<TableCell>
-											<div className="font-medium text-foreground">{wallet.name || "Người dùng"}</div>
-											<div className="text-xs text-muted-foreground">{wallet.email}</div>
+											<div className="font-medium text-foreground">
+												{wallet.name || "Người dùng"}
+											</div>
+											<div className="text-xs text-muted-foreground">
+												{wallet.email}
+											</div>
 										</TableCell>
 										<TableCell className="text-right">
 											<span className="font-stats font-semibold text-primary">
@@ -154,7 +192,8 @@ export function AdminWalletPage() {
 										</TableCell>
 										<TableCell className="text-right">
 											<span className="font-stats font-semibold text-secondary-foreground">
-												{wallet.pointsToNextVoucher?.toLocaleString("vi-VN") ?? 0}
+												{wallet.pointsToNextVoucher?.toLocaleString("vi-VN") ??
+													0}
 											</span>
 										</TableCell>
 									</TableRow>

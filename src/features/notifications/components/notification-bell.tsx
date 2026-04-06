@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
-import { Bell, Check, BellRing } from "lucide-react";
 import * as Popover from "@radix-ui/react-popover";
-import { useNotifications } from "../hooks/use-notifications";
+import { Bell, BellRing, Check } from "lucide-react";
+import React from "react";
 import { getStoredUserId } from "@/lib/api-config";
+import { useNotifications } from "../hooks/use-notifications";
 
 interface Props {
 	userRole?: string;
@@ -12,7 +12,8 @@ interface Props {
 
 export function NotificationBell({ userRole }: Props) {
 	const userId = getStoredUserId();
-	const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications(userRole, userId);
+	const { notifications, unreadCount, markAsRead, markAllAsRead } =
+		useNotifications(userRole, userId);
 
 	if (!userRole) return null;
 
@@ -54,7 +55,7 @@ export function NotificationBell({ userRole }: Props) {
 							</button>
 						)}
 					</div>
-					
+
 					{notifications.length === 0 ? (
 						<div className="py-8 text-center text-sm text-muted-foreground flex flex-col items-center justify-center">
 							<Bell className="h-8 w-8 mb-2 opacity-20" />
@@ -73,12 +74,16 @@ export function NotificationBell({ userRole }: Props) {
 									}`}
 								>
 									<div className="flex justify-between items-start mb-1">
-										<p className="text-sm font-medium text-foreground">{notif.title}</p>
+										<p className="text-sm font-medium text-foreground">
+											{notif.title}
+										</p>
 										{!notif.read && (
 											<span className="h-2 w-2 rounded-full bg-primary shrink-0 mt-1" />
 										)}
 									</div>
-									<p className="text-xs text-muted-foreground">{notif.message}</p>
+									<p className="text-xs text-muted-foreground">
+										{notif.message}
+									</p>
 									<p className="mt-2 text-[10px] text-muted-foreground/60 font-stats">
 										{new Date(notif.timestamp).toLocaleString("vi-VN")}
 									</p>

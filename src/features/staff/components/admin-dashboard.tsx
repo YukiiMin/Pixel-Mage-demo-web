@@ -1,14 +1,14 @@
 "use client";
-import { useState, useEffect } from "react";
-import { apiRequest, API_ENDPOINTS } from "@/lib/api-config";
 import {
 	CreditCard,
 	Package,
 	ShoppingBag,
 	Sparkles,
+	Trash2,
 	TrendingUp,
 	Users,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
 	Area,
 	AreaChart,
@@ -22,7 +22,7 @@ import {
 	YAxis,
 } from "recharts";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
 
 // ────────────────────────────────
 // MOCK DATA (replace with real BE endpoint when ready)
@@ -110,7 +110,9 @@ function StatCard({
 			<div className="flex items-start justify-between">
 				<div>
 					<p className="text-xs font-medium text-muted-foreground">{label}</p>
-					<p className="mt-1.5 text-2xl font-bold font-stats text-foreground">{value}</p>
+					<p className="mt-1.5 text-2xl font-bold font-stats text-foreground">
+						{value}
+					</p>
 					{sub && <p className="mt-0.5 text-xs text-muted-foreground">{sub}</p>}
 				</div>
 				<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-card/80 border border-border/40">
@@ -162,8 +164,13 @@ export function AdminDashboard() {
 	}, []);
 
 	const handleClearCache = async () => {
-		if (!confirm("Xác nhận xoá sạch Redis Cache? Tất cả dữ liệu đệm sẽ bị huỷ và tải lại từ Database.")) return;
-		
+		if (
+			!confirm(
+				"Xác nhận xoá sạch Redis Cache? Tất cả dữ liệu đệm sẽ bị huỷ và tải lại từ Database.",
+			)
+		)
+			return;
+
 		const id = toast.loading("Đang xoá cache...");
 		try {
 			// Using DELETE as requested by USER
@@ -173,12 +180,18 @@ export function AdminDashboard() {
 			window.location.reload();
 		} catch (err) {
 			console.error("Clear Cache Error:", err);
-			toast.error("Không thể xoá cache. Vui lòng kiểm tra quyền Admin.", { id });
+			toast.error("Không thể xoá cache. Vui lòng kiểm tra quyền Admin.", {
+				id,
+			});
 		}
 	};
 
 	if (loading) {
-		return <div className="flex justify-center p-12 text-muted-foreground">Đang tải biểu đồ dữ liệu...</div>;
+		return (
+			<div className="flex justify-center p-12 text-muted-foreground">
+				Đang tải biểu đồ dữ liệu...
+			</div>
+		);
 	}
 
 	const safeStats = stats || {
@@ -278,11 +291,22 @@ export function AdminDashboard() {
 						>
 							<defs>
 								<linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-									<stop offset="5%" stopColor="hsl(45,65%,55%)" stopOpacity={0.25} />
-									<stop offset="95%" stopColor="hsl(45,65%,55%)" stopOpacity={0} />
+									<stop
+										offset="5%"
+										stopColor="hsl(45,65%,55%)"
+										stopOpacity={0.25}
+									/>
+									<stop
+										offset="95%"
+										stopColor="hsl(45,65%,55%)"
+										stopOpacity={0}
+									/>
 								</linearGradient>
 							</defs>
-							<CartesianGrid strokeDasharray="3 3" stroke="hsl(230 20% 22% / 0.4)" />
+							<CartesianGrid
+								strokeDasharray="3 3"
+								stroke="hsl(230 20% 22% / 0.4)"
+							/>
 							<XAxis
 								dataKey="date"
 								tick={{ fontSize: 11, fill: "hsl(220 10% 65%)" }}
@@ -352,7 +376,10 @@ export function AdminDashboard() {
 					</ResponsiveContainer>
 					<ul className="mt-2 space-y-1.5">
 						{safeStats.revenueByPackType.map((item, i) => (
-							<li key={item.packName} className="flex items-center gap-2 text-xs text-muted-foreground">
+							<li
+								key={item.packName}
+								className="flex items-center gap-2 text-xs text-muted-foreground"
+							>
 								<span
 									className="h-2 w-2 shrink-0 rounded-full"
 									style={{ background: PIE_COLORS[i % PIE_COLORS.length] }}
@@ -392,8 +419,12 @@ export function AdminDashboard() {
 									<td className="py-3 font-stats text-xs text-muted-foreground">
 										#{order.orderId}
 									</td>
-									<td className="py-3 font-medium text-foreground">{order.customerName}</td>
-									<td className="py-3 text-muted-foreground">{order.createdAt}</td>
+									<td className="py-3 font-medium text-foreground">
+										{order.customerName}
+									</td>
+									<td className="py-3 text-muted-foreground">
+										{order.createdAt}
+									</td>
 									<td className="py-3 text-right font-stats font-semibold text-primary">
 										{formatVnd(order.amount)}
 									</td>
@@ -406,8 +437,6 @@ export function AdminDashboard() {
 					</table>
 				</div>
 			</div>
-
-
 		</div>
 	);
 }

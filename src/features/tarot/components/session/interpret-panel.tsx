@@ -16,7 +16,11 @@ interface InterpretPanelProps {
 const MAX_RETRIES = 2;
 const TIMEOUT_MS = 60_000;
 
-export function InterpretPanel({ sessionId, status, onComplete }: InterpretPanelProps) {
+export function InterpretPanel({
+	sessionId,
+	status,
+	onComplete,
+}: InterpretPanelProps) {
 	const router = useRouter();
 	const [retryCount, setRetryCount] = useState(0);
 	const [showTimeout, setShowTimeout] = useState(false);
@@ -61,12 +65,18 @@ export function InterpretPanel({ sessionId, status, onComplete }: InterpretPanel
 				className="space-y-6"
 				data-testid="interpret-panel"
 			>
-				<h2 className="text-center font-(--font-heading) text-2xl" style={{ color: "hsl(270 40% 80%)" }}>
-					<Sparkles className="mr-2 inline h-5 w-5" style={{ color: "hsl(270 40% 80%)" }} />
+				<h2
+					className="text-center font-(--font-heading) text-2xl"
+					style={{ color: "hsl(270 40% 80%)" }}
+				>
+					<Sparkles
+						className="mr-2 inline h-5 w-5"
+						style={{ color: "hsl(270 40% 80%)" }}
+					/>
 					Thông Điệp Từ Vũ Trụ
 				</h2>
 				<div className="glass-card mx-auto min-h-50 max-w-2xl rounded-2xl p-6 md:p-8">
-					<pre 
+					<pre
 						className="whitespace-pre-wrap font-(--font-body) text-sm leading-relaxed"
 						style={{ color: "hsl(270 40% 80%)" }}
 					>
@@ -122,7 +132,10 @@ export function InterpretPanel({ sessionId, status, onComplete }: InterpretPanel
 				</div>
 			) : (
 				<>
-					<div className="relative flex h-24 w-24 items-center justify-center" data-testid="spinner">
+					<div
+						className="relative flex h-24 w-24 items-center justify-center"
+						data-testid="spinner"
+					>
 						<motion.div
 							animate={{ rotate: 360 }}
 							transition={{
@@ -140,7 +153,10 @@ export function InterpretPanel({ sessionId, status, onComplete }: InterpretPanel
 						<Sparkles className="h-8 w-8 text-secondary" />
 					</div>
 					<div className="space-y-2">
-						<h3 className="font-(--font-heading) text-2xl" style={{ color: "hsl(270 40% 80%)" }}>
+						<h3
+							className="font-(--font-heading) text-2xl"
+							style={{ color: "hsl(270 40% 80%)" }}
+						>
 							Vũ Trụ Đang Giải Mã...
 						</h3>
 						<p style={{ color: "hsl(270 40% 80% / 0.8)" }}>

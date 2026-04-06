@@ -1,4 +1,4 @@
-import { GachaPoolManagement } from "@/features/admin/components/product-management/gacha-pool-management";
+import { GachaPoolManagement } from "@/features/staff/components/gacha-pool-management";
 
 export const metadata = {
 	title: "Product Management | PixelMage",

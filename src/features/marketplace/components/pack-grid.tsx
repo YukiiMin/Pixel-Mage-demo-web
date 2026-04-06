@@ -72,12 +72,17 @@ export function PackGrid({ packs, onSelectPack }: PackGridProps) {
 							{/* Gacha Pool Preview */}
 							{pack.poolPreview && pack.poolPreview.length > 0 && (
 								<div className="mb-4 space-y-2">
-									<p className="text-xs font-semibold text-muted-foreground">Có thể nhận được:</p>
+									<p className="text-xs font-semibold text-muted-foreground">
+										Có thể nhận được:
+									</p>
 									<div className="flex -space-x-3 overflow-hidden p-1">
 										{pack.poolPreview.slice(0, 5).map((preview, i) => (
-											<img 
+											<img
 												key={preview.cardTemplateId}
-												src={preview.imagePath || "https://placehold.co/150x210?text=Card"} 
+												src={
+													preview.imagePath ||
+													"https://placehold.co/150x210?text=Card"
+												}
 												alt={preview.name}
 												className="inline-block h-12 w-12 rounded-full border-2 border-background object-cover shadow-xs transition-transform hover:z-20 hover:-translate-y-1 hover:scale-110"
 												title={`${preview.name} (${preview.rarity})`}

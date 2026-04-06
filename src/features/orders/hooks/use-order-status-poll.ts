@@ -15,7 +15,8 @@ export function useOrderStatusPoll(orderId: number | null) {
 		refetchInterval: (query) => {
 			const paymentStatus = query.state.data?.paymentStatus;
 			// Dừng poll khi terminal state
-			if (paymentStatus === "SUCCEEDED" || paymentStatus === "FAILED") return false;
+			if (paymentStatus === "SUCCEEDED" || paymentStatus === "FAILED")
+				return false;
 			const orderStatus = query.state.data?.status;
 			if (orderStatus === "CANCELLED") return false;
 			return 3000;

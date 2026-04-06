@@ -46,7 +46,12 @@ export function PackDetailModal({
 		setCheckoutState("creating_order");
 
 		createOrder.mutate(
-			{ packIds: [pack.productId], paymentMethod: "SEPAY", shippingAddress: "Default Web Address", notes: "Mua từ Marketplace" },
+			{
+				packIds: [pack.productId],
+				paymentMethod: "SEPAY",
+				shippingAddress: "Default Web Address",
+				notes: "Mua từ Marketplace",
+			},
 			{
 				onSuccess: (orderData) => {
 					setCheckoutState("initiating_payment");
@@ -219,9 +224,7 @@ export function PackDetailModal({
 								<button
 									type="button"
 									onClick={handleCheckout}
-									disabled={
-										checkoutState !== "idle" || pack.stockCount <= 0
-									}
+									disabled={checkoutState !== "idle" || pack.stockCount <= 0}
 									className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-base font-bold text-primary-foreground shadow-lg transition-all hover:bg-primary/90 focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50"
 									data-testid="checkout-btn"
 								>
@@ -230,9 +233,7 @@ export function PackDetailModal({
 									) : (
 										<>
 											<CreditCard className="h-5 w-5" />
-											{pack.stockCount > 0
-												? "Mua ngay"
-												: "Hết hàng"}
+											{pack.stockCount > 0 ? "Mua ngay" : "Hết hàng"}
 										</>
 									)}
 								</button>

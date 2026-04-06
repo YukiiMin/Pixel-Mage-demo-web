@@ -1,5 +1,5 @@
-import React from "react";
 import Link from "next/link";
+import React from "react";
 import { PrivacyPolicyContent } from "@/components/shared/legal-modals";
 
 export const metadata = {
@@ -21,7 +21,7 @@ export default function PrivacyPolicyPage() {
 					</h1>
 					<PrivacyPolicyContent />
 				</div>
-				
+
 				<div className="mt-12 pt-8 border-t border-border/50 text-center relative z-10">
 					<Link href="/" className="btn-primary inline-flex">
 						Trở về trang chủ

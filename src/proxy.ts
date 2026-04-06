@@ -56,7 +56,7 @@ export function proxy(request: NextRequest) {
 	// We only need role for staff/admin routes
 	if (isStaffRoute || isAdminRoute) {
 		const role =
-			request.cookies.get("pm_user_role")?.value?.toUpperCase() ?? "CUSTOMER";
+			request.cookies.get("pm_user_role")?.value?.toUpperCase() ?? "USER";
 
 		if (isAdminRoute) {
 			if (role === "STAFF") {

@@ -2,9 +2,9 @@
 
 import { ShoppingBag } from "lucide-react";
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { PackDetailModal } from "@/features/marketplace/components/pack-detail-modal";
 import { PackGrid } from "@/features/marketplace/components/pack-grid";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ProductFilter } from "@/features/marketplace/components/product-filter";
 import { useMarketplace } from "@/features/marketplace/hooks/use-marketplace";
 
@@ -81,7 +81,10 @@ export function MarketplacePage() {
 			{status === "loading" ? (
 				<div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
 					{[1, 2, 3, 4, 5, 6].map((i) => (
-						<div key={i} className="glass-card flex h-60 flex-col justify-between rounded-2xl border border-border/50 p-5">
+						<div
+							key={i}
+							className="glass-card flex h-60 flex-col justify-between rounded-2xl border border-border/50 p-5"
+						>
 							<div>
 								<div className="mb-3 flex justify-between">
 									<Skeleton className="h-6 w-32 rounded-md" />
@@ -91,7 +94,10 @@ export function MarketplacePage() {
 								<Skeleton className="mb-4 h-4 w-2/3 rounded-md" />
 								<div className="flex -space-x-2">
 									{[1, 2, 3].map((j) => (
-										<Skeleton key={j} className="h-10 w-10 rounded-full border-2 border-background" />
+										<Skeleton
+											key={j}
+											className="h-10 w-10 rounded-full border-2 border-background"
+										/>
 									))}
 								</div>
 							</div>

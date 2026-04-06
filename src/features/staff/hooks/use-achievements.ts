@@ -46,7 +46,9 @@ export function useAdminAchievements() {
 	return useQuery({
 		queryKey: achievementKeys.list(),
 		queryFn: async () => {
-			const result = await apiRequest<Achievement[]>(API_ENDPOINTS.adminAchievements.list);
+			const result = await apiRequest<Achievement[]>(
+				API_ENDPOINTS.adminAchievements.list,
+			);
 			return result.data ?? [];
 		},
 		staleTime: 60_000,
@@ -57,10 +59,13 @@ export function useCreateAchievement() {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationFn: async (dto: CreateAchievementDto) => {
-			const result = await apiRequest<Achievement>(API_ENDPOINTS.adminAchievements.create, {
-				method: "POST",
-				body: JSON.stringify(dto),
-			});
+			const result = await apiRequest<Achievement>(
+				API_ENDPOINTS.adminAchievements.create,
+				{
+					method: "POST",
+					body: JSON.stringify(dto),
+				},
+			);
 			return result.data;
 		},
 		onSuccess: () => qc.invalidateQueries({ queryKey: achievementKeys.all }),
@@ -70,11 +75,20 @@ export function useCreateAchievement() {
 export function useUpdateAchievement() {
 	const qc = useQueryClient();
 	return useMutation({
-		mutationFn: async ({ id, dto }: { id: number; dto: Partial<CreateAchievementDto> }) => {
-			const result = await apiRequest<Achievement>(API_ENDPOINTS.adminAchievements.byId(id), {
-				method: "PUT",
-				body: JSON.stringify(dto),
-			});
+		mutationFn: async ({
+			id,
+			dto,
+		}: {
+			id: number;
+			dto: Partial<CreateAchievementDto>;
+		}) => {
+			const result = await apiRequest<Achievement>(
+				API_ENDPOINTS.adminAchievements.byId(id),
+				{
+					method: "PUT",
+					body: JSON.stringify(dto),
+				},
+			);
 			return result.data;
 		},
 		onSuccess: () => qc.invalidateQueries({ queryKey: achievementKeys.all }),

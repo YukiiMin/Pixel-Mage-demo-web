@@ -19,7 +19,7 @@ export interface UnlinkRequest {
 	id: number;
 	nfcUid: string;
 	status: UnlinkRequestStatus;
-	createdAt: string;   // ISO datetime — use this as requestedAt
+	createdAt: string; // ISO datetime — use this as requestedAt
 	resolvedAt?: string | null;
 	staffNote?: string | null;
 

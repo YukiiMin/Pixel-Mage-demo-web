@@ -1,4 +1,13 @@
-import { BarChart3, CreditCard, LayoutDashboard, LayoutGrid, Link2Off, Package, User, Users } from "lucide-react";
+import {
+	BarChart3,
+	CreditCard,
+	LayoutDashboard,
+	LayoutGrid,
+	Link2Off,
+	Package,
+	User,
+	Users,
+} from "lucide-react";
 
 export const sectionLinks = [
 	{ label: "Trang chủ", hash: "/" },
@@ -51,4 +60,3 @@ export function getInitials(name: string): string {
 		.join("")
 		.toUpperCase();
 }
-

@@ -46,91 +46,91 @@ export const voucherKeys = {
 // Hooks
 // ──────────────────────────────────────────────────
 export function useAdminVouchers() {
-  return useQuery({
-    queryKey: voucherKeys.list(),
-    queryFn: async () => {
-      // MOCK: Backend endpoint is missing.
-      return [
-        {
-          id: 1,
-          code: 'WELCOME20',
-          description: 'Giảm 20% cho đơn đầu tiên',
-          discountType: 'PERCENTAGE',
-          discountValue: 20,
-          usedCount: 15,
-          isActive: true,
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: 2,
-          code: 'SUMMER25',
-          description: 'Giảm 25.000₫ cho đơn mùa hè',
-          discountType: 'FIXED_AMOUNT',
-          discountValue: 25000,
-          usedCount: 0,
-          usageLimit: 100,
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          expiryDate: new Date(Date.now() + 86400000 * 30).toISOString(),
-        },
-      ] as Voucher[]
-    },
-    staleTime: 30_000,
-  })
+	return useQuery({
+		queryKey: voucherKeys.list(),
+		queryFn: async () => {
+			// MOCK: Backend endpoint is missing.
+			return [
+				{
+					id: 1,
+					code: "WELCOME20",
+					description: "Giảm 20% cho đơn đầu tiên",
+					discountType: "PERCENTAGE",
+					discountValue: 20,
+					usedCount: 15,
+					isActive: true,
+					createdAt: new Date().toISOString(),
+				},
+				{
+					id: 2,
+					code: "SUMMER25",
+					description: "Giảm 25.000₫ cho đơn mùa hè",
+					discountType: "FIXED_AMOUNT",
+					discountValue: 25000,
+					usedCount: 0,
+					usageLimit: 100,
+					isActive: true,
+					createdAt: new Date().toISOString(),
+					expiryDate: new Date(Date.now() + 86400000 * 30).toISOString(),
+				},
+			] as Voucher[];
+		},
+		staleTime: 30_000,
+	});
 }
 
 export function useCreateVoucher() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: async (dto: CreateVoucherDto) => {
-      // MOCK: Backend endpoint /api/admin/vouchers POST is missing.
-      return {
-        id: Math.floor(Math.random() * 10000),
-        ...dto,
-        usedCount: 0,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-      } as Voucher
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: voucherKeys.all }),
-  })
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: async (dto: CreateVoucherDto) => {
+			// MOCK: Backend endpoint /api/admin/vouchers POST is missing.
+			return {
+				id: Math.floor(Math.random() * 10000),
+				...dto,
+				usedCount: 0,
+				isActive: true,
+				createdAt: new Date().toISOString(),
+			} as Voucher;
+		},
+		onSuccess: () => qc.invalidateQueries({ queryKey: voucherKeys.all }),
+	});
 }
 
 export function useUpdateVoucher() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: async ({
-      id,
-      dto,
-    }: {
-      id: number
-      dto: Partial<CreateVoucherDto>
-    }) => {
-      // MOCK: Endpoint is missing.
-      return { id, ...dto } as Voucher
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: voucherKeys.all }),
-  })
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			id,
+			dto,
+		}: {
+			id: number;
+			dto: Partial<CreateVoucherDto>;
+		}) => {
+			// MOCK: Endpoint is missing.
+			return { id, ...dto } as Voucher;
+		},
+		onSuccess: () => qc.invalidateQueries({ queryKey: voucherKeys.all }),
+	});
 }
 
 export function useDeleteVoucher() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: async (id: number) => {
-      // MOCK: Endpoint is missing.
-      return Promise.resolve()
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: voucherKeys.all }),
-  })
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: async (id: number) => {
+			// MOCK: Endpoint is missing.
+			return Promise.resolve();
+		},
+		onSuccess: () => qc.invalidateQueries({ queryKey: voucherKeys.all }),
+	});
 }
 
 export function useToggleVoucher() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: async (id: number) => {
-      // MOCK: Endpoint is missing.
-      return Promise.resolve()
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: voucherKeys.all }),
-  })
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: async (id: number) => {
+			// MOCK: Endpoint is missing.
+			return Promise.resolve();
+		},
+		onSuccess: () => qc.invalidateQueries({ queryKey: voucherKeys.all }),
+	});
 }

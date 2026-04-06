@@ -28,7 +28,10 @@ const CounterStat = ({ end, label }: { end: string; label: string }) => {
 		const tick = (now: number) => {
 			const p = Math.min((now - start) / duration, 1);
 			const eased = 1 - (1 - p) ** 3;
-			const current = num < 10 ? (num * eased).toFixed(1) : Math.round(num * eased).toString();
+			const current =
+				num < 10
+					? (num * eased).toFixed(1)
+					: Math.round(num * eased).toString();
 			setVal(current + suffix);
 			if (p < 1) requestAnimationFrame(tick);
 		};

@@ -178,7 +178,9 @@ export function ProfilePage() {
 			<div className="container mx-auto max-w-4xl px-4 sm:px-6 pb-20">
 				<div className="glass-card rounded-2xl border border-border/50 p-8 text-center">
 					<LoaderCircle className="mx-auto h-6 w-6 animate-spin text-primary" />
-					<p className="mt-2 text-sm text-muted-foreground">Đang tải hồ sơ...</p>
+					<p className="mt-2 text-sm text-muted-foreground">
+						Đang tải hồ sơ...
+					</p>
 				</div>
 			</div>
 		);
@@ -202,7 +204,10 @@ export function ProfilePage() {
 	return (
 		<>
 			{/* ✅ AlertDialog confirm đổi mật khẩu */}
-			<AlertDialog open={showPwdConfirmDialog} onOpenChange={setShowPwdConfirmDialog}>
+			<AlertDialog
+				open={showPwdConfirmDialog}
+				onOpenChange={setShowPwdConfirmDialog}
+			>
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle className="flex items-center gap-2">
@@ -211,8 +216,10 @@ export function ProfilePage() {
 						</AlertDialogTitle>
 						<AlertDialogDescription>
 							Sau khi đổi mật khẩu thành công, bạn sẽ bị{" "}
-							<strong className="text-foreground">đăng xuất khỏi tất cả phiên</strong> và
-							cần đăng nhập lại bằng mật khẩu mới.
+							<strong className="text-foreground">
+								đăng xuất khỏi tất cả phiên
+							</strong>{" "}
+							và cần đăng nhập lại bằng mật khẩu mới.
 							<br />
 							<br />
 							Bạn có chắc chắn muốn tiếp tục không?
@@ -297,7 +304,9 @@ export function ProfilePage() {
 									/>
 								</div>
 							</div>
-							{saveError && <p className="text-xs text-destructive">{saveError}</p>}
+							{saveError && (
+								<p className="text-xs text-destructive">{saveError}</p>
+							)}
 							<div className="flex items-center gap-2">
 								<Button
 									type="button"

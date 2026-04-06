@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
+import { API_ENDPOINTS, apiRequest, getStoredUserId } from "@/lib/api-config";
 
 // ──────────────────────────────────────────────────
 // Types
@@ -39,8 +39,15 @@ export function useAdminCollections() {
 	return useQuery({
 		queryKey: adminCollectionKeys.list(),
 		queryFn: async () => {
-			const result = await apiRequest<AdminCollection[]>(API_ENDPOINTS.adminCollections.create);
-			return result.data ?? [];
+			const result = await apiRequest<
+				| {
+						content?: AdminCollection[];
+				  }
+				| AdminCollection[]
+			>(API_ENDPOINTS.collections.publicList);
+			const data = result.data;
+			if (Array.isArray(data)) return data;
+			return data?.content ?? [];
 		},
 		staleTime: 60_000,
 	});
@@ -50,25 +57,42 @@ export function useCreateAdminCollection() {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationFn: async (dto: CreateAdminCollectionDto) => {
-			const result = await apiRequest<AdminCollection>(API_ENDPOINTS.adminCollections.create, {
-				method: "POST",
-				body: JSON.stringify(dto),
-			});
+			const adminId = getStoredUserId();
+			if (!adminId) {
+				throw new Error("Không xác định được adminId hiện tại");
+			}
+			const result = await apiRequest<AdminCollection>(
+				`${API_ENDPOINTS.adminCollections.create}?adminId=${adminId}`,
+				{
+					method: "POST",
+					body: JSON.stringify(dto),
+				},
+			);
 			return result.data;
 		},
-		onSuccess: () => qc.invalidateQueries({ queryKey: adminCollectionKeys.all }),
+		onSuccess: () =>
+			qc.invalidateQueries({ queryKey: adminCollectionKeys.all }),
 	});
 }
 
 export function useToggleCollectionVisibility() {
 	const qc = useQueryClient();
 	return useMutation({
-		mutationFn: async ({ id, isVisible }: { id: number; isVisible: boolean }) => {
-			await apiRequest<void>(API_ENDPOINTS.adminCollections.updateVisibility(id), {
-				method: "PATCH",
-				body: JSON.stringify({ isVisible }),
-			});
+		mutationFn: async ({
+			id,
+			isVisible,
+		}: {
+			id: number;
+			isVisible: boolean;
+		}) => {
+			await apiRequest<void>(
+				`${API_ENDPOINTS.adminCollections.updateVisibility(id)}?isVisible=${String(isVisible)}`,
+				{
+					method: "PUT",
+				},
+			);
 		},
-		onSuccess: () => qc.invalidateQueries({ queryKey: adminCollectionKeys.all }),
+		onSuccess: () =>
+			qc.invalidateQueries({ queryKey: adminCollectionKeys.all }),
 	});
 }

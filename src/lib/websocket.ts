@@ -21,7 +21,7 @@ class WebSocketService {
 		}
 
 		const token = getStoredAccessToken();
-		
+
 		const wsUrl = API_CONFIG.baseUrl.replace(/^http/, "ws") + "/ws";
 
 		this.client = new Client({

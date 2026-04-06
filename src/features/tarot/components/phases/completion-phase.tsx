@@ -1,13 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CheckCircle2, Copy, Share2, Sparkles } from 'lucide-react';
+import { CheckCircle2, Copy, Share2, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useSessionDetail } from "@/features/tarot/hooks/use-tarot-session";
-
 
 interface CompletionPhaseProps {
 	sessionId: number;
@@ -100,7 +99,7 @@ export function CompletionPhase({ sessionId }: CompletionPhaseProps) {
 					<p className="mb-4 text-xs font-bold uppercase tracking-widest text-primary/60">
 						Lời khuyên từ Vũ Trụ
 					</p>
-					<pre 
+					<pre
 						className="whitespace-pre-wrap font-(--font-body) text-sm leading-relaxed"
 						style={{ color: "hsl(270 40% 80%)" }}
 					>

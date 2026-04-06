@@ -4,8 +4,14 @@ import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { clearStoredAuthSession, getStoredUserRole, getStoredUserId, hasStoredAuthSession, setStoredAuthSession } from "@/lib/api-config";
 import { useProfile } from "@/features/auth/hooks/use-auth";
+import {
+	clearStoredAuthSession,
+	getStoredUserId,
+	getStoredUserRole,
+	hasStoredAuthSession,
+	setStoredAuthSession,
+} from "@/lib/api-config";
 import { getInitials, resolveSectionHref, sectionLinks } from "./_config";
 import DesktopActions from "./desktop-actions";
 import DesktopNav from "./desktop-nav";
@@ -66,14 +72,14 @@ const Header = () => {
 		if (profileData) {
 			const profileRole = profileData.role || null;
 			const profileId = profileData.customerId || null;
-			
+
 			if (profileRole && profileRole !== userRole) {
 				setUserRole(profileRole);
 			}
 			if (profileId && profileId !== userId) {
 				setUserId(profileId);
 			}
-			
+
 			// Only sync back if values meaningfully differ from markers
 			// (prevents redundant cookie writes and potential loops)
 			if (profileId && (profileId !== userId || profileRole !== userRole)) {

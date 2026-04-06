@@ -1,35 +1,34 @@
 "use client";
 
+import { getInitials } from "@/components/layout/header/_config";
+import { useProfile } from "@/features/auth/hooks/use-auth";
 import {
-	Award,
-	BarChart3,
-	BookOpen,
-	ChevronLeft,
-	ChevronRight,
-	CreditCard,
-	LayoutDashboard,
-	Link2Off,
-	LogOut,
-	NfcIcon,
-	Package,
-	Settings,
-	Sparkles,
-	Ticket,
-	Trophy,
-	Users,
-	Wallet,
+    clearStoredAuthSession,
+    getStoredUserId,
+    getStoredUserRole,
+    hasStoredAuthSession,
+} from "@/lib/api-config";
+import {
+    BarChart3,
+    BookOpen,
+    ChevronLeft,
+    ChevronRight,
+    CreditCard,
+    LayoutDashboard,
+    Link2Off,
+    LogOut,
+    NfcIcon,
+    Package,
+    Settings,
+    Sparkles,
+    Ticket,
+    Trophy,
+    Users,
+    Wallet
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useProfile } from "@/features/auth/hooks/use-auth";
-import {
-	clearStoredAuthSession,
-	getStoredUserRole,
-	getStoredUserId,
-	hasStoredAuthSession,
-} from "@/lib/api-config";
-import { getInitials } from "@/components/layout/header/_config";
 
 // ────────────────────────────────────────────
 // Navigation config per role
@@ -44,11 +43,16 @@ const adminOnlyLinks = [
 	{ label: "Accounts", href: "/staff/admin/accounts", icon: Users },
 	{ label: "Wallet Management", href: "/staff/admin/wallet", icon: Wallet },
 	{ label: "Card Management", href: "/staff/admin/cards", icon: CreditCard },
-	{ label: "Physical Cards", href: "/staff/admin/physical-cards", icon: NfcIcon },
+	{
+		label: "Physical Cards",
+		href: "/staff/admin/physical-cards",
+		icon: NfcIcon,
+	},
 	{ label: "Collections", href: "/staff/admin/collections", icon: BookOpen },
 	{ label: "Vouchers", href: "/staff/admin/vouchers", icon: Ticket },
 	{ label: "Achievements", href: "/staff/admin/achievements", icon: Trophy },
 	{ label: "Analytics", href: "/staff/admin/analytics", icon: BarChart3 },
+	{ label: "Pack Monitoring", href: "/staff/admin/pack-monitoring", icon: Package },
 ];
 
 // ────────────────────────────────────────────
@@ -94,10 +98,7 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
 	};
 
 	const isAdmin = role === "ADMIN";
-	const navLinks = [
-		...(isAdmin ? adminOnlyLinks : []),
-		...staffLinks,
-	];
+	const navLinks = [...(isAdmin ? adminOnlyLinks : []), ...staffLinks];
 
 	const NavItem = ({
 		href,
@@ -110,9 +111,9 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
 	}) => {
 		// Fix: don't highlight Dashboard if we are in a sub-item like /accounts
 		const isRootAdmin = href === "/staff/admin";
-		const active = isRootAdmin 
-			? pathname === href 
-			: (pathname === href || pathname.startsWith(href + "/"));
+		const active = isRootAdmin
+			? pathname === href
+			: pathname === href || pathname.startsWith(href + "/");
 
 		return (
 			<Link
@@ -198,8 +199,12 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
 							{initials}
 						</div>
 						<div className="min-w-0 flex-1">
-							<p className="truncate text-xs font-semibold text-foreground">{displayName}</p>
-							<p className="truncate text-[10px] text-muted-foreground">{profile?.email}</p>
+							<p className="truncate text-xs font-semibold text-foreground">
+								{displayName}
+							</p>
+							<p className="truncate text-[10px] text-muted-foreground">
+								{profile?.email}
+							</p>
 						</div>
 						<button
 							type="button"
@@ -255,13 +260,25 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
 						className="rounded-lg p-2 text-muted-foreground hover:bg-accent transition-colors"
 						aria-label="Mở menu"
 					>
-						<svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+						<svg
+							className="h-5 w-5"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M4 6h16M4 12h16M4 18h16"
+							/>
 						</svg>
 					</button>
 					<Link href="/" className="flex items-center gap-2">
 						<Sparkles className="h-4 w-4 text-primary" />
-						<span className="font-bold gradient-gold-purple text-sm">PixelMage Staff</span>
+						<span className="font-bold gradient-gold-purple text-sm">
+							PixelMage Staff
+						</span>
 					</Link>
 					<div className="flex h-7 w-7 items-center justify-center rounded-full gradient-gold-purple-bg text-xs font-bold text-primary-foreground">
 						{initials}
@@ -272,7 +289,8 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
 				<header className="hidden md:flex h-14 items-center justify-between border-b border-border/20 bg-card/20 px-6 backdrop-blur-sm">
 					<div>
 						<h2 className="text-sm font-semibold text-foreground capitalize">
-							{navLinks.find((l) => pathname.startsWith(l.href))?.label ?? "Dashboard"}
+							{navLinks.find((l) => pathname.startsWith(l.href))?.label ??
+								"Dashboard"}
 						</h2>
 					</div>
 					<p className="text-xs text-muted-foreground">

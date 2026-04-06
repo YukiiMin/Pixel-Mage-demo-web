@@ -157,7 +157,11 @@ export function UnlinkRequestTable({
 									<TableCell>
 										<div>
 											<p className="text-sm text-foreground font-medium">
-												{req.userName ?? <span className="text-muted-foreground italic">Chưa có tên</span>}
+												{req.userName ?? (
+													<span className="text-muted-foreground italic">
+														Chưa có tên
+													</span>
+												)}
 											</p>
 											<p className="text-xs text-[hsl(220_10%_55%)]">
 												{req.userEmail ?? "—"}
@@ -168,7 +172,9 @@ export function UnlinkRequestTable({
 										{req.cardName ?? req.nfcUid ?? "—"}
 									</TableCell>
 									<TableCell className="text-sm text-[hsl(220_10%_65%)] font-stats">
-										{new Date(req.createdAt ?? req.requestedAt ?? Date.now()).toLocaleDateString("vi-VN")}
+										{new Date(
+											req.createdAt ?? req.requestedAt ?? Date.now(),
+										).toLocaleDateString("vi-VN")}
 									</TableCell>
 									<TableCell>
 										<StatusBadge status={req.status} />
@@ -176,24 +182,20 @@ export function UnlinkRequestTable({
 									<TableCell className="text-right">
 										{actionableStatuses.includes(req.status) ? (
 											<div className="flex gap-2 justify-end">
-												<Button
-													variant="ghost"
-													size="sm"
+												<button
 													data-testid={`approve-btn-${req.id}`}
 													onClick={() => setApproveTarget(req)}
-													className="text-[hsl(150_60%_55%)] hover:text-[hsl(150_60%_65%)] hover:bg-[hsl(150_40%_15%)] h-7 px-2 text-xs"
+													className="inline-flex items-center justify-center rounded-lg border border-[hsl(150_40%_15%)] p-1.5 px-3 text-[hsl(150_60%_55%)] transition-colors hover:bg-[hsl(150_40%_15%)] hover:text-[hsl(150_60%_55%)] text-xs font-medium"
 												>
 													✓ Duyệt
-												</Button>
-												<Button
-													variant="ghost"
-													size="sm"
+												</button>
+												<button
 													data-testid={`reject-btn-${req.id}`}
 													onClick={() => setRejectTarget(req)}
-													className="text-[hsl(0_70%_60%)] hover:text-[hsl(0_70%_70%)] hover:bg-[hsl(0_50%_15%)] h-7 px-2 text-xs"
+													className="inline-flex items-center justify-center rounded-lg border border-destructive/20 p-1.5 px-3 text-destructive transition-colors hover:bg-destructive/10 text-xs font-medium"
 												>
 													✗ Từ chối
-												</Button>
+												</button>
 											</div>
 										) : (
 											<span className="text-xs text-[hsl(220_10%_45%)]">—</span>

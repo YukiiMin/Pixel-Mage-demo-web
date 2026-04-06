@@ -1,8 +1,21 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+	Award,
+	Gift,
+	Loader2,
+	Pencil,
+	Plus,
+	Star,
+	ToggleLeft,
+	ToggleRight,
+	Trash2,
+	Trophy,
+	Zap,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
 	AlertDialog,
@@ -57,19 +70,6 @@ import {
 	useToggleAchievement,
 	useUpdateAchievement,
 } from "../hooks/use-achievements";
-import {
-	Award,
-	Gift,
-	Loader2,
-	Pencil,
-	Plus,
-	Star,
-	ToggleLeft,
-	ToggleRight,
-	Trash2,
-	Trophy,
-	Zap,
-} from "lucide-react";
 
 // ──────────────────────────────────────────────────
 // Schema
@@ -108,19 +108,30 @@ const CONDITION_OPTIONS = [
 // ──────────────────────────────────────────────────
 // Reward type badge
 // ──────────────────────────────────────────────────
-function RewardBadge({ type, value }: { type: Achievement["rewardType"]; value?: number }) {
-	if (type === "NONE") return <span className="text-muted-foreground text-sm">—</span>;
+function RewardBadge({
+	type,
+	value,
+}: {
+	type: Achievement["rewardType"];
+	value?: number;
+}) {
+	if (type === "NONE")
+		return <span className="text-muted-foreground text-sm">—</span>;
 	return (
 		<div className="flex items-center gap-1.5">
 			{type === "POINT" ? (
 				<>
 					<Zap className="h-3.5 w-3.5 text-primary" />
-					<span className="font-stats text-primary font-semibold">{value} pts</span>
+					<span className="font-stats text-primary font-semibold">
+						{value} pts
+					</span>
 				</>
 			) : (
 				<>
 					<Gift className="h-3.5 w-3.5 text-secondary" />
-					<span className="font-stats text-secondary font-semibold">1 Pack</span>
+					<span className="font-stats text-secondary font-semibold">
+						1 Pack
+					</span>
 				</>
 			)}
 		</div>
@@ -267,7 +278,12 @@ function AchievementFormModal({
 											Giá trị điều kiện
 										</FormLabel>
 										<FormControl>
-											<Input {...field} type="number" placeholder="5" className="font-stats" />
+											<Input
+												{...field}
+												type="number"
+												placeholder="5"
+												className="font-stats"
+											/>
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -310,7 +326,12 @@ function AchievementFormModal({
 												Số Points thưởng
 											</FormLabel>
 											<FormControl>
-												<Input {...field} type="number" placeholder="500" className="font-stats" />
+												<Input
+													{...field}
+													type="number"
+													placeholder="500"
+													className="font-stats"
+												/>
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -323,9 +344,16 @@ function AchievementFormModal({
 									name="rewardPackId"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel className="text-xs text-muted-foreground">Pack ID</FormLabel>
+											<FormLabel className="text-xs text-muted-foreground">
+												Pack ID
+											</FormLabel>
 											<FormControl>
-												<Input {...field} type="number" placeholder="1" className="font-stats" />
+												<Input
+													{...field}
+													type="number"
+													placeholder="1"
+													className="font-stats"
+												/>
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -335,7 +363,12 @@ function AchievementFormModal({
 						</div>
 
 						<DialogFooter className="pt-2">
-							<Button type="button" variant="ghost" onClick={onClose} disabled={isPending}>
+							<Button
+								type="button"
+								variant="ghost"
+								onClick={onClose}
+								disabled={isPending}
+							>
 								Huỷ
 							</Button>
 							<Button type="submit" disabled={isPending} className="gap-2">
@@ -385,16 +418,25 @@ export function AdminAchievementsPage() {
 						{achievements.filter((a) => a.isActive).length} đang hoạt động
 					</p>
 				</div>
-				<Button onClick={openCreate} className="gap-2">
+				<button
+					type="button"
+					onClick={openCreate}
+					className="flex items-center gap-2 rounded-xl bg-primary/20 px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/30"
+				>
 					<Plus className="h-4 w-4" />
 					Tạo Achievement
-				</Button>
+				</button>
 			</div>
 
 			{/* ── Stats Strip ── */}
 			<div className="grid grid-cols-4 gap-3">
 				{[
-					{ label: "Tổng", value: achievements.length, icon: Trophy, color: "text-primary" },
+					{
+						label: "Tổng",
+						value: achievements.length,
+						icon: Trophy,
+						color: "text-primary",
+					},
 					{
 						label: "Đang hoạt động",
 						value: achievements.filter((a) => a.isActive).length,
@@ -423,7 +465,9 @@ export function AdminAchievementsPage() {
 							<p className="font-stats text-xl font-semibold text-foreground leading-none">
 								{stat.value}
 							</p>
-							<p className="text-xs text-muted-foreground mt-0.5 truncate">{stat.label}</p>
+							<p className="text-xs text-muted-foreground mt-0.5 truncate">
+								{stat.label}
+							</p>
 						</div>
 					</div>
 				))}
@@ -459,16 +503,21 @@ export function AdminAchievementsPage() {
 						<TableBody>
 							{achievements.length === 0 ? (
 								<TableRow>
-									<TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+									<TableCell
+										colSpan={5}
+										className="text-center py-12 text-muted-foreground"
+									>
 										<Award className="h-8 w-8 mx-auto mb-2 opacity-30" />
-										<p>Chưa có achievement nào. Hãy tạo achievement đầu tiên!</p>
+										<p>
+											Chưa có achievement nào. Hãy tạo achievement đầu tiên!
+										</p>
 									</TableCell>
 								</TableRow>
 							) : (
 								achievements.map((a) => {
 									const conditionLabel =
-										CONDITION_OPTIONS.find((o) => o.value === a.condition)?.label ??
-										a.condition;
+										CONDITION_OPTIONS.find((o) => o.value === a.condition)
+											?.label ?? a.condition;
 
 									return (
 										<TableRow
@@ -481,7 +530,9 @@ export function AdminAchievementsPage() {
 														<Trophy className="h-4 w-4 text-primary" />
 													</div>
 													<div className="min-w-0">
-														<p className="font-medium text-foreground text-sm truncate">{a.name}</p>
+														<p className="font-medium text-foreground text-sm truncate">
+															{a.name}
+														</p>
 														<p className="text-xs text-muted-foreground truncate max-w-50">
 															{a.description}
 														</p>
@@ -489,7 +540,9 @@ export function AdminAchievementsPage() {
 												</div>
 											</TableCell>
 											<TableCell>
-												<span className="text-sm text-muted-foreground">{conditionLabel}</span>
+												<span className="text-sm text-muted-foreground">
+													{conditionLabel}
+												</span>
 												{a.conditionValue !== undefined && (
 													<span className="font-stats text-primary ml-1">
 														≥ {a.conditionValue}
@@ -497,7 +550,10 @@ export function AdminAchievementsPage() {
 												)}
 											</TableCell>
 											<TableCell>
-												<RewardBadge type={a.rewardType} value={a.rewardValue} />
+												<RewardBadge
+													type={a.rewardType}
+													value={a.rewardValue}
+												/>
 											</TableCell>
 											<TableCell>
 												<Badge
@@ -512,37 +568,33 @@ export function AdminAchievementsPage() {
 												</Badge>
 											</TableCell>
 											<TableCell>
-												<div className="flex items-center justify-end gap-1">
-													<Button
-														variant="ghost"
-														size="icon"
-														className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-white/5"
+												<div className="flex items-center justify-end gap-2">
+													<button
 														onClick={() => toggleMut.mutate(a.id)}
 														disabled={toggleMut.isPending}
 														title={a.isActive ? "Tắt" : "Bật"}
+														className="inline-flex items-center justify-center rounded-lg border border-border/50 p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
 													>
 														{a.isActive ? (
 															<ToggleRight className="h-4 w-4 text-green-400" />
 														) : (
 															<ToggleLeft className="h-4 w-4" />
 														)}
-													</Button>
-													<Button
-														variant="ghost"
-														size="icon"
-														className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-white/5"
+													</button>
+													<button
 														onClick={() => openEdit(a)}
+														title="Chỉnh sửa"
+														className="inline-flex items-center justify-center rounded-lg border border-border/50 p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
 													>
-														<Pencil className="h-3.5 w-3.5" />
-													</Button>
-													<Button
-														variant="ghost"
-														size="icon"
-														className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+														<Pencil className="h-4 w-4" />
+													</button>
+													<button
 														onClick={() => setDeleteTarget(a)}
+														title="Xoá"
+														className="inline-flex items-center justify-center rounded-lg border border-destructive/20 p-1.5 text-destructive transition-colors hover:bg-destructive/10"
 													>
-														<Trash2 className="h-3.5 w-3.5" />
-													</Button>
+														<Trash2 className="h-4 w-4" />
+													</button>
 												</div>
 											</TableCell>
 										</TableRow>
@@ -561,7 +613,10 @@ export function AdminAchievementsPage() {
 				editTarget={editTarget}
 			/>
 
-			<AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(undefined)}>
+			<AlertDialog
+				open={!!deleteTarget}
+				onOpenChange={() => setDeleteTarget(undefined)}
+			>
 				<AlertDialogContent
 					style={{
 						background: "hsl(230 40% 12% / 0.95)",
@@ -571,11 +626,15 @@ export function AdminAchievementsPage() {
 					className="border-border"
 				>
 					<AlertDialogHeader>
-						<AlertDialogTitle className="font-heading">Xác nhận xoá Achievement</AlertDialogTitle>
+						<AlertDialogTitle className="font-heading">
+							Xác nhận xoá Achievement
+						</AlertDialogTitle>
 						<AlertDialogDescription>
 							Bạn sắp xoá achievement{" "}
-							<span className="font-semibold text-foreground">{deleteTarget?.name}</span>. Hành
-							động này không thể hoàn tác.
+							<span className="font-semibold text-foreground">
+								{deleteTarget?.name}
+							</span>
+							. Hành động này không thể hoàn tác.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>

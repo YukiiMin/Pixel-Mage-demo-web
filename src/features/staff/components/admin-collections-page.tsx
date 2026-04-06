@@ -1,8 +1,19 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+	BookOpen,
+	Eye,
+	EyeOff,
+	FolderOpen,
+	Image,
+	Layers,
+	Loader2,
+	Plus,
+	Users,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
 	AlertDialog,
@@ -48,17 +59,6 @@ import {
 	useCreateAdminCollection,
 	useToggleCollectionVisibility,
 } from "../hooks/use-admin-collections";
-import {
-	BookOpen,
-	Eye,
-	EyeOff,
-	FolderOpen,
-	Image,
-	Layers,
-	Loader2,
-	Plus,
-	Users,
-} from "lucide-react";
 
 // ──────────────────────────────────────────────────
 // Schema
@@ -66,14 +66,18 @@ import {
 const collectionSchema = z.object({
 	name: z.string().min(2, "Tên tối thiểu 2 ký tự"),
 	description: z.string().optional(),
-	coverImageUrl: z.string().url("URL không hợp lệ").optional().or(z.literal("")),
+	coverImageUrl: z
+		.string()
+		.url("URL không hợp lệ")
+		.optional()
+		.or(z.literal("")),
 	cardTemplateIds: z.string().transform((val) =>
 		val
 			.split(",")
 			.map((s) => s.trim())
 			.filter(Boolean)
 			.map(Number)
-			.filter((n) => !Number.isNaN(n))
+			.filter((n) => !Number.isNaN(n)),
 	),
 });
 
@@ -168,7 +172,11 @@ function CollectionFormModal({
 										Mô tả
 									</FormLabel>
 									<FormControl>
-										<Textarea {...field} placeholder="Bộ sưu tập gồm các thẻ huyền thoại..." rows={2} />
+										<Textarea
+											{...field}
+											placeholder="Bộ sưu tập gồm các thẻ huyền thoại..."
+											rows={2}
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -200,7 +208,11 @@ function CollectionFormModal({
 										CardTemplate IDs (phân cách bằng dấu phẩy)
 									</FormLabel>
 									<FormControl>
-										<Input {...field} placeholder="1, 2, 5, 12, 37" className="font-stats" />
+										<Input
+											{...field}
+											placeholder="1, 2, 5, 12, 37"
+											className="font-stats"
+										/>
 									</FormControl>
 									<p className="text-xs text-muted-foreground">
 										Nhập ID các CardTemplate cần gộp vào collection này.
@@ -219,8 +231,14 @@ function CollectionFormModal({
 							>
 								Huỷ
 							</Button>
-							<Button type="submit" disabled={createMut.isPending} className="gap-2">
-								{createMut.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+							<Button
+								type="submit"
+								disabled={createMut.isPending}
+								className="gap-2"
+							>
+								{createMut.isPending && (
+									<Loader2 className="h-4 w-4 animate-spin" />
+								)}
 								Tạo Collection
 							</Button>
 						</DialogFooter>
@@ -249,13 +267,18 @@ export function AdminCollectionsPage() {
 						Admin Collections
 					</h2>
 					<p className="text-sm text-muted-foreground mt-0.5">
-						{collections.length} collection • Bộ sưu tập hệ thống áp dụng cho người dùng
+						{collections.length} collection • Bộ sưu tập hệ thống áp dụng cho
+						người dùng
 					</p>
 				</div>
-				<Button onClick={() => setModalOpen(true)} className="gap-2">
+				<button
+					type="button"
+					onClick={() => setModalOpen(true)}
+					className="flex items-center gap-2 rounded-xl bg-primary/20 px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/30"
+				>
 					<Plus className="h-4 w-4" />
 					Tạo Collection
-				</Button>
+				</button>
 			</div>
 
 			{/* ── Stats Strip ── */}
@@ -275,7 +298,10 @@ export function AdminCollectionsPage() {
 					},
 					{
 						label: "Tổng thẻ được quản lý",
-						value: collections.reduce((sum, c) => sum + (c.cardTemplateIds?.length ?? 0), 0),
+						value: collections.reduce(
+							(sum, c) => sum + (c.cardTemplateIds?.length ?? 0),
+							0,
+						),
 						icon: Layers,
 						color: "text-secondary",
 					},
@@ -289,114 +315,145 @@ export function AdminCollectionsPage() {
 							<p className="font-stats text-xl font-semibold text-foreground leading-none">
 								{stat.value}
 							</p>
-							<p className="text-xs text-muted-foreground mt-0.5 truncate">{stat.label}</p>
+							<p className="text-xs text-muted-foreground mt-0.5 truncate">
+								{stat.label}
+							</p>
 						</div>
 					</div>
 				))}
 			</div>
 
-			{/* ── Collections Grid ── */}
+			{/* ── Collections Table ── */}
 			{isLoading ? (
-				<div className="flex items-center justify-center h-48">
+				<div className="flex items-center justify-center py-20">
 					<Loader2 className="h-6 w-6 animate-spin text-primary" />
 				</div>
 			) : collections.length === 0 ? (
-				<div className="glass-card rounded-xl flex flex-col items-center justify-center h-48 text-muted-foreground">
-					<BookOpen className="h-8 w-8 mb-2 opacity-30" />
-					<p>Chưa có Admin Collection nào. Hãy tạo collection đầu tiên!</p>
+				<div className="glass-card flex flex-col items-center justify-center rounded-2xl border border-border/50 py-20 text-muted-foreground">
+					<BookOpen className="mb-4 h-10 w-10 opacity-30" />
+					<p className="text-sm font-medium">
+						Chưa có Admin Collection nào. Hãy tạo collection đầu tiên!
+					</p>
 				</div>
 			) : (
-				<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-					{collections.map((c) => (
-						<div
-							key={c.id}
-							className="glass-card rounded-xl overflow-hidden group transition-all duration-200 hover:bg-white/4"
-						>
-							{/* Cover image or placeholder */}
-							<div className="relative h-28 bg-linear-to-br from-primary/10 to-secondary/10 overflow-hidden">
-								{c.coverImageUrl ? (
-									<img
-										src={c.coverImageUrl}
-										alt={c.name}
-										className="w-full h-full object-cover opacity-70"
-									/>
-								) : (
-									<div className="flex items-center justify-center h-full">
-										<Image className="h-10 w-10 opacity-20 text-primary" />
-									</div>
-								)}
-								<div className="absolute inset-0 bg-linear-to-t from-card/80 to-transparent" />
-								<div className="absolute bottom-2 left-3">
-									<Badge
-										variant="outline"
-										className={
-											c.isVisible
-												? "bg-green-500/10 text-green-400 border-green-500/20"
-												: "text-muted-foreground"
-										}
+				<div className="glass-card overflow-hidden rounded-2xl border border-border/50">
+					<div className="overflow-x-auto">
+						<table className="w-full text-sm">
+							<thead className="border-b border-border/40 bg-card/60 text-xs text-muted-foreground">
+								<tr>
+									<th className="px-4 py-3 font-semibold text-left">Ảnh</th>
+									<th className="px-4 py-3 font-semibold text-left">
+										Tên Collection & Mô Tả
+									</th>
+									<th className="px-4 py-3 font-semibold text-left">
+										Trạng Thái
+									</th>
+									<th className="px-4 py-3 font-semibold text-left">
+										Thống Kê
+									</th>
+									<th className="px-4 py-3 font-semibold text-right">
+										Thao Tác
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								{collections.map((c) => (
+									<tr
+										key={c.id}
+										className="border-b border-border/20 transition-colors hover:bg-card/40 last:border-0 group"
 									>
-										{c.isVisible ? (
-											<Eye className="h-3 w-3 mr-1" />
-										) : (
-											<EyeOff className="h-3 w-3 mr-1" />
-										)}
-										{c.isVisible ? "Công khai" : "Ẩn"}
-									</Badge>
-								</div>
-							</div>
-
-							<div className="p-4 space-y-3">
-								<div>
-									<h3 className="font-heading font-semibold text-foreground truncate">{c.name}</h3>
-									{c.description && (
-										<p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-											{c.description}
-										</p>
-									)}
-								</div>
-
-								<div className="flex items-center gap-4 text-xs text-muted-foreground">
-									<span className="flex items-center gap-1">
-										<Layers className="h-3.5 w-3.5" />
-										<span className="font-stats">{c.cardTemplateIds?.length ?? 0}</span> thẻ
-									</span>
-									<span className="flex items-center gap-1">
-										<Users className="h-3.5 w-3.5" />
-										<span className="font-stats">{c.appliedToUserCount ?? 0}</span> users
-									</span>
-								</div>
-
-								<div className="flex items-center justify-end pt-1">
-									<Button
-										variant="outline"
-										size="sm"
-										className="gap-1.5 text-xs border-border hover:border-primary/50"
-										onClick={() =>
-											toggleMut.mutate({ id: c.id, isVisible: !c.isVisible })
-										}
-										disabled={toggleMut.isPending}
-									>
-										{c.isVisible ? (
-											<>
-												<EyeOff className="h-3.5 w-3.5" />
-												Ẩn
-											</>
-										) : (
-											<>
-												<Eye className="h-3.5 w-3.5" />
-												Công khai
-											</>
-										)}
-									</Button>
-								</div>
-							</div>
-						</div>
-					))}
+										<td className="px-4 py-3 w-28">
+											<div className="relative h-14 w-20 rounded-md border border-border/40 overflow-hidden bg-secondary/10 flex items-center justify-center">
+												{c.coverImageUrl ? (
+													<img
+														src={c.coverImageUrl}
+														alt={c.name}
+														className="h-full w-full object-cover"
+													/>
+												) : (
+													<Image className="h-5 w-5 opacity-30 text-primary" />
+												)}
+											</div>
+										</td>
+										<td className="px-4 py-3">
+											<p className="font-bold text-foreground tracking-normal">
+												{c.name}
+											</p>
+											{c.description && (
+												<p
+													className="text-xs text-muted-foreground mt-0.5 line-clamp-2 max-w-sm"
+													title={c.description}
+												>
+													{c.description}
+												</p>
+											)}
+										</td>
+										<td className="px-4 py-3">
+											<span
+												className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase ${
+													c.isVisible
+														? "border-green-500/25 bg-green-500/10 text-green-400"
+														: "border-border/30 bg-muted/40 text-muted-foreground"
+												}`}
+											>
+												{c.isVisible ? "Công Khai" : "Ẩn"}
+											</span>
+										</td>
+										<td className="px-4 py-3 text-xs text-muted-foreground">
+											<div className="flex flex-col gap-1">
+												<span className="flex items-center gap-1.5">
+													<Layers className="h-3.5 w-3.5" />
+													<span className="font-stats font-medium">
+														{c.cardTemplateIds?.length ?? 0}
+													</span>{" "}
+													thẻ bài
+												</span>
+												<span className="flex items-center gap-1.5">
+													<Users className="h-3.5 w-3.5" />
+													<span className="font-stats font-medium">
+														{c.appliedToUserCount ?? 0}
+													</span>{" "}
+													người dùng
+												</span>
+											</div>
+										</td>
+										<td className="px-4 py-3 text-right">
+											<button
+												type="button"
+												disabled={toggleMut.isPending}
+												onClick={() =>
+													toggleMut.mutate({
+														id: c.id,
+														isVisible: !c.isVisible,
+													})
+												}
+												className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+													c.isVisible
+														? "border-border/50 text-muted-foreground hover:bg-accent hover:text-foreground"
+														: "border-green-500/30 text-green-400 hover:bg-green-500/10"
+												}`}
+											>
+												{c.isVisible ? (
+													<EyeOff className="h-3.5 w-3.5" />
+												) : (
+													<Eye className="h-3.5 w-3.5" />
+												)}
+												{c.isVisible ? "Ẩn Khỏi Game" : "Bật Công Khai"}
+											</button>
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
 				</div>
 			)}
 
 			{/* ── Modal ── */}
-			<CollectionFormModal open={modalOpen} onClose={() => setModalOpen(false)} />
+			<CollectionFormModal
+				open={modalOpen}
+				onClose={() => setModalOpen(false)}
+			/>
 		</div>
 	);
 }

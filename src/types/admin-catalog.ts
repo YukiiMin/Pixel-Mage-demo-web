@@ -60,6 +60,25 @@ export interface CardTemplateResponse {
 	frameworkName?: string;
 }
 
+export interface CardTemplateSummary {
+	cardTemplateId: number;
+	name: string;
+	description?: string;
+	arcanaType?: string;
+	suit?: string;
+	cardNumber?: number;
+	rarity?: string;
+	imagePath?: string;
+	frameworkName?: string;
+}
+
+export interface CardFrameworkResponse {
+	frameworkId: number;
+	name: string;
+	description?: string;
+	active?: boolean;
+}
+
 export interface CardContentRequestDTO {
 	cardTemplateId: number;
 	title?: string;

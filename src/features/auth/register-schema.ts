@@ -38,7 +38,10 @@ export const registerSchema = z.object({
 				if (!val || val.trim() === "") return true; // optional
 				return isValidPhoneNumber(val, "VN");
 			},
-			{ message: "Số điện thoại không hợp lệ. Vui lòng nhập đúng đầu số Việt Nam." },
+			{
+				message:
+					"Số điện thoại không hợp lệ. Vui lòng nhập đúng đầu số Việt Nam.",
+			},
 		),
 
 	password: z
