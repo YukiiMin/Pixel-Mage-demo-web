@@ -21,7 +21,9 @@
 *.pem
 Thumbs.db
 
-
+/*.md
+/*.env
+/*.env.local
 # debug
 npm-debug.log*
 yarn-debug.log*
@@ -29,9 +31,6 @@ yarn-error.log*
 .pnpm-debug.log*
 pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-!.env.example
 
 # vercel
 .vercel
@@ -53,8 +52,6 @@ next-env.d.ts
 *.sln
 *.sw?
 
-#md files
-*.md
 
 #agent files
 /.agents

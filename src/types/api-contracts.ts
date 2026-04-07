@@ -41,6 +41,65 @@ export interface CardContentResponse {
 	nfcUid: string;
 	isActive: boolean;
 	secretPhrase?: string; // May be omitted depending on role
+	// Additional fields for Card Gallery
+	contentType?: string;
+	title?: string;
+	textData?: string;
+	contentUrl?: string;
+	thumbnailUrl?: string;
+	order?: number;
+	isPublic?: boolean;
+	createdAt?: string;
+	updatedAt?: string;
+}
+
+export interface CardFrameworkResponse {
+	frameworkId: string;
+	name: string;
+	description: string;
+	imageUrl?: string;
+	totalCards: number;
+	isActive: boolean;
+	createdAt: string;
+	updatedAt?: string;
+}
+
+export interface CardTemplateResponse {
+	cardTemplateId: number;
+	name: string;
+	cardCode?: string;
+	description?: string;
+	imagePath?: string;
+	rarity: string;
+	frameworkId?: string;
+	frameworkName?: string;
+	totalContentPieces?: number;
+	publicContentCount?: number;
+	privateContentCount?: number;
+	dropRate?: number;
+	isOwned?: boolean;
+	ownerCount?: number;
+	createdAt?: string;
+	updatedAt?: string;
+}
+
+export interface CardTemplateResponseSummary {
+	cardTemplateId: number;
+	name: string;
+	cardCode?: string;
+	description?: string;
+	imagePath?: string;
+	rarity: string;
+	frameworkId?: string;
+	frameworkName?: string;
+	totalContentPieces?: number;
+	publicContentCount?: number;
+	privateContentCount?: number;
+	dropRate?: number;
+	isOwned?: boolean;
+	ownerCount?: number;
+	createdAt?: string;
+	updatedAt?: string;
 }
 
 export interface OrderResponse {

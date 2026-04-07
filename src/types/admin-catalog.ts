@@ -100,3 +100,4 @@ export interface CardContentResponse {
 	createdAt?: string;
 	updatedAt?: string;
 }
+

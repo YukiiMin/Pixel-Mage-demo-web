@@ -2,7 +2,7 @@ import type { ApiEnvelope, ApiRequestResult } from "../types/api";
 import { ApiHttpError } from "../types/api";
 
 const DEFAULT_API_BASE_URL =
-	process.env.NEXT_PUBLIC_API_BASE_URL ||
+	process.env.NEXT_PUBLIC_BACKEND_BASE_URL ||
 	process.env.BACKEND_URL_NGROK ||
 	process.env.BACKEND_URL ||
 	"http://localhost:8080";
@@ -10,7 +10,7 @@ const AUTH_LOGIN_MARKER_COOKIE = "pm_logged_in";
 
 export const API_CONFIG = {
 	baseUrl:
-		process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ??
+		process.env.NEXT_PUBLIC_BACKEND_BASE_URL?.replace(/\/$/, '') ??
 		DEFAULT_API_BASE_URL,
 	timeoutMs: 15000,
 	defaultHeaders: {
@@ -85,6 +85,7 @@ export const API_ENDPOINTS = {
 	},
 	cardManagement: {
 		list: "/api/cards/list",
+		publicList: "/api/cards/public/list",
 		create: "/api/cards/create",
 		bind: "/api/cards/bind",
 		byId: (id: number | string) => `/api/cards/${id}`,

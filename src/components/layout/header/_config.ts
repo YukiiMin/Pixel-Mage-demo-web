@@ -1,12 +1,12 @@
 import {
-	BarChart3,
-	CreditCard,
-	LayoutDashboard,
-	LayoutGrid,
-	Link2Off,
-	Package,
-	User,
-	Users,
+    BarChart3,
+    CreditCard,
+    LayoutDashboard,
+    LayoutGrid,
+    Link2Off,
+    Package,
+    User,
+    Users,
 } from "lucide-react";
 
 export const sectionLinks = [
@@ -19,6 +19,7 @@ export const sectionLinks = [
 // Always visible in nav bar (not auth-gated)
 export const publicNavLinks = [
 	{ label: "Marketplace", href: "/marketplace" },
+	{ label: "Card Gallery", href: "/card-gallery" },
 	{ label: "Explore Deck", href: "/tarot" },
 ];
 

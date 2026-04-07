@@ -1,15 +1,15 @@
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header/index";
 import StarBackground from "@/components/ui/star-background";
-import { ShopPage } from "@/features/marketplace/components/shop-page";
+import { CardGalleryPageClient } from "@/features/card-gallery/components/card-gallery-page";
 
-export default function MarketplaceRoutePage() {
+export default function CardGalleryPage() {
 	return (
 		<div className="relative min-h-screen overflow-x-hidden">
 			<StarBackground />
 			<Header />
 			<main className="relative z-10 pt-28">
-				<ShopPage />
+				<CardGalleryPageClient />
 			</main>
 			<Footer />
 		</div>

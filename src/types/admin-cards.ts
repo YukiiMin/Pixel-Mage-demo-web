@@ -6,6 +6,33 @@ import type {
 	CardTemplateSummary,
 } from "@/types/admin-catalog";
 
+// Physical Card Types - Matches PhysicalCardFullResponse from BE
+export type CardProductStatus = "PENDING_BIND" | "READY" | "SOLD" | "LINKED" | "DEACTIVATED";
+export type CardCondition = "NEW" | "EXCELLENT" | "GOOD" | "FAIR" | "POOR" | "DAMAGED";
+
+export interface PhysicalCard {
+	id: number;
+	nfcUid: string;
+	softwareUuid?: string;
+	status: CardProductStatus;
+	cardCondition: CardCondition;
+	cardTemplateId?: number;
+	cardTemplateName?: string;
+	cardTemplateImageUrl?: string;
+	productId?: number;
+	productName?: string;
+	serialNumber?: string;
+	productionBatch?: string;
+	customText?: string;
+	ownerId?: number;
+	ownerName?: string;
+	ownerEmail?: string;
+	linkedAt?: string;
+	soldAt?: string;
+	createdAt: string;
+	updatedAt?: string;
+}
+
 export type CardSummaryLike = CardTemplateResponse | CardTemplateSummary;
 
 export interface CardDescriptionCellProps {
