@@ -10,7 +10,7 @@ import {
 	XCircle,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useCreateOrder } from "@/features/orders/hooks/use-create-order";
 import { useInitiatePayment } from "@/features/orders/hooks/use-initiate-payment";
 import { useOrderStatusPoll } from "@/features/orders/hooks/use-order-status-poll";
@@ -67,10 +67,41 @@ export function CheckoutPage({ productId }: Props) {
 	const [orderId, setOrderId] = useState<number | null>(null);
 	const [qrUrl, setQrUrl] = useState<string | null>(null);
 	const [errorMessage, setErrorMessage] = useState<string>("");
+	const [countdown, setCountdown] = useState<number>(300); // 5 phút
 
 	const createOrder = useCreateOrder();
 	const initiatePayment = useInitiatePayment();
-	const { data: orderStatus } = useOrderStatusPoll(orderId);
+	const { data: orderStatus, refetch: refetchOrderStatus } = useOrderStatusPoll(orderId);
+
+	// ─── Countdown timer (5 phút) khi đang ở bước polling ───────────────────────
+	useEffect(() => {
+		if (step !== "polling") return;
+		setCountdown(300);
+		const timer = setInterval(() => {
+			setCountdown((c) => {
+				if (c <= 1) {
+					clearInterval(timer);
+					setStep("failed");
+					setErrorMessage("Hết thời gian chờ thanh toán (5 phút). Vui lòng thử lại.");
+					return 0;
+				}
+				return c - 1;
+			});
+		}, 1000);
+		return () => clearInterval(timer);
+	}, [step]);
+
+	// ─── Manual check ────────────────────────────────────────────────────────────
+	const handleManualCheck = useCallback(async () => {
+		await refetchOrderStatus();
+	}, [refetchOrderStatus]);
+
+	// ─── Format countdown mm:ss ──────────────────────────────────────────────────
+	const formatCountdown = (secs: number) => {
+		const m = Math.floor(secs / 60).toString().padStart(2, "0");
+		const s = (secs % 60).toString().padStart(2, "0");
+		return `${m}:${s}`;
+	};
 
 	// Token is already used if this mounts more than once — use a ref guard
 	const verifyCalledRef = useRef(false);
@@ -297,11 +328,26 @@ export function CheckoutPage({ productId }: Props) {
 			)}
 
 			{step === "polling" && (
-				<div className="space-y-6">
+				<div className="space-y-4">
 					<div className="glass-card rounded-2xl border border-border/40 p-6 text-center">
-						<p className="mb-4 text-sm font-medium text-foreground">
-							Quét mã QR để thanh toán
-						</p>
+						{/* Header + countdown */}
+						<div className="mb-4 flex items-center justify-between">
+							<p className="text-sm font-medium text-foreground">Quét mã QR để thanh toán</p>
+							<span className={`font-mono text-sm font-bold tabular-nums ${
+								countdown <= 60 ? "text-destructive" : "text-primary"
+							}`}>
+								Hết hạn sau: {formatCountdown(countdown)}
+							</span>
+						</div>
+
+						{/* Order info */}
+						{pack && orderId && (
+							<p className="mb-3 text-xs text-muted-foreground">
+								Đơn #{orderId} · <span className="font-semibold text-foreground">{new Intl.NumberFormat("vi-VN").format(pack.price)} VND</span>
+							</p>
+						)}
+
+						{/* QR Code */}
 						{qrUrl ? (
 							// eslint-disable-next-line @next/next/no-img-element
 							<img
@@ -314,15 +360,24 @@ export function CheckoutPage({ productId }: Props) {
 								<Loader2 className="h-8 w-8 animate-spin text-primary" />
 							</div>
 						)}
-						<p className="mt-4 text-xs text-muted-foreground">
-							Trang này sẽ tự động cập nhật sau khi nhận được xác nhận thanh
-							toán.
-						</p>
-						<div className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+
+						{/* Status indicator */}
+						<div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
 							<Loader2 className="h-3 w-3 animate-spin" />
 							Đang chờ xác nhận từ ngân hàng...
 						</div>
 					</div>
+
+					{/* Manual check button */}
+					<button
+						type="button"
+						onClick={handleManualCheck}
+						className="btn-primary flex w-full items-center justify-center gap-2 py-3"
+					>
+						<CheckCircle className="h-4 w-4" />
+						Tôi đã chuyển khoản rồi
+					</button>
+
 					<button
 						type="button"
 						onClick={() =>
