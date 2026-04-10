@@ -357,9 +357,9 @@ export function AdminCollectionsPage() {
 								</tr>
 							</thead>
 							<tbody>
-								{collections.map((c) => (
+								{collections.map((c, idx) => (
 									<tr
-										key={c.id}
+										key={c.id ?? `collection-${idx}`}
 										className="border-b border-border/20 transition-colors hover:bg-card/40 last:border-0 group"
 									>
 										<td className="px-4 py-3 w-28">

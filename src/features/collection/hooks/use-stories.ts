@@ -1,6 +1,6 @@
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import type { Story } from "@/types/collection";
+import type { Story } from "@/features/collection/types";
 
 export function useStories(userId: number | null): UseQueryResult<Story[]> {
 	return useQuery({

@@ -1,7 +1,7 @@
 import type {
 	CardContentRequestDTO,
 	CardTemplateRequestDTO,
-} from "@/types/admin-catalog";
+} from "@/features/staff/types/catalog";
 
 export const PAGE_SIZE = 12;
 

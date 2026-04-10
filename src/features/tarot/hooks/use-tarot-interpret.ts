@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import type { InterpretResponse } from "@/types/tarot";
+import type { InterpretResponse } from "@/features/tarot/types";
 
 export function useTarotInterpret(sessionId: number | null) {
 	return useQuery({

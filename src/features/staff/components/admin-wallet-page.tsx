@@ -13,7 +13,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import type { WalletBalance } from "@/types/wallet";
+import type { WalletBalance } from "@/features/profile/types/wallet";
 
 interface AdminWallet extends WalletBalance {
 	userId: number;

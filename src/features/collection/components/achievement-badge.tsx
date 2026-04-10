@@ -1,6 +1,6 @@
 import { Check } from "lucide-react";
 import Image from "next/image";
-import type { Achievement } from "@/types/collection";
+import type { Achievement } from "@/features/collection/types";
 
 interface AchievementBadgeProps {
 	achievement: Achievement;

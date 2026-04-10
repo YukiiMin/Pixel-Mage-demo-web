@@ -6,8 +6,8 @@ import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
 import {
 	type SessionPhase,
 	useTarotSessionStore,
-} from "@/stores/use-tarot-session-store";
-import type { ReadingSession } from "@/types/tarot";
+} from "@/features/tarot/stores/use-tarot-session-store";
+import type { ReadingSession } from "@/features/tarot/types";
 
 const PHASE_ORDER: SessionPhase[] = [
 	"SHUFFLING",

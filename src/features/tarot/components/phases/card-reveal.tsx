@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { useTarotSessionStore } from "@/stores/use-tarot-session-store";
+import { useTarotSessionStore } from "@/features/tarot/stores/use-tarot-session-store";
 
 interface CardRevealProps {
 	onAllRevealed: () => void;

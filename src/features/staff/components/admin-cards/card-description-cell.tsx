@@ -2,8 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import type { CardDescriptionCellProps } from "@/types/admin-cards";
-import type { CardTemplateResponse } from "@/types/admin-catalog";
+import type { CardDescriptionCellProps } from "@/features/staff/types/admin-cards";
+import type { CardTemplateResponse } from "@/features/staff/types/catalog";
 
 export function CardDescriptionCell({ card }: CardDescriptionCellProps) {
 	const hasDescription =

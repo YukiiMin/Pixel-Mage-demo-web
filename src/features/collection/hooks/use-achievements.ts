@@ -1,6 +1,9 @@
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import type { Achievement, EarnedAchievement } from "@/types/collection";
+import type {
+	Achievement,
+	EarnedAchievement,
+} from "@/features/collection/types";
 
 export function useAchievements(): UseQueryResult<Achievement[]> {
 	return useQuery({

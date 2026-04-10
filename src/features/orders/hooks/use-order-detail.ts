@@ -1,6 +1,6 @@
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import type { OrderDetail } from "@/types/order";
+import type { OrderDetail } from "@/features/orders/types";
 
 // GET /api/orders/{id} đã bao gồm orderItems (EAGER load)
 // KHÔNG gọi thêm /api/order-items/order/{orderId} — endpoint không tồn tại

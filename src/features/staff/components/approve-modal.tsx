@@ -11,7 +11,7 @@ import {
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useApproveUnlink } from "@/features/staff/hooks/use-approve-unlink";
-import type { UnlinkRequest } from "@/types/staff";
+import type { UnlinkRequest } from "@/features/staff/types/unlink";
 
 interface ApproveModalProps {
 	request: UnlinkRequest | null;

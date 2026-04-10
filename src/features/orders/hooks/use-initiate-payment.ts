@@ -3,7 +3,7 @@ import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
 import type {
 	InitiatePaymentRequest,
 	InitiatePaymentResponse,
-} from "@/types/order";
+} from "@/features/orders/types";
 
 // Bước 2 của checkout: lấy paymentUrl từ SEPay
 export function useInitiatePayment() {

@@ -1,9 +1,5 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { AlertTriangle, ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useMyCards } from "@/features/inventory/hooks/use-my-cards";
@@ -14,10 +10,14 @@ import { ReadingHistory } from "@/features/tarot/components/reading-history";
 import { SpreadSelector } from "@/features/tarot/components/spread-selector";
 import { getStoredUserId } from "@/lib/api-config";
 import { fadeInUp, staggerContainer } from "@/lib/motion-variants";
-import { TOPICS } from "@/lib/tarot-data";
+import { TOPICS } from "@/features/tarot/lib/tarot-data";
 import { isSameDay } from "@/lib/utils";
-import { useTarotSessionStore } from "@/stores/use-tarot-session-store";
+import { useTarotSessionStore } from "@/features/tarot/stores/use-tarot-session-store";
 import type { ApiHttpError } from "@/types/api";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AlertTriangle, ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useCreateSession } from "../hooks/use-create-session";
 
 const STEPS = ["Chọn Chủ Đề", "Câu Hỏi", "Kiểu Trải Bài"];
@@ -125,25 +125,30 @@ export function TarotSetupPage() {
 							variants={shouldReduceMotion ? {} : fadeInUp}
 							className="grid grid-cols-2 gap-4"
 						>
-							{TOPICS.map((t) => (
-								<button
-									type="button"
-									key={t.key}
-									onClick={() => setTopic(t.key)}
-									className={`glass-card group rounded-2xl p-6 text-center transition-all duration-300 ${!shouldReduceMotion && "hover:scale-105"} ${
-										topic === t.key
-											? "ring-2 ring-primary glow-gold"
-											: "hover:border-primary/30"
-									}`}
-								>
-									<span className="mb-3 block text-4xl transition-transform group-hover:scale-110">
-										{t.emoji}
-									</span>
-									<span className="font-semibold text-foreground">
-										{t.label}
-									</span>
-								</button>
-							))}
+							{TOPICS.map(
+								(t: {
+									key: string;
+									name: string;
+									icon: string;
+									emoji: string;
+									label: string;
+								}) => (
+									<button
+										type="button"
+										key={t.key}
+										onClick={() => setTopic(t.key)}
+										className={`glass-card group rounded-2xl p-6 text-center transition-all duration-300 ${!shouldReduceMotion && "hover:scale-105"} ${
+											topic === t.key
+												? "ring-2 ring-primary glow-gold"
+												: "hover:border-primary/30"
+										}`}
+									>
+										<div className="text-2xl mb-2">{t.icon}</div>
+										<h3 className="text-lg font-bold text-white">{t.name}</h3>
+										<p className="text-sm text-white/60">{t.label}</p>
+									</button>
+								),
+							)}
 						</motion.div>
 					</motion.div>
 				)}

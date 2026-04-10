@@ -1,6 +1,6 @@
 import { Lock } from "lucide-react";
 import Image from "next/image";
-import type { Story } from "@/types/collection";
+import type { Story } from "@/features/collection/types";
 
 interface StoryCardProps {
 	story: Story;

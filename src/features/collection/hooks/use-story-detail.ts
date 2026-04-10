@@ -1,7 +1,7 @@
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
 import { ApiHttpError } from "@/types/api";
-import type { StoryDetail } from "@/types/collection";
+import type { StoryDetail } from "@/features/collection/types";
 
 export function useStoryDetail(
 	id: number | null,

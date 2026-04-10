@@ -1,4 +1,4 @@
-import { StoriesPageClient } from "@/features/collection/components/stories-page";
+import { StoriesPageClient } from "@/features/collection";
 
 export default function StoriesPage() {
 	return <StoriesPageClient />;

@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+	reactStrictMode: false, // Fix Turbopack continuous recompiling
 	images: {
 		remotePatterns: [
 			{
@@ -27,9 +28,28 @@ const nextConfig: NextConfig = {
 		return [
 			{
 				source: "/oauth2/:path*",
-				destination: `${(process.env.BACKEND_URL_NGROK || process.env.BACKEND_URL || "http://localhost:8080").replace(/\/$/, "")}/oauth2/:path*`,
+				destination: `${(process.env.BACKEND_URL_NGROK || process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080").replace(/\/$/, "")}/oauth2/:path*`,
 			},
 		];
+	},
+	// Cấu hình Turbopack (nếu chạy next dev --turbo)
+	// Hiện tại Turbopack trong Next.js 15+ đã tự động support Tailwind v4 và path aliases (@/*).
+	// Chỉ thêm quy tắc vào đây nếu bạn có loader đặc biệt (như @svgr/webpack cho SVG).
+	turbopack: {
+		rules: {
+			// Ví dụ: Cấu hình SVG nếu bạn dùng thư viện ngoài
+			// "*.svg": {
+			// 	loaders: ["@svgr/webpack"],
+			// 	as: "*.js",
+			// },
+		},
+		resolveAlias: {
+			// Các alias tùy chỉnh không nằm trong tsconfig.json
+		},
+	},
+	// Disable React strict mode in development
+	compiler: {
+		removeConsole: process.env.NODE_ENV === 'production',
 	},
 };
 

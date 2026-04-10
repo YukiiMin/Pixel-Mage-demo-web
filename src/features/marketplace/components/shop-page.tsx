@@ -31,7 +31,8 @@ export function ShopPage() {
 		stats,
 	} = useShop();
 
-	const [selectedProduct, setSelectedProduct] = useState<ProductResponse | null>(null);
+	const [selectedProduct, setSelectedProduct] =
+		useState<ProductResponse | null>(null);
 
 	return (
 		<div className="min-h-screen pb-20">
@@ -53,7 +54,9 @@ export function ShopPage() {
 							className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5"
 						>
 							<Sparkles className="h-4 w-4 text-primary" />
-							<span className="text-sm font-medium text-primary">PixelMage Card Shop</span>
+							<span className="text-sm font-medium text-primary">
+								PixelMage Card Shop
+							</span>
 						</motion.div>
 
 						<h1
@@ -63,8 +66,8 @@ export function ShopPage() {
 							Mỗi Pack là một<span className="text-primary"> bí ẩn</span>
 						</h1>
 						<p className="mx-auto max-w-2xl text-muted-foreground md:text-lg">
-							Khám phá các gói thẻ bài Tarot vật lý được RNG ngẫu nhiên.
-							Mở hộp để nhận các lá bài có thể gắn NFC!
+							Khám phá các gói thẻ bài Tarot vật lý được RNG ngẫu nhiên. Mở hộp
+							để nhận các lá bài có thể gắn NFC!
 						</p>
 
 						<motion.div
@@ -91,21 +94,27 @@ export function ShopPage() {
 								<TrendingUp className="h-4 w-4" />
 								<span className="text-xs">Sản phẩm</span>
 							</div>
-							<p className="font-stats text-2xl font-bold text-foreground">{stats.totalProducts}</p>
+							<p className="font-stats text-2xl font-bold text-foreground">
+								{stats.totalProducts}
+							</p>
 						</div>
 						<div className="glass-card rounded-xl border border-border/50 p-4 text-center">
 							<div className="mb-1 flex items-center justify-center gap-2 text-muted-foreground">
 								<Package className="h-4 w-4" />
 								<span className="text-xs">Tồn kho</span>
 							</div>
-							<p className="font-stats text-2xl font-bold text-foreground">{stats.totalStock}</p>
+							<p className="font-stats text-2xl font-bold text-foreground">
+								{stats.totalStock}
+							</p>
 						</div>
 						<div className="glass-card rounded-xl border border-border/50 p-4 text-center">
 							<div className="mb-1 flex items-center justify-center gap-2 text-muted-foreground">
 								<Star className="h-4 w-4" />
 								<span className="text-xs">Limited</span>
 							</div>
-							<p className="font-stats text-2xl font-bold text-foreground">{stats.limitedCount}</p>
+							<p className="font-stats text-2xl font-bold text-foreground">
+								{stats.limitedCount}
+							</p>
 						</div>
 					</motion.div>
 				</div>
@@ -160,7 +169,10 @@ export function ShopPage() {
 				{isLoading ? (
 					<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
 						{[1, 2, 3, 4, 5, 6].map((i) => (
-							<div key={i} className="glass-card rounded-2xl border border-border/50 p-5">
+							<div
+								key={i}
+								className="glass-card rounded-2xl border border-border/50 p-5"
+							>
 								<Skeleton className="mb-4 h-40 w-full rounded-xl" />
 								<Skeleton className="mb-2 h-6 w-3/4" />
 								<Skeleton className="mb-4 h-4 w-full" />
@@ -173,13 +185,19 @@ export function ShopPage() {
 					</div>
 				) : isError ? (
 					<div className="py-20 text-center">
-						<p className="text-muted-foreground">Không thể tải sản phẩm. Vui lòng thử lại sau.</p>
+						<p className="text-muted-foreground">
+							Không thể tải sản phẩm. Vui lòng thử lại sau.
+						</p>
 					</div>
 				) : products.length === 0 ? (
 					<div className="py-20 text-center">
 						<Package className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-						<p className="text-lg font-medium text-foreground">Không tìm thấy sản phẩm</p>
-						<p className="text-sm text-muted-foreground">Thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm</p>
+						<p className="text-lg font-medium text-foreground">
+							Không tìm thấy sản phẩm
+						</p>
+						<p className="text-sm text-muted-foreground">
+							Thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm
+						</p>
 					</div>
 				) : (
 					<motion.div

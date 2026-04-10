@@ -1,6 +1,6 @@
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import type { OrderDetail } from "@/types/order";
+import type { OrderDetail } from "@/features/orders/types";
 
 export function useOrders(
 	userId: number | null,

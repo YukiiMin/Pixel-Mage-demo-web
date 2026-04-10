@@ -6,8 +6,8 @@ import {
 	useSessionDetail,
 	useTarotSession,
 } from "@/features/tarot/hooks/use-tarot-session";
-import type { SessionPhase } from "@/stores/use-tarot-session-store";
-import { useTarotSessionStore } from "@/stores/use-tarot-session-store";
+import type { SessionPhase } from "@/features/tarot/stores/use-tarot-session-store";
+import { useTarotSessionStore } from "@/features/tarot/stores/use-tarot-session-store";
 import { CardDrawArea } from "./phases/card-draw-area";
 import { CardReveal } from "./phases/card-reveal";
 import { CompletionPhase } from "./phases/completion-phase";

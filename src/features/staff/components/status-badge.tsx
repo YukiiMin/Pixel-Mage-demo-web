@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type { UnlinkRequestStatus } from "@/types/staff";
+import type { UnlinkRequestStatus } from "@/features/staff/types/unlink";
 
 interface StatusBadgeProps {
 	status: UnlinkRequestStatus;

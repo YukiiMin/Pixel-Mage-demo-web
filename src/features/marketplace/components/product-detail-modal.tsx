@@ -10,9 +10,25 @@ import { formatVnd } from "@/features/marketplace/hooks/use-marketplace";
 import { SepayQrScreen } from "@/features/orders/components/sepay-qr-screen";
 import { useCreateOrder } from "@/features/orders/hooks/use-create-order";
 import { useInitiatePayment } from "@/features/orders/hooks/use-initiate-payment";
-import type { CardTemplateSummaryResponse, ProductResponse, Rarity } from "@/types/commerce";
+import type {
+	CardTemplateSummaryResponse,
+	ProductResponse,
+	Rarity,
+} from "@/types/commerce";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Circle, CreditCard, Crown, Gem, Loader2, Package, Sparkles, Star, X } from "lucide-react";
+import {
+	ChevronLeft,
+	ChevronRight,
+	Circle,
+	CreditCard,
+	Crown,
+	Gem,
+	Loader2,
+	Package,
+	Sparkles,
+	Star,
+	X,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -22,7 +38,7 @@ function RarityBar({
 	percentage,
 	color,
 	bgColor,
-	delay = 0
+	delay = 0,
 }: {
 	label: string;
 	percentage: number;
@@ -33,8 +49,12 @@ function RarityBar({
 	return (
 		<div className="mb-2 sm:mb-3">
 			<div className="mb-1 flex items-center justify-between">
-				<span className={`text-[10px] sm:text-xs font-semibold ${color}`}>{label}</span>
-				<span className={`text-[10px] sm:text-xs font-bold ${color}`}>{percentage}%</span>
+				<span className={`text-[10px] sm:text-xs font-semibold ${color}`}>
+					{label}
+				</span>
+				<span className={`text-[10px] sm:text-xs font-bold ${color}`}>
+					{percentage}%
+				</span>
 			</div>
 			<div className="h-2 sm:h-2.5 w-full overflow-hidden rounded-full bg-muted">
 				<motion.div
@@ -92,7 +112,7 @@ function TiltCard({
 	card,
 	index,
 	onHover,
-	size = "normal"
+	size = "normal",
 }: {
 	card: CardTemplateSummaryResponse;
 	index: number;
@@ -131,7 +151,9 @@ function TiltCard({
 				animate={{ rotateX: rotation.x, rotateY: rotation.y }}
 				transition={{ type: "spring", stiffness: 300, damping: 20 }}
 				className={`relative cursor-pointer rounded-lg border-2 border-border/50 bg-card shadow-lg transition-shadow duration-300 ${glowClass} ${
-					size === "small" ? "h-14 w-10 sm:h-16 sm:w-12" : "h-16 w-12 sm:h-20 sm:w-14"
+					size === "small"
+						? "h-14 w-10 sm:h-16 sm:w-12"
+						: "h-16 w-12 sm:h-20 sm:w-14"
 				}`}
 				style={{ transformStyle: "preserve-3d" }}
 			>
@@ -160,7 +182,11 @@ interface ProductDetailModalProps {
 	onClose: () => void;
 }
 
-export function ProductDetailModal({ product, open, onClose }: ProductDetailModalProps) {
+export function ProductDetailModal({
+	product,
+	open,
+	onClose,
+}: ProductDetailModalProps) {
 	const [checkoutState, setCheckoutState] = useState<
 		"idle" | "creating_order" | "initiating_payment" | "qr_ready"
 	>("idle");
@@ -170,7 +196,8 @@ export function ProductDetailModal({ product, open, onClose }: ProductDetailModa
 		totalAmount: number;
 	} | null>(null);
 	const [showPoolPanel, setShowPoolPanel] = useState(false);
-	const [hoveredCard, setHoveredCard] = useState<CardTemplateSummaryResponse | null>(null);
+	const [hoveredCard, setHoveredCard] =
+		useState<CardTemplateSummaryResponse | null>(null);
 
 	const createOrder = useCreateOrder();
 	const initiatePayment = useInitiatePayment();
@@ -207,7 +234,7 @@ export function ProductDetailModal({ product, open, onClose }: ProductDetailModa
 								toast.error(err.message || "Lỗi khởi tạo thanh toán");
 								setCheckoutState("idle");
 							},
-						}
+						},
 					);
 				},
 				onError: (err: any) => {
@@ -216,7 +243,7 @@ export function ProductDetailModal({ product, open, onClose }: ProductDetailModa
 					else toast.error(err.message || "Lỗi tạo đơn hàng");
 					setCheckoutState("idle");
 				},
-			}
+			},
 		);
 	};
 
@@ -240,18 +267,26 @@ export function ProductDetailModal({ product, open, onClose }: ProductDetailModa
 	const topCards = sortedPool.slice(0, 5);
 	const remainingCards = sortedPool.slice(5);
 
-	const legendaryCount = remainingCards.filter((c) => c.rarity === "LEGENDARY").length;
+	const legendaryCount = remainingCards.filter(
+		(c) => c.rarity === "LEGENDARY",
+	).length;
 	const rareCount = remainingCards.filter((c) => c.rarity === "RARE").length;
-	const commonCount = remainingCards.filter((c) => c.rarity === "COMMON").length;
+	const commonCount = remainingCards.filter(
+		(c) => c.rarity === "COMMON",
+	).length;
 
 	return (
 		<Dialog open={open} onOpenChange={(val) => !val && handleClose()}>
-			<DialogContent 
+			<DialogContent
 				className="max-h-[90vh] w-[calc(100vw-1rem)] sm:w-auto overflow-hidden border-border/50 bg-background/95 p-0 backdrop-blur-xl"
-				style={{ maxWidth: showPoolPanel ? "min(900px, 95vw)" : "min(400px, 90vw)" }}
+				style={{
+					maxWidth: showPoolPanel ? "min(900px, 95vw)" : "min(400px, 90vw)",
+				}}
 			>
 				<DialogTitle className="sr-only">{product.name}</DialogTitle>
-				<DialogDescription className="sr-only">Chi tiết sản phẩm và thanh toán</DialogDescription>
+				<DialogDescription className="sr-only">
+					Chi tiết sản phẩm và thanh toán
+				</DialogDescription>
 
 				{/* Close Button */}
 				<button
@@ -281,7 +316,9 @@ export function ProductDetailModal({ product, open, onClose }: ProductDetailModa
 					) : (
 						<div className="flex flex-col sm:flex-row max-h-[90vh]">
 							{/* LEFT PANEL - Pack Details */}
-							<div className={`flex-shrink-0 flex flex-col ${showPoolPanel ? "sm:w-[380px] w-full" : "w-full"}`}>
+							<div
+								className={`flex-shrink-0 flex flex-col ${showPoolPanel ? "sm:w-[380px] w-full" : "w-full"}`}
+							>
 								{/* Scrollable Content Area */}
 								<div className="flex-1 overflow-y-auto">
 									{/* Header */}
@@ -308,11 +345,17 @@ export function ProductDetailModal({ product, open, onClose }: ProductDetailModa
 												{product.name}
 											</h2>
 											<div className="mt-1 flex flex-wrap gap-1">
-												<span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-													product.stockCount > 0 ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
-												}`}>
+												<span
+													className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+														product.stockCount > 0
+															? "bg-emerald-500/10 text-emerald-500"
+															: "bg-red-500/10 text-red-500"
+													}`}
+												>
 													<Package className="h-2.5 w-2.5" />
-													{product.stockCount > 0 ? `Còn ${product.stockCount}` : "Hết hàng"}
+													{product.stockCount > 0
+														? `Còn ${product.stockCount}`
+														: "Hết hàng"}
 												</span>
 											</div>
 										</div>
@@ -327,25 +370,50 @@ export function ProductDetailModal({ product, open, onClose }: ProductDetailModa
 												<Sparkles className="h-3 w-3 text-primary" />
 												Tỷ lệ nhận thẻ
 											</div>
-											<RarityBar label="Common" percentage={65} color="text-sky-400" bgColor="bg-gradient-to-r from-sky-500 to-sky-400" delay={0} />
-											<RarityBar label="Rare" percentage={30} color="text-purple-400" bgColor="bg-gradient-to-r from-purple-600 to-purple-400" delay={0.1} />
-											<RarityBar label="Legendary" percentage={5} color="text-amber-400" bgColor="bg-gradient-to-r from-amber-500 to-amber-300" delay={0.2} />
+											<RarityBar
+												label="Common"
+												percentage={65}
+												color="text-sky-400"
+												bgColor="bg-gradient-to-r from-sky-500 to-sky-400"
+												delay={0}
+											/>
+											<RarityBar
+												label="Rare"
+												percentage={30}
+												color="text-purple-400"
+												bgColor="bg-gradient-to-r from-purple-600 to-purple-400"
+												delay={0.1}
+											/>
+											<RarityBar
+												label="Legendary"
+												percentage={5}
+												color="text-amber-400"
+												bgColor="bg-gradient-to-r from-amber-500 to-amber-300"
+												delay={0.2}
+											/>
 										</div>
 
 										{/* Top 5 Cards */}
 										{topCards.length > 0 && (
 											<div className="mb-2 sm:mb-3">
 												<div className="mb-1.5 flex items-center justify-between">
-													<p className="text-xs font-semibold text-foreground">Pool gacha:</p>
+													<p className="text-xs font-semibold text-foreground">
+														Pool gacha:
+													</p>
 													{remainingCards.length > 0 && (
 														<button
 															onClick={() => setShowPoolPanel(!showPoolPanel)}
 															className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary transition-colors hover:bg-primary/20"
 														>
 															{showPoolPanel ? (
-																<><ChevronLeft className="h-3 w-3" /> Thu gọn</>
+																<>
+																	<ChevronLeft className="h-3 w-3" /> Thu gọn
+																</>
 															) : (
-																<>Xem thêm {remainingCards.length} lá <ChevronRight className="h-3 w-3" /></>
+																<>
+																	Xem thêm {remainingCards.length} lá{" "}
+																	<ChevronRight className="h-3 w-3" />
+																</>
 															)}
 														</button>
 													)}
@@ -359,15 +427,26 @@ export function ProductDetailModal({ product, open, onClose }: ProductDetailModa
 															exit={{ opacity: 0, y: 5 }}
 															className="mb-1.5 rounded-md bg-background/90 px-2 py-1 text-center text-[10px] backdrop-blur-sm"
 														>
-															<span className="text-muted-foreground">{hoveredCard.name}</span>
-															<span className={`ml-1 ${getRarityTextClass(hoveredCard.rarity)}`}>({hoveredCard.rarity})</span>
+															<span className="text-muted-foreground">
+																{hoveredCard.name}
+															</span>
+															<span
+																className={`ml-1 ${getRarityTextClass(hoveredCard.rarity)}`}
+															>
+																({hoveredCard.rarity})
+															</span>
 														</motion.div>
 													)}
 												</AnimatePresence>
 
 												<div className="flex items-center justify-center gap-1.5">
 													{topCards.map((card, index) => (
-														<TiltCard key={card.cardTemplateId} card={card} index={index} onHover={setHoveredCard} />
+														<TiltCard
+															key={card.cardTemplateId}
+															card={card}
+															index={index}
+															onHover={setHoveredCard}
+														/>
 													))}
 												</div>
 											</div>
@@ -380,19 +459,31 @@ export function ProductDetailModal({ product, open, onClose }: ProductDetailModa
 									<div className="mb-2 flex items-end justify-between">
 										<div>
 											<p className="text-[10px] text-muted-foreground">Giá</p>
-											<p className="font-stats text-lg sm:text-xl font-bold text-foreground">{formatVnd(product.price)}</p>
+											<p className="font-stats text-lg sm:text-xl font-bold text-foreground">
+												{formatVnd(product.price)}
+											</p>
 										</div>
 									</div>
 
 									<button
 										onClick={handleCheckout}
-										disabled={checkoutState !== "idle" || product.stockCount <= 0}
+										disabled={
+											checkoutState !== "idle" || product.stockCount <= 0
+										}
 										className="flex h-10 sm:h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground shadow-lg transition-all hover:bg-primary/90 hover:shadow-primary/25 hover:scale-[1.02] active:scale-[0.98] focus:outline-hidden focus:ring-2 focus:ring-primary disabled:opacity-50"
 									>
 										{checkoutState !== "idle" ? (
-											<><Loader2 className="h-4 w-4 animate-spin" /> {checkoutState === "creating_order" ? "Đang tạo đơn..." : "Đang khởi tạo..."}</>
+											<>
+												<Loader2 className="h-4 w-4 animate-spin" />{" "}
+												{checkoutState === "creating_order"
+													? "Đang tạo đơn..."
+													: "Đang khởi tạo..."}
+											</>
 										) : (
-											<><CreditCard className="h-4 w-4" /> {product.stockCount > 0 ? "⚡ Mua ngay" : "Hết hàng"}</>
+											<>
+												<CreditCard className="h-4 w-4" />{" "}
+												{product.stockCount > 0 ? "⚡ Mua ngay" : "Hết hàng"}
+											</>
 										)}
 									</button>
 								</div>
@@ -411,8 +502,12 @@ export function ProductDetailModal({ product, open, onClose }: ProductDetailModa
 										{/* Pool Header */}
 										<div className="shrink-0 flex items-center justify-between border-b border-border/50 px-3 py-2">
 											<div>
-												<h3 className="text-sm font-bold text-foreground">Toàn bộ Pool</h3>
-												<p className="text-[10px] text-muted-foreground">{remainingCards.length} lá bài</p>
+												<h3 className="text-sm font-bold text-foreground">
+													Toàn bộ Pool
+												</h3>
+												<p className="text-[10px] text-muted-foreground">
+													{remainingCards.length} lá bài
+												</p>
 											</div>
 											<button
 												onClick={() => setShowPoolPanel(false)}
@@ -426,15 +521,21 @@ export function ProductDetailModal({ product, open, onClose }: ProductDetailModa
 										<div className="shrink-0 flex flex-wrap gap-1.5 border-b border-border/50 px-3 py-2">
 											<div className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5">
 												<Crown className="h-3 w-3 text-amber-500" />
-												<span className="text-[10px] font-medium text-amber-500">{legendaryCount}</span>
+												<span className="text-[10px] font-medium text-amber-500">
+													{legendaryCount}
+												</span>
 											</div>
 											<div className="flex items-center gap-1 rounded-full bg-purple-500/10 px-2 py-0.5">
 												<Gem className="h-3 w-3 text-purple-500" />
-												<span className="text-[10px] font-medium text-purple-500">{rareCount}</span>
+												<span className="text-[10px] font-medium text-purple-500">
+													{rareCount}
+												</span>
 											</div>
 											<div className="flex items-center gap-1 rounded-full bg-sky-500/10 px-2 py-0.5">
 												<Circle className="h-3 w-3 text-sky-500" />
-												<span className="text-[10px] font-medium text-sky-500">{commonCount}</span>
+												<span className="text-[10px] font-medium text-sky-500">
+													{commonCount}
+												</span>
 											</div>
 										</div>
 
@@ -449,13 +550,30 @@ export function ProductDetailModal({ product, open, onClose }: ProductDetailModa
 														transition={{ delay: index * 0.01 }}
 														className="group relative"
 													>
-														<div className={`relative overflow-hidden rounded-lg border-2 bg-card transition-all duration-300 group-hover:scale-105 ${getRarityGlow(card.rarity)}`}>
-															<img src={card.imagePath || "https://placehold.co/120x168?text=?"} alt={card.name} className="aspect-[3/4] w-full object-cover" />
-															<div className="absolute right-0.5 top-0.5 rounded-full bg-background/80 p-0.5 backdrop-blur-sm">{getRarityIcon(card.rarity)}</div>
+														<div
+															className={`relative overflow-hidden rounded-lg border-2 bg-card transition-all duration-300 group-hover:scale-105 ${getRarityGlow(card.rarity)}`}
+														>
+															<img
+																src={
+																	card.imagePath ||
+																	"https://placehold.co/120x168?text=?"
+																}
+																alt={card.name}
+																className="aspect-[3/4] w-full object-cover"
+															/>
+															<div className="absolute right-0.5 top-0.5 rounded-full bg-background/80 p-0.5 backdrop-blur-sm">
+																{getRarityIcon(card.rarity)}
+															</div>
 														</div>
 														<div className="mt-1 text-center">
-															<p className="line-clamp-1 text-[9px] font-medium text-foreground">{card.name}</p>
-															<p className={`text-[8px] ${getRarityTextClass(card.rarity)}`}>{card.rarity}</p>
+															<p className="line-clamp-1 text-[9px] font-medium text-foreground">
+																{card.name}
+															</p>
+															<p
+																className={`text-[8px] ${getRarityTextClass(card.rarity)}`}
+															>
+																{card.rarity}
+															</p>
 														</div>
 													</motion.div>
 												))}
@@ -464,7 +582,9 @@ export function ProductDetailModal({ product, open, onClose }: ProductDetailModa
 
 										{/* Pool Footer */}
 										<div className="shrink-0 border-t border-border/50 px-3 py-2 text-center">
-											<p className="text-[9px] text-muted-foreground">🎲 RNG sẽ chọn ngẫu nhiên khi mở pack</p>
+											<p className="text-[9px] text-muted-foreground">
+												🎲 RNG sẽ chọn ngẫu nhiên khi mở pack
+											</p>
 										</div>
 									</motion.div>
 								)}

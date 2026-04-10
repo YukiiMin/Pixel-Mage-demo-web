@@ -1,4 +1,4 @@
-import { StoryDetailPageClient } from "@/features/collection/components/story-detail-page";
+import { StoryDetailPageClient } from "@/features/collection";
 
 export default async function StoryDetailPage({
 	params,

@@ -3,8 +3,8 @@ import { Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import { useTarotSessionStore } from "@/stores/use-tarot-session-store";
-import type { ReadingCard } from "@/types/tarot";
+import { useTarotSessionStore } from "@/features/tarot/stores/use-tarot-session-store";
+import type { ReadingCard } from "@/features/tarot/types";
 
 interface CardDrawAreaProps {
 	sessionId: number;

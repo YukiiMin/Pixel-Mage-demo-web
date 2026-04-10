@@ -43,7 +43,10 @@ import {
 } from "@/components/ui/table";
 import { useAdminUpload } from "@/features/staff/hooks/use-admin-upload";
 import { apiRequest } from "@/lib/api-config";
-import type { ProductRequestDTO, ProductResponse } from "@/types/admin-catalog";
+import type {
+	ProductRequestDTO,
+	ProductResponse,
+} from "@/features/staff/types/catalog";
 
 function ProductModal({
 	product,

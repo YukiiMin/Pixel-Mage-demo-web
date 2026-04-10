@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
 import type { ApiHttpError } from "@/types/api";
-import type { RejectUnlinkPayload } from "@/types/staff";
+import type { RejectUnlinkPayload } from "@/features/staff/types/unlink";
 
 interface RejectUnlinkArgs {
 	id: number;

@@ -13,7 +13,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRejectUnlink } from "@/features/staff/hooks/use-reject-unlink";
-import type { UnlinkRequest } from "@/types/staff";
+import type { UnlinkRequest } from "@/features/staff/types/unlink";
 
 interface RejectModalProps {
 	request: UnlinkRequest | null;

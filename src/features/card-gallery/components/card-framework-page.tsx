@@ -1,392 +1,888 @@
-'use client'
+"use client";
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent as CardContentUI, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { EnhancedCardDetailModal } from '@/features/card-gallery/components/enhanced-card-detail-modal'
-import { getCardContentsByTemplateId, getCardTemplatesByFramework } from '@/lib/card-gallery-simple'
-import { getApiErrorMessage } from '@/types/api'
-import type {
-  CardContent,
-  CardGalleryFilters,
-  CardTemplateWithContent,
-  Rarity
-} from '@/types/card-gallery'
-import { useQuery } from '@tanstack/react-query'
-import { AnimatePresence, motion } from 'framer-motion'
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { EnhancedCardDetailModal } from "@/features/card-gallery/components/enhanced-card-detail-modal";
 import {
-  ArrowLeft,
-  Eye,
-  FileText,
-  Heart,
-  Search,
-  Sparkles
-} from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useParams, useSearchParams } from 'next/navigation'
-import { Suspense, useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
+	getCardContentsByTemplateId,
+	getCardFrameworks,
+	getCardTemplatesByFramework,
+} from "@/features/card-gallery/lib/card-gallery";
+import type {
+	CardContent,
+	CardFramework,
+	CardGalleryFilters,
+	CardTemplateWithContent,
+	Rarity,
+} from "@/features/card-gallery/types";
+import { getApiErrorMessage } from "@/types/api";
+import { useQuery } from "@tanstack/react-query";
+import {
+	AnimatePresence,
+	motion,
+	type TargetAndTransition,
+} from "framer-motion";
+import {
+	ArrowLeft,
+	ChevronLeft,
+	ChevronRight,
+	Eye,
+	Heart,
+	Search,
+	Sparkles,
+	Star,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useParams, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 // ─────────────────────────────────────────────
-// Sub-components
+// Constants
+// ─────────────────────────────────────────────
+const PAGE_SIZE = 20;
+
+const RARITY_TABS: { label: string; value: Rarity | "ALL" }[] = [
+	{ label: "TẤT CẢ", value: "ALL" },
+	{ label: "COMMON", value: "COMMON" },
+	{ label: "RARE", value: "RARE" },
+	{ label: "LEGENDARY", value: "LEGENDARY" },
+];
+
+// ─────────────────────────────────────────────
+// Rarity-specific config (card hover & badge styles)
+// ─────────────────────────────────────────────
+const RARITY_CONFIG: Record<
+	string,
+	{
+		badge: string;
+		cardBorder: string;
+		cardBg: string;
+		shimmer: string;
+		hoverBorder: string;
+	}
+> = {
+	LEGENDARY: {
+		badge: "bg-yellow-500/25 text-yellow-300 border border-yellow-400/60",
+		cardBorder: "border-yellow-500/40",
+		cardBg: "bg-gradient-to-b from-[#1e1810] via-[#1a1520] to-[#0f0d1e]",
+		shimmer: "legendary-shimmer",
+		hoverBorder: "hover:border-yellow-400/80",
+	},
+	RARE: {
+		badge: "bg-purple-500/25 text-purple-300 border border-purple-400/60",
+		cardBorder: "border-purple-500/40",
+		cardBg: "bg-gradient-to-b from-[#140e1e] via-[#120f1e] to-[#0f0d1e]",
+		shimmer: "rare-shimmer",
+		hoverBorder: "hover:border-purple-400/80",
+	},
+	COMMON: {
+		badge: "bg-blue-500/20 text-blue-300 border border-blue-400/40",
+		cardBorder: "border-blue-500/20",
+		cardBg: "bg-gradient-to-b from-[#0d1220] via-[#0e1020] to-[#0f0d1e]",
+		shimmer: "common-shimmer",
+		hoverBorder: "hover:border-blue-400/60",
+	},
+};
+
+// ─────────────────────────────────────────────
+// Skeleton
 // ─────────────────────────────────────────────
 function CardSkeleton() {
-  return (
-    <Card className="glass-card overflow-hidden group">
-      <div className="h-64 bg-muted/20 animate-pulse" />
-      <CardContentUI className="p-4">
-        <div className="h-6 bg-muted/40 rounded mb-2 animate-pulse" />
-        <div className="h-4 bg-muted/30 rounded mb-2 animate-pulse" />
-        <div className="h-4 bg-muted/30 rounded w-2/3 animate-pulse" />
-      </CardContentUI>
-    </Card>
-  )
+	return (
+		<div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 animate-pulse">
+			<div className="h-72 bg-white/10" />
+			<div className="p-3 space-y-2">
+				<div className="h-4 bg-white/10 rounded w-3/4" />
+				<div className="h-3 bg-white/10 rounded w-1/2" />
+			</div>
+		</div>
+	);
 }
 
+// ─────────────────────────────────────────────
+// Card Item — rarity-aware hover animations
+// ─────────────────────────────────────────────
 function CardItem({
-  card,
-  onClick,
-  getRarityColor
+	card,
+	onClick,
 }: {
-  card: CardTemplateWithContent
-  onClick: () => void
-  getRarityColor: (rarity: Rarity) => string
+	card: CardTemplateWithContent;
+	onClick: () => void;
 }) {
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.3 }}
-      whileHover={{ y: -5 }}
-    >
-      <Card
-        className="glass-card overflow-hidden group cursor-pointer transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] border-border/30"
-        onClick={onClick}
-      >
-        {/* Card Image */}
-        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
-          {card.imagePath ? (
-            <Image
-              src={card.imagePath}
-              alt={card.name}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <Sparkles className="h-12 w-12 text-primary/30" />
-            </div>
-          )}
+	const rarity = card.rarity ?? "COMMON";
+	const cfg = RARITY_CONFIG[rarity] ?? RARITY_CONFIG.COMMON;
 
-          {/* Overlay with badges */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="absolute top-3 left-3 right-3">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className={`px-2 py-1 rounded-md text-xs font-semibold ${getRarityColor(card.rarity)}`}>
-                  {card.rarity}
-                </span>
-                {card.isOwned && (
-                  <span className="px-2 py-1 rounded-md text-xs font-semibold bg-green-500/20 text-green-400 border border-green-500/30">
-                    <Heart className="h-3 w-3 inline mr-1" />
-                    Đã sở hữu
-                  </span>
-                )}
-              </div>
-            </div>
+	// Per-rarity motion variants — typed as TargetAndTransition for Framer Motion
+	const legendaryHover: TargetAndTransition = {
+		y: -10,
+		scale: 1.04,
+		rotateY: 6,
+		filter:
+			"drop-shadow(0 0 8px rgba(250,204,21,0.6)) drop-shadow(0 0 24px rgba(250,204,21,0.35)) drop-shadow(0 0 48px rgba(250,204,21,0.15))",
+		transition: { duration: 0.35, ease: "easeOut" },
+	};
+	const rareHover: TargetAndTransition = {
+		y: -8,
+		scale: 1.03,
+		rotateY: 4,
+		filter:
+			"drop-shadow(0 0 12px rgba(168,85,247,0.6)) drop-shadow(0 0 32px rgba(168,85,247,0.25))",
+		transition: { duration: 0.3, ease: "easeOut" },
+	};
+	const commonHover: TargetAndTransition = {
+		y: -5,
+		scale: 1.02,
+		filter: "drop-shadow(0 0 8px rgba(59,130,246,0.4))",
+		transition: { duration: 0.25, ease: "easeOut" },
+	};
 
-            <div className="absolute bottom-3 left-3">
-              <div className="flex items-center gap-1 text-white/80 text-xs">
-                <Eye className="h-3 w-3" />
-                {card.ownerCount?.toLocaleString() || 0}
-              </div>
-            </div>
-          </div>
-        </div>
+	const whileHoverVariant: TargetAndTransition =
+		rarity === "LEGENDARY"
+			? legendaryHover
+			: rarity === "RARE"
+				? rareHover
+				: commonHover;
 
-        <CardContentUI className="p-4">
-          <CardHeader className="p-0 mb-3">
-            <CardTitle className="text-sm font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2">
-              {card.name}
-            </CardTitle>
-          </CardHeader>
+	return (
+		<motion.div
+			layout
+			initial={{ opacity: 0, y: 16 }}
+			animate={{ opacity: 1, y: 0 }}
+			exit={{ opacity: 0, scale: 0.9 }}
+			transition={{ duration: 0.25 }}
+			whileHover={whileHoverVariant}
+			onClick={onClick}
+			className="cursor-pointer group"
+			style={{ perspective: 800 }}
+		>
+			{/* Card wrapper */}
+			<div
+				className={`
+          relative rounded-2xl overflow-hidden
+          border-2 ${cfg.cardBorder} ${cfg.hoverBorder}
+          ${cfg.cardBg}
+          transition-all duration-300
+          ${rarity === "LEGENDARY" ? "legendary-card-wrap" : ""}
+        `}
+			>
+				{/* Image */}
+				<div className="relative aspect-[2/3] overflow-hidden">
+					{card.imagePath ? (
+						<Image
+							src={card.imagePath}
+							alt={card.name}
+							fill
+							sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+							className="object-cover transition-transform duration-500 group-hover:scale-110"
+						/>
+					) : (
+						<div className="flex items-center justify-center h-full bg-gradient-to-br from-primary/20 to-secondary/20">
+							<Sparkles className="h-12 w-12 text-primary/30" />
+						</div>
+					)}
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-1 rounded-md text-xs bg-blue-500/10 text-blue-400 border border-blue-500/30">
-                <FileText className="h-3 w-3 inline mr-1" />
-                {card.totalContentPieces || 0}
-              </span>
-              {card.dropRate && (
-                <span className="px-2 py-1 rounded-md text-xs bg-orange-500/10 text-orange-400 border border-orange-500/30">
-                  {card.dropRate}%
-                </span>
-              )}
-            </div>
+					{/* ── Rarity badge: BOTTOM-LEFT (không che logo PixelMage góc trên trái) ── */}
+					<div className="absolute bottom-2 left-2">
+						<span
+							className={`px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider backdrop-blur-sm ${cfg.badge}`}
+						>
+							{rarity}
+						</span>
+					</div>
 
-            <Button size="sm" variant="ghost" className="text-xs">
-              Chi tiết
-            </Button>
-          </div>
-        </CardContentUI>
-      </Card>
-    </motion.div>
-  )
+					{/* Owned badge — top-right */}
+					{card.isOwned && (
+						<div className="absolute top-2 right-2">
+							<span className="flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-green-500/25 text-green-300 border border-green-400/50 backdrop-blur-sm">
+								<Heart className="h-2.5 w-2.5 fill-green-400" />
+								Sở hữu
+							</span>
+						</div>
+					)}
+
+					{/* Legendary rainbow shimmer overlay (only on hover) */}
+					{rarity === "LEGENDARY" && (
+						<div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none legendary-rainbow-overlay" />
+					)}
+
+					{/* Rare purple shimmer */}
+					{rarity === "RARE" && (
+						<div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rare-shimmer-overlay" />
+					)}
+
+					{/* Hover overlay — owner count */}
+					<div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+						<div className="flex items-center gap-2 text-white/80 text-xs">
+							<Eye className="h-3.5 w-3.5" />
+							<span>{card.ownerCount?.toLocaleString() ?? 0} người sở hữu</span>
+						</div>
+					</div>
+				</div>
+
+				{/* Card footer */}
+				<div
+					className={`px-3 py-2 ${
+						rarity === "LEGENDARY"
+							? "bg-linear-to-r from-yellow-950/60 via-black/40 to-yellow-950/60"
+							: rarity === "RARE"
+								? "bg-linear-to-r from-purple-950/60 via-black/40 to-purple-950/60"
+								: "bg-black/30"
+					}`}
+				>
+					<p
+						className={`text-xs font-semibold line-clamp-1 transition-colors ${
+							rarity === "LEGENDARY"
+								? "text-yellow-200 group-hover:text-yellow-300"
+								: rarity === "RARE"
+									? "text-purple-200 group-hover:text-purple-300"
+									: "text-white group-hover:text-blue-300"
+						}`}
+					>
+						{card.name}
+					</p>
+					{card.cardCode && (
+						<p className="text-[10px] text-white/40 mt-0.5">#{card.cardCode}</p>
+					)}
+				</div>
+			</div>
+		</motion.div>
+	);
+}
+
+// ─────────────────────────────────────────────
+// Pagination
+// ─────────────────────────────────────────────
+function Pagination({
+	currentPage,
+	totalPages,
+	onPageChange,
+}: {
+	currentPage: number;
+	totalPages: number;
+	onPageChange: (page: number) => void;
+}) {
+	if (totalPages <= 1) return null;
+
+	const pages: (number | "...")[] = [];
+	if (totalPages <= 7) {
+		for (let i = 0; i < totalPages; i++) pages.push(i);
+	} else {
+		pages.push(0);
+		if (currentPage > 2) pages.push("...");
+		for (
+			let i = Math.max(1, currentPage - 1);
+			i <= Math.min(totalPages - 2, currentPage + 1);
+			i++
+		) {
+			pages.push(i);
+		}
+		if (currentPage < totalPages - 3) pages.push("...");
+		pages.push(totalPages - 1);
+	}
+
+	return (
+		<div className="flex items-center justify-center gap-1 mt-10">
+			<button
+				onClick={() => onPageChange(currentPage - 1)}
+				disabled={currentPage === 0}
+				className="p-2 rounded-lg border border-white/10 text-white/60 hover:border-amber-500/40 hover:text-amber-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+			>
+				<ChevronLeft className="h-4 w-4" />
+			</button>
+
+			{pages.map((p, i) =>
+				p === "..." ? (
+					<span key={`dots-${i}`} className="px-3 py-2 text-white/30 text-sm">
+						…
+					</span>
+				) : (
+					<button
+						key={p}
+						onClick={() => onPageChange(p as number)}
+						className={`
+              min-w-9 px-3 py-1.5 rounded-lg text-sm font-medium border transition-all
+              ${
+								p === currentPage
+									? "bg-amber-500 border-amber-500 text-black font-bold shadow-[0_0_12px_rgba(245,158,11,0.5)]"
+									: "border-white/10 text-white/60 hover:border-amber-500/40 hover:text-amber-400"
+							}
+            `}
+					>
+						{(p as number) + 1}
+					</button>
+				),
+			)}
+
+			<button
+				onClick={() => onPageChange(currentPage + 1)}
+				disabled={currentPage === totalPages - 1}
+				className="p-2 rounded-lg border border-white/10 text-white/60 hover:border-amber-500/40 hover:text-amber-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+			>
+				<ChevronRight className="h-4 w-4" />
+			</button>
+		</div>
+	);
+}
+
+// ─────────────────────────────────────────────
+// Framework Switcher Dropdown
+// ─────────────────────────────────────────────
+function FrameworkSwitcher({
+	frameworks,
+	currentFrameworkId,
+}: {
+	frameworks: CardFramework[];
+	currentFrameworkId: string;
+}) {
+	const [open, setOpen] = useState(false);
+	const current = frameworks.find(
+		(f) => String(f.frameworkId) === String(currentFrameworkId),
+	);
+
+	return (
+		<div className="relative">
+			<button
+				onClick={() => setOpen(!open)}
+				className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1a1730]/80 border border-white/15 hover:border-amber-500/50 text-sm text-white transition-all backdrop-blur-sm"
+			>
+				<Star className="h-4 w-4 text-amber-400" />
+				<span className="max-w-[120px] truncate">
+					{current?.name ?? "Chọn bộ"}
+				</span>
+				<ChevronLeft
+					className={`h-4 w-4 text-white/50 transition-transform ${open ? "-rotate-90" : "rotate-180"}`}
+				/>
+			</button>
+
+			{open && (
+				<div className="absolute top-full mt-1 left-0 z-50 min-w-50 rounded-xl bg-[#12101e] border border-white/10 shadow-2xl overflow-hidden">
+					{frameworks.map((fw) => {
+						const isSelected =
+							String(fw.frameworkId) === String(currentFrameworkId);
+						return (
+							<Link
+								key={fw.frameworkId}
+								href={`/card-gallery/${fw.frameworkId}`}
+								onClick={() => setOpen(false)}
+								className={`flex items-center gap-2 px-4 py-2.5 text-sm transition-colors ${
+									isSelected
+										? "bg-amber-500/20 text-amber-400"
+										: "text-white/70 hover:bg-white/5 hover:text-white"
+								}`}
+							>
+								<Star className="h-3.5 w-3.5 shrink-0" />
+								<span className="flex-1">{fw.name}</span>
+								{isSelected && <span className="text-amber-400">✓</span>}
+							</Link>
+						);
+					})}
+				</div>
+			)}
+		</div>
+	);
+}
+
+// ─────────────────────────────────────────────
+// Styled Select (dark theme matching background)
+// ─────────────────────────────────────────────
+function DarkSelect({
+	value,
+	onChange,
+	options,
+	className = "",
+}: {
+	value: string;
+	onChange: (val: string) => void;
+	options: { value: string; label: string }[];
+	className?: string;
+}) {
+	return (
+		<div className={`relative ${className}`}>
+			<select
+				value={value}
+				onChange={(e) => onChange(e.target.value)}
+				className="appearance-none w-full px-3 py-2 h-9 rounded-lg bg-[#1a1730]/80 border border-white/15 text-sm text-white/80 hover:border-amber-500/40 focus:border-amber-500/60 focus:outline-none backdrop-blur-sm cursor-pointer pr-8 transition-all"
+				style={{ colorScheme: "dark" }}
+			>
+				{options.map((opt) => (
+					<option
+						key={opt.value}
+						value={opt.value}
+						className="bg-[#12101e] text-white"
+					>
+						{opt.label}
+					</option>
+				))}
+			</select>
+			{/* custom arrow */}
+			<ChevronLeft className="absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-white/40 -rotate-90 pointer-events-none" />
+		</div>
+	);
 }
 
 // ─────────────────────────────────────────────
 // Main Component
 // ─────────────────────────────────────────────
 function CardFrameworkContent() {
-  const params = useParams()
-  const searchParams = useSearchParams()
-  const frameworkId = params.frameworkId as string
-  const initialCardId = searchParams.get('card')
+	const params = useParams();
+	const searchParams = useSearchParams();
+	const frameworkId = params.frameworkId as string;
+	const initialCardId = searchParams.get("card");
 
-  const [selectedCard, setSelectedCard] = useState<CardTemplateWithContent | null>(null)
-  const [filters, setFilters] = useState<CardGalleryFilters>({
-    search: '',
-    rarity: 'ALL',
-    sortBy: 'name',
-    sortOrder: 'asc'
-  })
+	const [selectedCard, setSelectedCard] =
+		useState<CardTemplateWithContent | null>(null);
+	const [page, setPage] = useState(0);
+	const [filters, setFilters] = useState<CardGalleryFilters>({
+		search: "",
+		rarity: "ALL",
+		sortBy: "name",
+		sortOrder: "asc",
+		page: 0,
+		limit: PAGE_SIZE,
+	});
+	const [isAuthenticated] = useState(false);
 
-  const [isAuthenticated] = useState(false)
+	// Reset page when filter changes
+	useEffect(() => {
+		setPage(0);
+	}, [filters.search, filters.rarity, filters.sortBy, filters.sortOrder]);
 
-  const { data: cards = [], isLoading, error } = useQuery({
-    queryKey: ['cardTemplates', frameworkId],
-    queryFn: async () => {
-      const templates = await getCardTemplatesByFramework(frameworkId)
+	// Fetch card frameworks for switcher
+	const { data: frameworks = [] } = useQuery<CardFramework[]>({
+		queryKey: ["cardFrameworks"],
+		queryFn: getCardFrameworks,
+		staleTime: 1000 * 60 * 5,
+	});
 
-      const cardsWithContent = await Promise.all(
-        templates.map(async (template: CardTemplateWithContent) => {
-          try {
-            const contents = await getCardContentsByTemplateId(template.cardTemplateId)
-            return {
-              ...template,
-              cardContents: contents as CardContent[],
-              totalContentPieces: contents.length,
-              publicContentCount: contents.filter((c: CardContent) => c.isPublic).length,
-              privateContentCount: contents.filter((c: CardContent) => !c.isPublic).length,
-              frameworkId,
-              frameworkName: frameworkId
-            }
-          } catch {
-            return {
-              ...template,
-              cardContents: [],
-              totalContentPieces: 0,
-              publicContentCount: 0,
-              privateContentCount: 0,
-              frameworkId,
-              frameworkName: frameworkId
-            }
-          }
-        })
-      )
+	// Derive API-compatible rarity param (undefined = no filter)
+	const rarityParam = filters.rarity === "ALL" ? undefined : filters.rarity;
 
-      return cardsWithContent
-    },
-    enabled: !!frameworkId
-  })
+	// Fetch cards
+	const {
+		data: pageData,
+		isLoading,
+		error,
+	} = useQuery({
+		queryKey: [
+			"cardTemplatesPaged",
+			frameworkId,
+			page,
+			rarityParam,
+			filters.search,
+			filters.sortBy,
+			filters.sortOrder,
+		],
+		queryFn: async () => {
+			const result = await getCardTemplatesByFramework(frameworkId, {
+				search: filters.search,
+				rarity: rarityParam,
+				sortBy: filters.sortBy,
+				sortOrder: filters.sortOrder,
+				page,
+				limit: PAGE_SIZE,
+			});
+			// Enrich with card contents
+			const enriched = await Promise.allSettled(
+				result.content.map(async (template: CardTemplateWithContent) => {
+					try {
+						const contents = await getCardContentsByTemplateId(
+							template.cardTemplateId,
+						);
+						return {
+							...template,
+							cardContents: contents as CardContent[],
+							totalContentPieces: contents.length,
+							publicContentCount: contents.filter(
+								(c: CardContent) => c.isPublic,
+							).length,
+							privateContentCount: contents.filter(
+								(c: CardContent) => !c.isPublic,
+							).length,
+							frameworkId,
+						};
+					} catch {
+						return { ...template, cardContents: [], frameworkId };
+					}
+				}),
+			);
+			return {
+				...result,
+				content: enriched.map((r) =>
+					r.status === "fulfilled" ? r.value : r.reason,
+				),
+			};
+		},
+		enabled: !!frameworkId,
+	});
 
-  useEffect(() => {
-    if (error) {
-      toast.error(getApiErrorMessage(error, 'Không thể tải danh sách lá bài'))
-    }
-  }, [error])
+	const cards = pageData?.content ?? [];
+	const totalPages = pageData?.totalPages ?? 0;
+	const totalElements = pageData?.totalElements ?? 0;
 
-  useEffect(() => {
-    if (initialCardId && cards.length > 0) {
-      const card = cards.find(c => c.cardTemplateId === Number(initialCardId))
-      if (card) {
-        setSelectedCard(card)
-      }
-    }
-  }, [initialCardId, cards])
+	useEffect(() => {
+		if (error) {
+			toast.error(getApiErrorMessage(error, "Không thể tải danh sách lá bài"));
+		}
+	}, [error]);
 
-  const filteredCards = useMemo(() => {
-    let result = [...cards]
+	useEffect(() => {
+		if (initialCardId && cards.length > 0) {
+			const card = cards.find(
+				(c: CardTemplateWithContent) =>
+					c.cardTemplateId === Number(initialCardId),
+			);
+			if (card) setSelectedCard(card);
+		}
+	}, [initialCardId, cards]);
 
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase()
-      result = result.filter(card =>
-        card.name.toLowerCase().includes(searchLower) ||
-        card.description?.toLowerCase().includes(searchLower)
-      )
-    }
+	const currentFramework = frameworks.find(
+		(f) => String(f.frameworkId) === String(frameworkId),
+	);
+	const frameworkDisplayName =
+		currentFramework?.name ??
+		frameworkId
+			.split("-")
+			.map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+			.join(" ");
 
-    if (filters.rarity && filters.rarity !== 'ALL') {
-      result = result.filter(card => card.rarity === filters.rarity)
-    }
+	// Stats derived from current page for panel
+	const legendaryCount = cards.filter(
+		(c: CardTemplateWithContent) => c.rarity === "LEGENDARY",
+	).length;
+	const rareCount = cards.filter(
+		(c: CardTemplateWithContent) => c.rarity === "RARE",
+	).length;
 
-    result.sort((a, b) => {
-      let comparison = 0
-      switch (filters.sortBy) {
-        case 'name':
-          comparison = a.name.localeCompare(b.name)
-          break
-        case 'rarity':
-          const rarityOrder: Record<Rarity, number> = { COMMON: 1, RARE: 2, LEGENDARY: 3 }
-          comparison = rarityOrder[a.rarity] - rarityOrder[b.rarity]
-          break
-        case 'dropRate':
-          comparison = (a.dropRate || 0) - (b.dropRate || 0)
-          break
-        default:
-          comparison = 0
-      }
-      return filters.sortOrder === 'desc' ? -comparison : comparison
-    })
+	return (
+		<div className="min-h-screen">
+			{/* Global CSS for rarity animations */}
+			<style jsx global>{`
+        @keyframes legendaryRainbow {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
 
-    return result
-  }, [cards, filters])
+        .legendary-rainbow-overlay {
+          background: linear-gradient(
+            135deg,
+            rgba(255,215,0,0.18) 0%,
+            rgba(255,128,0,0.12) 14%,
+            rgba(220,60,255,0.16) 28%,
+            rgba(80,180,255,0.14) 42%,
+            rgba(60,255,140,0.12) 57%,
+            rgba(255,240,60,0.18) 71%,
+            rgba(255,100,120,0.14) 85%,
+            rgba(255,215,0,0.18) 100%
+          );
+          background-size: 300% 300%;
+          animation: legendaryRainbow 3s ease infinite;
+          mix-blend-mode: screen;
+        }
 
-  const getRarityColor = (rarity: Rarity) => {
-    switch (rarity) {
-      case 'LEGENDARY':
-        return 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-400 border border-yellow-500/30'
-      case 'RARE':
-        return 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 border border-blue-500/30'
-      case 'COMMON':
-        return 'bg-gray-500/10 text-gray-400 border border-gray-500/30'
-      default:
-        return 'bg-muted/40 text-muted-foreground'
-    }
-  }
+        .rare-shimmer-overlay {
+          background: linear-gradient(
+            135deg,
+            rgba(168,85,247,0.0) 0%,
+            rgba(200,140,255,0.22) 40%,
+            rgba(140,80,230,0.20) 60%,
+            rgba(168,85,247,0.0) 100%
+          );
+          background-size: 200% 200%;
+          animation: legendaryRainbow 2.5s ease infinite;
+          mix-blend-mode: screen;
+        }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90">
-      {/* Header */}
-      <div className="bg-card/20 backdrop-blur-sm border-b border-border/20 sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold gradient-gold-purple mb-2" style={{ fontFamily: 'Fruktur, var(--font-heading)' }}>
-                {frameworkId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-              </h1>
-              <p className="text-muted-foreground">
-                {isLoading ? 'Đang tải...' : `${filteredCards.length} lá bài trong bộ sưu tập`}
-              </p>
-            </div>
+        /* Legendary card: ambient golden glow border on hover */
+        .legendary-card-wrap:hover {
+          box-shadow:
+            0 0 12px rgba(250,204,21,0.35),
+            0 0 40px rgba(250,204,21,0.18),
+            0 0 80px rgba(250,204,21,0.08),
+            inset 0 0 20px rgba(250,204,21,0.05);
+        }
+      `}</style>
 
-            <Link href="/card-gallery">
-              <Button variant="outline" className="gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Quay lại Gallery
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
+			{/* ── Set Header Banner ── */}
+			<div className="container mx-auto px-4 mb-6">
+				<div className="flex items-center gap-2 text-xs text-white/40 mb-4">
+					<Link href="/" className="hover:text-white transition-colors">
+						Trang chủ
+					</Link>
+					<span>/</span>
+					<Link
+						href="/card-gallery"
+						className="hover:text-white transition-colors"
+					>
+						Card Gallery
+					</Link>
+					<span>/</span>
+					<span className="text-white/70">{frameworkDisplayName}</span>
+				</div>
 
-      {/* Filters */}
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Tìm kiếm lá bài..."
-              value={filters.search}
-              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-              className="pl-10 glass-card border-border/40"
-            />
-          </div>
+				<div className="flex flex-col md:flex-row md:items-center gap-4 p-5 rounded-2xl bg-white/5 border border-white/10">
+					{/* Set icon */}
+					<div className="relative w-20 h-20 rounded-xl overflow-hidden bg-gradient-to-br from-amber-500/20 to-purple-500/20 flex-shrink-0">
+						{currentFramework?.imageUrl ? (
+							<Image
+								src={currentFramework.imageUrl}
+								alt={frameworkDisplayName}
+								fill
+								className="object-cover"
+							/>
+						) : (
+							<div className="flex items-center justify-center h-full">
+								<Star className="h-8 w-8 text-amber-400/60" />
+							</div>
+						)}
+					</div>
 
-          <div className="flex gap-2 flex-wrap">
-            <select
-              value={filters.rarity}
-              onChange={(e) => setFilters(prev => ({ ...prev, rarity: e.target.value as Rarity | 'ALL' }))}
-              className="px-3 py-2 rounded-md bg-card/50 border border-border/30 text-sm"
-            >
-              <option value="ALL">Tất cả độ hiếm</option>
-              <option value="COMMON">Common</option>
-              <option value="RARE">Rare</option>
-              <option value="LEGENDARY">Legendary</option>
-            </select>
+					{/* Info */}
+					<div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4">
+						<div>
+							<p className="text-[10px] text-white/40 uppercase tracking-widest mb-0.5">
+								Tên bộ
+							</p>
+							<p className="text-white font-bold text-sm">
+								{frameworkDisplayName}
+							</p>
+						</div>
+						<div>
+							<p className="text-[10px] text-white/40 uppercase tracking-widest mb-0.5">
+								Ngày tạo
+							</p>
+							<p className="text-white text-sm">
+								{currentFramework?.createdAt
+									? new Date(currentFramework.createdAt).toLocaleDateString(
+											"vi-VN",
+											{
+												day: "numeric",
+												month: "long",
+												year: "numeric",
+											},
+										)
+									: "N/A"}
+							</p>
+						</div>
+						<div>
+							<p className="text-[10px] text-white/40 uppercase tracking-widest mb-0.5">
+								Tổng thẻ
+							</p>
+							<p className="text-white font-bold text-sm">
+								{currentFramework?.totalCards ?? totalElements}
+							</p>
+						</div>
+						<div>
+							<p className="text-[10px] text-white/40 uppercase tracking-widest mb-0.5">
+								Đang hiển thị
+							</p>
+							<p className="text-amber-400 font-bold text-sm">
+								{isLoading ? "..." : `${totalElements} lá bài`}
+							</p>
+						</div>
+					</div>
 
-            <select
-              value={filters.sortBy}
-              onChange={(e) => setFilters(prev => ({ ...prev, sortBy: e.target.value as typeof filters.sortBy }))}
-              className="px-3 py-2 rounded-md bg-card/50 border border-border/30 text-sm"
-            >
-              <option value="name">Sắp xếp theo tên</option>
-              <option value="rarity">Sắp xếp theo độ hiếm</option>
-              <option value="dropRate">Sắp xếp theo tỷ lệ rơi</option>
-            </select>
+					{/* Back */}
+					<Link href="/card-gallery">
+						<Button
+							variant="outline"
+							size="sm"
+							className="gap-2 border-white/10 hover:border-amber-500/40 text-white/70 hover:text-white"
+						>
+							<ArrowLeft className="h-4 w-4" />
+							Quay lại
+						</Button>
+					</Link>
+				</div>
+			</div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setFilters(prev => ({ ...prev, sortOrder: prev.sortOrder === 'asc' ? 'desc' : 'asc' }))}
-            >
-              {filters.sortOrder === 'asc' ? '↑' : '↓'}
-            </Button>
-          </div>
-        </div>
-      </div>
+			{/* ── Filters Row ── */}
+			<div className="container mx-auto px-4 mb-4">
+				<div className="flex flex-wrap items-center gap-3">
+					{/* Search */}
+					<div className="relative flex-1 min-w-45 max-w-xs">
+						<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+						<Input
+							placeholder="Tìm kiếm theo tên..."
+							value={filters.search}
+							onChange={(e) =>
+								setFilters((prev) => ({ ...prev, search: e.target.value }))
+							}
+							className="pl-9 bg-[#1a1730]/80 border-white/15 text-white placeholder:text-white/30 focus:border-amber-500/50 h-9 text-sm backdrop-blur-sm"
+							style={{ colorScheme: "dark" }}
+						/>
+					</div>
 
-      {/* Cards Grid */}
-      <div className="container mx-auto px-4 pb-12">
-        {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <CardSkeleton key={i} />
-            ))}
-          </div>
-        ) : filteredCards.length === 0 ? (
-          <div className="text-center py-16">
-            <Sparkles className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-            <h3 className="text-xl font-semibold text-foreground mb-2">
-              Không tìm thấy lá bài nào
-            </h3>
-            <p className="text-muted-foreground">
-              Thử tìm kiếm với từ khóa khác hoặc bộ lọc khác
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            <AnimatePresence mode="popLayout">
-              {filteredCards.map((card) => (
-                <CardItem
-                  key={card.cardTemplateId}
-                  card={card}
-                  onClick={() => setSelectedCard(card)}
-                  getRarityColor={getRarityColor}
-                />
-              ))}
-            </AnimatePresence>
-          </div>
-        )}
-      </div>
+					{/* Framework switcher */}
+					{frameworks.length > 0 && (
+						<FrameworkSwitcher
+							frameworks={frameworks}
+							currentFrameworkId={frameworkId}
+						/>
+					)}
 
-      <EnhancedCardDetailModal
-        card={selectedCard}
-        open={!!selectedCard}
-        onClose={() => setSelectedCard(null)}
-        isAuthenticated={isAuthenticated}
-        frameworkName={frameworkId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-      />
-    </div>
-  )
+					{/* Sort By field */}
+					<div className="flex items-center gap-2">
+						<span className="text-xs text-white/40 whitespace-nowrap hidden sm:inline">
+							Sắp xếp theo:
+						</span>
+						<DarkSelect
+							value={filters.sortBy ?? "name"}
+							onChange={(val) =>
+								setFilters((prev) => ({
+									...prev,
+									sortBy: val as CardGalleryFilters["sortBy"],
+								}))
+							}
+							options={[
+								{ value: "name", label: "Tên" },
+								{ value: "rarity", label: "Độ hiếm" },
+								{ value: "dropRate", label: "Drop rate" },
+								{ value: "createdAt", label: "Mới nhất" },
+							]}
+							className="min-w-30"
+						/>
+					</div>
+
+					{/* Sort Order */}
+					<div className="flex items-center gap-2">
+						<span className="text-xs text-white/40 whitespace-nowrap hidden sm:inline">
+							Thứ tự:
+						</span>
+						<DarkSelect
+							value={filters.sortOrder ?? "asc"}
+							onChange={(val) =>
+								setFilters((prev) => ({
+									...prev,
+									sortOrder: val as "asc" | "desc",
+								}))
+							}
+							options={[
+								{ value: "asc", label: "↑ Tăng dần" },
+								{ value: "desc", label: "↓ Giảm dần" },
+							]}
+							className="min-w-30"
+						/>
+					</div>
+				</div>
+			</div>
+
+			{/* ── Rarity Tab Bar ── */}
+			<div className="container mx-auto px-4 mb-6">
+				<div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+					{RARITY_TABS.map((tab) => {
+						const isActive = filters.rarity === tab.value;
+						const tabStyle = {
+							ALL: isActive
+								? "bg-amber-500 border-amber-500 text-black shadow-[0_0_12px_rgba(245,158,11,0.5)]"
+								: "bg-white/5 border-white/15 text-white/60 hover:border-white/30 hover:text-white",
+							COMMON: isActive
+								? "bg-blue-500 border-blue-500 text-white shadow-[0_0_12px_rgba(59,130,246,0.5)]"
+								: "bg-white/5 border-white/15 text-white/60 hover:border-blue-400/40 hover:text-blue-300",
+							RARE: isActive
+								? "bg-purple-500 border-purple-500 text-white shadow-[0_0_12px_rgba(168,85,247,0.5)]"
+								: "bg-white/5 border-white/15 text-white/60 hover:border-purple-400/40 hover:text-purple-300",
+							LEGENDARY: isActive
+								? "bg-yellow-500 border-yellow-500 text-black shadow-[0_0_14px_rgba(234,179,8,0.6)]"
+								: "bg-white/5 border-white/15 text-white/60 hover:border-yellow-400/40 hover:text-yellow-300",
+						}[tab.value];
+
+						return (
+							<button
+								key={tab.value}
+								onClick={() =>
+									setFilters((prev) => ({ ...prev, rarity: tab.value }))
+								}
+								className={`
+                  shrink-0 px-4 py-1.5 rounded-full text-xs font-bold tracking-wider border transition-all
+                  ${tabStyle}
+                `}
+							>
+								{tab.label}
+							</button>
+						);
+					})}
+				</div>
+			</div>
+
+			{/* ── Results count ── */}
+			<div className="container mx-auto px-4 mb-4">
+				<p className="text-white/40 text-sm">
+					{isLoading
+						? "Đang tải..."
+						: `${totalElements.toLocaleString()} lá bài${filters.rarity !== "ALL" ? ` · ${filters.rarity}` : ""} — Trang ${page + 1} / ${Math.max(1, totalPages)}`}
+				</p>
+			</div>
+
+			{/* ── Cards Grid ── */}
+			<div className="container mx-auto px-4 pb-12">
+				{isLoading ? (
+					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+						{Array.from({ length: PAGE_SIZE }).map((_, i) => (
+							<CardSkeleton key={i} />
+						))}
+					</div>
+				) : cards.length === 0 ? (
+					<div className="text-center py-24">
+						<Sparkles className="mx-auto h-14 w-14 text-white/20 mb-4" />
+						<h3 className="text-lg font-semibold text-white/60 mb-2">
+							Không tìm thấy lá bài nào
+						</h3>
+						<p className="text-white/30 text-sm">
+							Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm
+						</p>
+					</div>
+				) : (
+					<AnimatePresence mode="popLayout">
+						<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+							{cards.map((card: CardTemplateWithContent) => (
+								<CardItem
+									key={card.cardTemplateId}
+									card={card}
+									onClick={() => setSelectedCard(card)}
+								/>
+							))}
+						</div>
+					</AnimatePresence>
+				)}
+
+				<Pagination
+					currentPage={page}
+					totalPages={totalPages}
+					onPageChange={(newPage) => {
+						setPage(newPage);
+						window.scrollTo({ top: 0, behavior: "smooth" });
+					}}
+				/>
+			</div>
+
+			<EnhancedCardDetailModal
+				card={selectedCard}
+				open={!!selectedCard}
+				onClose={() => setSelectedCard(null)}
+				isAuthenticated={isAuthenticated}
+				frameworkName={frameworkDisplayName}
+			/>
+		</div>
+	);
 }
 
 export function CardFrameworkPageClient() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90">
-        <div className="container mx-auto px-4 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <CardSkeleton key={i} />
-            ))}
-          </div>
-        </div>
-      </div>
-    }>
-      <CardFrameworkContent />
-    </Suspense>
-  )
+	return (
+		<Suspense
+			fallback={
+				<div className="container mx-auto px-4 py-12">
+					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+						{Array.from({ length: 12 }).map((_, i) => (
+							<CardSkeleton key={i} />
+						))}
+					</div>
+				</div>
+			}
+		>
+			<CardFrameworkContent />
+		</Suspense>
+	);
 }

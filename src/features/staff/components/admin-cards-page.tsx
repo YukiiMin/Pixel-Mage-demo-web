@@ -64,7 +64,7 @@ import type {
 	CardTemplatesPageResult,
 	ToggleContentPayload,
 	UpdateContentPayload,
-} from "@/types/admin-cards";
+} from "@/features/staff/types/admin-cards";
 import type {
 	CardContentRequestDTO,
 	CardContentResponse,
@@ -72,7 +72,7 @@ import type {
 	CardTemplateRequestDTO,
 	CardTemplateResponse,
 	CardTemplateSummary,
-} from "@/types/admin-catalog";
+} from "@/features/staff/types/catalog";
 import { getApiErrorMessage } from "@/types/api";
 
 function CardTemplateFormModal({

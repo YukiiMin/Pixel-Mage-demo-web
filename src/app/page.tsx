@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header/index";
 import { Skeleton } from "@/components/ui/skeleton";
-import HeroSection from "@/features/landing/components/hero-section";
+import { HeroSection } from "@/features/landing";
 
 // StarBackground is purely visual canvas — no SSR needed
 const StarBackground = dynamic(
@@ -14,7 +14,8 @@ const StarBackground = dynamic(
 
 // Below-fold sections: lazy load with skeleton placeholders
 const FeaturedSection = dynamic(
-	() => import("@/features/landing/components/featured-section"),
+	() =>
+		import("@/features/landing").then((m) => ({ default: m.FeaturedSection })),
 	{
 		loading: () => (
 			<section className="py-24">
@@ -32,7 +33,7 @@ const FeaturedSection = dynamic(
 );
 
 const HowItWorks = dynamic(
-	() => import("@/features/landing/components/how-it-works"),
+	() => import("@/features/landing").then((m) => ({ default: m.HowItWorks })),
 	{
 		loading: () => (
 			<section className="py-24">
@@ -49,7 +50,8 @@ const HowItWorks = dynamic(
 );
 
 const DownloadSection = dynamic(
-	() => import("@/features/landing/components/download-section"),
+	() =>
+		import("@/features/landing").then((m) => ({ default: m.DownloadSection })),
 	{
 		loading: () => (
 			<section className="py-24">

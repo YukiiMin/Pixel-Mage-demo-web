@@ -1,6 +1,6 @@
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import type { Spread } from "@/types/tarot";
+import type { Spread } from "@/features/tarot/types";
 
 export function useSpreads(): UseQueryResult<Spread[]> {
 	return useQuery({

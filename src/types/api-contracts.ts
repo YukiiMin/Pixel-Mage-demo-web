@@ -1,7 +1,7 @@
 // Centralized API Contract Types - Synced with Backend
 // Based on BE_SYNC_REPORT_2026_04_03.md and PixelMage_API_Types_Contract.md
 
-import type { OrderStatus, PaymentStatus } from "./order";
+import type { OrderStatus, PaymentStatus } from "@/features/orders/types";
 
 export interface DashboardResponse {
 	totalUsers: number;

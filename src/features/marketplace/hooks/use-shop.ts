@@ -8,7 +8,9 @@ import type { ProductResponse } from "@/types/commerce";
 export type ShopSort = "newest" | "price-asc" | "price-desc" | "stock";
 
 async function fetchProducts(): Promise<ProductResponse[]> {
-	const res = await apiRequest<ProductResponse[]>(API_ENDPOINTS.productManagement.list);
+	const res = await apiRequest<ProductResponse[]>(
+		API_ENDPOINTS.productManagement.list,
+	);
 	return res.data ?? [];
 }
 
@@ -17,7 +19,11 @@ export function useShop() {
 	const [sortBy, setSortBy] = useState<ShopSort>("newest");
 	const [filterLimited, setFilterLimited] = useState(false);
 
-	const { data: products = [], isLoading, isError } = useQuery({
+	const {
+		data: products = [],
+		isLoading,
+		isError,
+	} = useQuery({
 		queryKey: ["shop-products"],
 		queryFn: fetchProducts,
 		staleTime: 60_000,
@@ -32,7 +38,7 @@ export function useShop() {
 			result = result.filter(
 				(p) =>
 					p.name.toLowerCase().includes(term) ||
-					p.description.toLowerCase().includes(term)
+					p.description.toLowerCase().includes(term),
 			);
 		}
 

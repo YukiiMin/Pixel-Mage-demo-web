@@ -1,9 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import { useTarotSessionStore } from "@/stores/use-tarot-session-store";
+import { useTarotSessionStore } from "@/features/tarot/stores/use-tarot-session-store";
 import type { ApiHttpError } from "@/types/api";
-import type { CreateSessionRequest, ReadingSession } from "@/types/tarot";
+import type {
+	CreateSessionRequest,
+	ReadingSession,
+} from "@/features/tarot/types";
 
 export function useCreateSession(userId: number | null) {
 	const queryClient = useQueryClient();

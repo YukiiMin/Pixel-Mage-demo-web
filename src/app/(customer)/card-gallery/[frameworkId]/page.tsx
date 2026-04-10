@@ -1,7 +1,7 @@
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header/index";
 import StarBackground from "@/components/ui/star-background";
-import { CardFrameworkPageClient } from "@/features/card-gallery/components/card-framework-page";
+import { CardFrameworkPageClient } from "@/features/card-gallery";
 
 export default function CardFrameworkPage() {
 	return (

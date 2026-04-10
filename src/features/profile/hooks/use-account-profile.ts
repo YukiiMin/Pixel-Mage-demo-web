@@ -1,6 +1,6 @@
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import type { AccountProfile } from "@/types/tarot";
+import type { AccountProfile } from "@/features/tarot/types";
 
 export function useAccountProfile(
 	userId: number | null,

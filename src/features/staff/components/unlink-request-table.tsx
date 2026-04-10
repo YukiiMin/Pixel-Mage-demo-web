@@ -15,7 +15,10 @@ import { ApproveModal } from "@/features/staff/components/approve-modal";
 import { RejectModal } from "@/features/staff/components/reject-modal";
 import { StatusBadge } from "@/features/staff/components/status-badge";
 import { cn } from "@/lib/utils";
-import type { UnlinkRequest, UnlinkRequestStatus } from "@/types/staff";
+import type {
+	UnlinkRequest,
+	UnlinkRequestStatus,
+} from "@/features/staff/types/unlink";
 
 type FilterTab = "ALL" | UnlinkRequestStatus;
 

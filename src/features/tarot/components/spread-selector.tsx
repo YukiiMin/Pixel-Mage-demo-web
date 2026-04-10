@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { fadeInUp } from "@/lib/motion-variants";
-import { useTarotSessionStore } from "@/stores/use-tarot-session-store";
+import { useTarotSessionStore } from "@/features/tarot/stores/use-tarot-session-store";
 import { useSpreads } from "../hooks/use-spreads";
 
 function SpreadSkeleton() {

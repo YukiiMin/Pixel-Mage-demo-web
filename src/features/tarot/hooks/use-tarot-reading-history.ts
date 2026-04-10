@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import type { ReadingSession } from "@/types/tarot";
+import type { ReadingSession } from "@/features/tarot/types";
 
 export function useTarotReadingHistory(userId: number | null) {
 	return useQuery({

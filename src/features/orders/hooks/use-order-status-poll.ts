@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import type { OrderDetail } from "@/types/order";
+import type { OrderDetail } from "@/features/orders/types";
 
 // Poll GET /api/orders/{id} để theo dõi paymentStatus
 // Pattern giống tarot interpret poll

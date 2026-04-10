@@ -4,7 +4,7 @@ import type {
 	ValidateVoucherRequest,
 	ValidateVoucherResponse,
 	Voucher,
-} from "@/types/wallet";
+} from "@/features/profile/types/wallet";
 
 export function useVouchers(userId: number | null) {
 	return useQuery({

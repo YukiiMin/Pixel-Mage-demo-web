@@ -11,7 +11,11 @@ interface ShopProductCardProps {
 	index: number;
 }
 
-export function ShopProductCard({ product, onSelect, index }: ShopProductCardProps) {
+export function ShopProductCard({
+	product,
+	onSelect,
+	index,
+}: ShopProductCardProps) {
 	const delay = Math.min(index * 0.1, 0.5);
 
 	return (
@@ -47,7 +51,9 @@ export function ShopProductCard({ product, onSelect, index }: ShopProductCardPro
 				</div>
 
 				{/* Title & Description */}
-				<h3 className="mb-2 text-lg font-bold text-foreground">{product.name}</h3>
+				<h3 className="mb-2 text-lg font-bold text-foreground">
+					{product.name}
+				</h3>
 				<p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
 					{product.description}
 				</p>
@@ -67,7 +73,9 @@ export function ShopProductCard({ product, onSelect, index }: ShopProductCardPro
 									title={`${preview.name} (${preview.rarity})`}
 								>
 									<img
-										src={preview.imagePath || "https://placehold.co/100x140?text=?"}
+										src={
+											preview.imagePath || "https://placehold.co/100x140?text=?"
+										}
 										alt={preview.name}
 										className="h-full w-full object-cover opacity-70 grayscale transition-all hover:opacity-100 hover:grayscale-0"
 									/>

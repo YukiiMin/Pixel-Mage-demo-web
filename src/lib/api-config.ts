@@ -10,7 +10,7 @@ const AUTH_LOGIN_MARKER_COOKIE = "pm_logged_in";
 
 export const API_CONFIG = {
 	baseUrl:
-		process.env.NEXT_PUBLIC_BACKEND_BASE_URL?.replace(/\/$/, '') ??
+		process.env.NEXT_PUBLIC_BACKEND_BASE_URL?.replace(/\/$/, "") ??
 		DEFAULT_API_BASE_URL,
 	timeoutMs: 15000,
 	defaultHeaders: {
