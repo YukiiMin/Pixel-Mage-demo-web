@@ -267,9 +267,6 @@ export function buildApiUrl(path: string): string {
 	return normalizedPath;
 }
 
-export function getStoredAccessToken(): string | null {
-	return null;
-}
 
 export function clearStoredAuthSession(): void {
 	if (typeof window === "undefined") {
@@ -345,15 +342,11 @@ export function hasStoredAuthSession(): boolean {
 }
 
 export function createApiHeaders(token?: string): HeadersInit {
-	const resolvedToken = token ?? getStoredAccessToken();
-	if (!resolvedToken) {
-		return API_CONFIG.defaultHeaders;
+	const headers = { ...API_CONFIG.defaultHeaders } as Record<string, string>;
+	if (token) {
+		headers.Authorization = `Bearer ${token}`;
 	}
-
-	return {
-		...API_CONFIG.defaultHeaders,
-		Authorization: `Bearer ${resolvedToken}`,
-	};
+	return headers;
 }
 
 export interface ApiRequestOptions extends Omit<RequestInit, "headers"> {
@@ -435,7 +428,7 @@ export async function apiRequest<T>(
 		const response = await fetch(buildApiUrl(path), {
 			...options,
 			body: finalBody,
-			credentials: options.credentials ?? "same-origin",
+			credentials: options.credentials ?? "include",
 			referrerPolicy: options.referrerPolicy ?? "no-referrer",
 			headers: mergedHeaders as HeadersInit,
 			signal: controller.signal,

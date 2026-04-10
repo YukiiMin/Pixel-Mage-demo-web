@@ -225,7 +225,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 						</dl>
 					</motion.div>
 
-					{order.note && (
+					{order.notes && (
 						<motion.div
 							variants={fadeInUp}
 							className="glass-card rounded-2xl border border-border/50 p-5"
@@ -233,7 +233,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 							<h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
 								<FileText className="h-4 w-4 text-primary" /> Ghi chú
 							</h3>
-							<p className="text-sm text-muted-foreground">{order.note}</p>
+							<p className="text-sm text-muted-foreground">{order.notes}</p>
 						</motion.div>
 					)}
 
@@ -254,13 +254,17 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 									const subtotal = item.quantity * item.unitPrice;
 									return (
 										<li
-											key={item.id}
+											key={item.orderItemId}
 											className="flex items-center justify-between rounded-xl border border-border/40 bg-muted/20 px-4 py-3"
 										>
 											<div>
 												<p className="text-sm font-semibold text-foreground">
-													{item.pack?.name ??
-														`Pack #${item.pack?.packId ?? item.id}`}
+													{item.product?.name ?? "Sản phẩm"}
+													{item.pack && (
+														<span className="ml-2 text-xs font-normal text-muted-foreground">
+															(Pack #{item.pack.packId})
+														</span>
+													)}
 												</p>
 												<p className="text-xs text-muted-foreground">
 													Số lượng: {item.quantity} ×{" "}

@@ -47,7 +47,15 @@ export function PackDetailModal({
 
 		createOrder.mutate(
 			{
-				packIds: [pack.productId],
+				orderItems: [
+					{
+						productId: pack.productId,
+						quantity: quantity,
+						unitPrice: pack.price,
+						subtotal: quantity * pack.price,
+					},
+				],
+				totalAmount: quantity * pack.price,
 				paymentMethod: "SEPAY",
 				shippingAddress: "Default Web Address",
 				notes: "Mua từ Marketplace",

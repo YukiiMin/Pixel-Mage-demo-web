@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
@@ -118,6 +119,10 @@ export function UserDetailProfile({
 		return (
 			<Dialog open={open} onOpenChange={onClose}>
 				<DialogContent className="max-w-6xl max-h-[90vh]">
+					<DialogHeader className="sr-only">
+						<DialogTitle>Đang tải thông tin người dùng</DialogTitle>
+						<DialogDescription>Vui lòng chờ trong giây lát</DialogDescription>
+					</DialogHeader>
 					<div className="flex items-center justify-center h-64">
 						<Loader2 className="h-8 w-8 animate-spin text-primary" />
 						<span className="ml-2 text-muted-foreground">

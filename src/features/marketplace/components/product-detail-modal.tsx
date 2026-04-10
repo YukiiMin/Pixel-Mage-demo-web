@@ -207,7 +207,15 @@ export function ProductDetailModal({
 		setCheckoutState("creating_order");
 		createOrder.mutate(
 			{
-				packIds: [product.productId],
+				orderItems: [
+					{
+						productId: product.productId,
+						quantity: 1,
+						unitPrice: product.price,
+						subtotal: product.price,
+					},
+				],
+				totalAmount: product.price,
 				paymentMethod: "SEPAY",
 				shippingAddress: "Digital Delivery",
 				notes: `Mua ${product.name} từ Shop`,
@@ -218,6 +226,7 @@ export function ProductDetailModal({
 					initiatePayment.mutate(
 						{
 							orderId: orderData.orderId,
+							// ✅ Dùng totalAmount từ order BE (có thể đã apply voucher/discount)
 							amount: orderData.totalAmount,
 							currency: "VND",
 						},

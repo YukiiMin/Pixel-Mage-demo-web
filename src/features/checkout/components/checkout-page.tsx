@@ -51,10 +51,10 @@ function redirectToMobile(
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface Props {
-	packId: number;
+	productId: number;
 }
 
-export function CheckoutPage({ packId }: Props) {
+export function CheckoutPage({ productId }: Props) {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const queryClient = useQueryClient();
@@ -110,7 +110,7 @@ export function CheckoutPage({ packId }: Props) {
 		(async () => {
 			try {
 				const res = await apiRequest<ProductResponse>(
-					API_ENDPOINTS.productManagement.byId(packId),
+					API_ENDPOINTS.productManagement.byId(productId),
 				);
 				setPack(res.data);
 				setStep("confirmed");
@@ -119,7 +119,7 @@ export function CheckoutPage({ packId }: Props) {
 				setErrorMessage("Không thể tải thông tin pack. Vui lòng thử lại.");
 			}
 		})();
-	}, [step, packId]);
+	}, [step, productId]);
 
 	// ─── Step 4: Watch orderStatus for PAID/FAILED ───────────────────────────────
 	useEffect(() => {
@@ -148,13 +148,22 @@ export function CheckoutPage({ packId }: Props) {
 		setStep("ordering");
 		try {
 			const order = await createOrder.mutateAsync({
-				packIds: [pack.productId],
+				orderItems: [
+					{
+						productId: pack.productId,
+						quantity: 1,
+						unitPrice: pack.price,
+						subtotal: pack.price,
+					},
+				],
+				totalAmount: pack.price,
 				paymentMethod: "SEPAY",
 				shippingAddress: "Default Web Address",
 			});
 			const payment = await initiatePayment.mutateAsync({
 				orderId: order.orderId,
-				amount: pack.price,
+				// ✅ Dùng totalAmount từ order BE (có thể đã apply voucher), không dùng pack.price
+				amount: order.totalAmount,
 				currency: "VND",
 			});
 			setOrderId(order.orderId);

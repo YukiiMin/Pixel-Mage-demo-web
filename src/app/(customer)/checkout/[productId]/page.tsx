@@ -5,23 +5,23 @@ import StarBackground from "@/components/ui/star-background";
 import { CheckoutPage } from "@/features/checkout";
 
 interface Props {
-	params: Promise<{ packId: string }>;
+	params: Promise<{ productId: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-	const { packId } = await params;
+	const { productId } = await params;
 	return {
-		title: `Thanh toán Pack #${packId} · PixelMage`,
+		title: `Thanh toán Pack #${productId} · PixelMage`,
 		description: "Thanh toán pack thẻ bài PixelMage qua SEPay VietQR",
 		robots: "noindex, nofollow", // Checkout pages should not be indexed
 	};
 }
 
 export default async function CheckoutRoute({ params }: Props) {
-	const { packId } = await params;
-	const packIdNum = Number(packId);
+	const { productId } = await params;
+	const productIdNum = Number(productId);
 
-	if (!packId || Number.isNaN(packIdNum) || packIdNum <= 0) {
+	if (!productId || Number.isNaN(productIdNum) || productIdNum <= 0) {
 		return (
 			<div className="relative min-h-screen overflow-x-hidden">
 				<StarBackground />
@@ -44,7 +44,7 @@ export default async function CheckoutRoute({ params }: Props) {
 						</div>
 					}
 				>
-					<CheckoutPage packId={packIdNum} />
+					<CheckoutPage productId={productIdNum} />
 				</Suspense>
 			</main>
 		</div>
