@@ -1,6 +1,17 @@
 'use client'
 
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -29,6 +40,7 @@ interface DesktopActionsProps {
   displayName: string
   userEmail: string
   initials: string
+  avatarUrl: string | null
   onLogout: () => void
 }
 
@@ -39,6 +51,7 @@ const DesktopActions = ({
   displayName,
   userEmail,
   initials,
+  avatarUrl,
   onLogout,
 }: DesktopActionsProps) => (
   <div className="hidden md:flex items-center gap-3">
@@ -51,9 +64,17 @@ const DesktopActions = ({
               type="button"
               className="flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent transition-colors"
             >
-              <span className="flex items-center justify-center w-7 h-7 rounded-full gradient-gold-purple-bg text-xs font-bold text-primary-foreground select-none">
-                {initials}
-              </span>
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={displayName}
+                  className="w-7 h-7 rounded-full object-cover"
+                />
+              ) : (
+                <span className="flex items-center justify-center w-7 h-7 rounded-full gradient-gold-purple-bg text-xs font-bold text-primary-foreground select-none">
+                  {initials}
+                </span>
+              )}
               <span className="max-w-30 truncate">{displayName}</span>
               <ChevronDown size={14} className="text-muted-foreground" />
             </button>
@@ -164,13 +185,36 @@ const DesktopActions = ({
             </DropdownMenuSub>
 
             <DropdownMenuSeparator className="mt-2" />
-            <DropdownMenuItem
-              className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer py-2 mt-1"
-              onClick={onLogout}
-            >
-              <LogOut size={15} className="mr-2" />
-              Đăng xuất
-            </DropdownMenuItem>
+
+            {/* Logout with Confirm Dialog */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem
+                  onSelect={(e) => e.preventDefault()}
+                  className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer py-2 mt-1"
+                >
+                  <LogOut size={15} className="mr-2" />
+                  Đăng xuất
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Xác nhận đăng xuất?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Hủy</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={onLogout}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Đăng xuất
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       </>

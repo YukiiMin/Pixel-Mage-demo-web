@@ -1,7 +1,18 @@
 "use client";
 
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { LogOut, X } from "lucide-react";
 import Link from "next/link";
 import {
 	authDropdownLinks,
@@ -19,6 +30,7 @@ interface MobileMenuProps {
 	displayName: string;
 	userEmail: string;
 	initials: string;
+	avatarUrl: string | null;
 	mappedSectionLinks: Array<{ label: string; hash: string; href: string }>;
 	onLogout: () => void;
 }
@@ -32,6 +44,7 @@ const MobileMenu = ({
 	displayName,
 	userEmail,
 	initials,
+	avatarUrl,
 	mappedSectionLinks,
 	onLogout,
 }: MobileMenuProps) => (
@@ -65,9 +78,17 @@ const MobileMenu = ({
 					{/* User info when logged in */}
 					{isAuth && (
 						<div className="flex flex-col items-center gap-1 mb-2">
-							<span className="flex items-center justify-center w-12 h-12 rounded-full gradient-gold-purple-bg text-lg font-bold text-primary-foreground select-none">
-								{initials}
-							</span>
+							{avatarUrl ? (
+								<img
+									src={avatarUrl}
+									alt={displayName}
+									className="w-12 h-12 rounded-full object-cover"
+								/>
+							) : (
+								<span className="flex items-center justify-center w-12 h-12 rounded-full gradient-gold-purple-bg text-lg font-bold text-primary-foreground select-none">
+									{initials}
+								</span>
+							)}
 							<span className="text-base font-semibold text-foreground">
 								{displayName}
 							</span>
@@ -143,16 +164,37 @@ const MobileMenu = ({
 									{item.label}
 								</Link>
 							))}
-							<button
-								type="button"
-								onClick={() => {
-									onClose();
-									onLogout();
-								}}
-								className="text-xl font-heading text-destructive hover:opacity-80 transition-opacity"
-							>
-								Đăng xuất
-							</button>
+							<AlertDialog>
+								<AlertDialogTrigger asChild>
+									<button
+										type="button"
+										className="text-xl font-heading text-destructive hover:opacity-80 transition-opacity flex items-center gap-2"
+									>
+										<LogOut size={18} />
+										Đăng xuất
+									</button>
+								</AlertDialogTrigger>
+								<AlertDialogContent>
+									<AlertDialogHeader>
+										<AlertDialogTitle>Xác nhận đăng xuất?</AlertDialogTitle>
+										<AlertDialogDescription>
+											Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?
+										</AlertDialogDescription>
+									</AlertDialogHeader>
+									<AlertDialogFooter>
+										<AlertDialogCancel onClick={onClose}>Hủy</AlertDialogCancel>
+										<AlertDialogAction
+											onClick={() => {
+												onClose();
+												onLogout();
+											}}
+											className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+										>
+											Đăng xuất
+										</AlertDialogAction>
+									</AlertDialogFooter>
+								</AlertDialogContent>
+							</AlertDialog>
 						</>
 					) : (
 						<>

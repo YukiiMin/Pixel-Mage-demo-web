@@ -3,6 +3,7 @@
 import { getInitials } from "@/components/layout/header/_config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import StarBackground from "@/components/ui/star-background";
 import { useProfile } from "@/features/auth/hooks/use-auth";
 import { motion } from "framer-motion";
 import {
@@ -133,11 +134,11 @@ export default function UserDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
-      {/* Header sẽ được thêm ở layout level */}
-      <main>
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="grid lg:grid-cols-12 gap-6">
+    <div className="min-h-screen relative overflow-x-hidden">
+      <StarBackground />
+      <main className="relative z-10">
+        <div className="px-2 sm:px-4 py-4">
+          <div className="grid lg:grid-cols-12 gap-4">
 
             {/* Row 1: Welcome Banner - Full Width */}
             <motion.div
@@ -146,28 +147,39 @@ export default function UserDashboard() {
               transition={{ duration: 0.6 }}
               className="col-span-12"
             >
-              <Card className="bg-gradient-to-r from-purple-900/60 via-blue-900/60 to-purple-900/60 border-purple-500/20 backdrop-blur-sm overflow-hidden h-full">
-                <CardContent className="p-8">
-                  <div className="flex items-center gap-6">
-                    {/* Avatar */}
-                    <Link href="/profile" className="flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity" title="Quay ra trang trn">
-                      <div className="w-16 h-16 rounded-full gradient-gold-purple-bg flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                        {initials}
+              <Card className="glass-card border-primary/20 overflow-hidden h-full animate-fog-in">
+                <CardContent className="p-6 sm:p-8">
+                  <div className="flex items-center gap-4 sm:gap-6">
+                    {/* Avatar - Use Cloudinary image if available, else fallback to initials */}
+                    <Link href="/profile" className="flex-shrink-0 cursor-pointer hover:scale-105 transition-transform duration-300" title="Quay ra trang cá nhân">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden glow-gold animate-pulse-gold">
+                        {profileData?.avatarUrl ? (
+                          <img
+                            src={profileData.avatarUrl}
+                            alt="Avatar"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full gradient-gold-purple-bg flex items-center justify-center text-white font-bold text-lg sm:text-xl">
+                            {initials}
+                          </div>
+                        )}
                       </div>
                     </Link>
 
-                    {/* Welcome Text */}
-                    <div className="flex-1">
+                    {/* Welcome Text với Mystic Typography */}
+                    <div className="flex-1 min-w-0">
                       <motion.h1
-                        className="text-3xl font-bold text-white mb-2"
+                        className="text-2xl sm:text-3xl text-mystic-gradient animate-fog-in mb-1 sm:mb-2"
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6, delay: 0.2 }}
+                        style={{ fontFamily: "var(--font-heading)" }}
                       >
                         Chào mừng trở lại, {userName}!
                       </motion.h1>
                       <motion.p
-                        className="text-purple-200 text-lg"
+                        className="text-ethereal text-base sm:text-lg"
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6, delay: 0.3 }}
@@ -180,27 +192,27 @@ export default function UserDashboard() {
               </Card>
             </motion.div>
 
-            {/* Row 2: Stats Cards - 3 columns */}
+            {/* Row 2: Stats Cards - 3 columns với glass-card */}
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.title}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="col-span-12 lg:col-span-4"
+                className="col-span-12 sm:col-span-6 lg:col-span-4"
               >
                 <Link href={stat.href}>
-                  <Card className={`bg-gradient-to-br ${stat.bgGradient} border border-white/10 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group h-full`}>
-                    <CardHeader className="pb-3">
+                  <Card className="glass-card border-primary/10 hover:border-primary/30 hover:glow-gold transition-all duration-300 hover:scale-105 cursor-pointer group h-full">
+                    <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-white/80 text-sm font-medium">
+                        <CardTitle className="text-white/80 text-sm font-medium" style={{ fontFamily: "var(--font-heading)" }}>
                           {stat.title}
                         </CardTitle>
-                        <stat.icon className="h-4 w-4 text-white/60 group-hover:text-white/80 transition-colors" />
+                        <stat.icon className="h-4 w-4 text-primary/60 group-hover:text-primary transition-colors" />
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className={`text-2xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+                      <div className="text-2xl font-bold text-gold-shimmer" style={{ fontFamily: "var(--font-stats)" }}>
                         {stat.value}
                       </div>
                     </CardContent>
@@ -211,12 +223,12 @@ export default function UserDashboard() {
 
             {/* Row 3: Main Content - 2 columns */}
 
-            {/* Left Column: Quick Actions - 4 columns */}
+            {/* Left Column: Quick Actions - 4 columns với glass-card */}
             <div className="col-span-12 lg:col-span-4 space-y-4">
-              <Card className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 border-slate-700/30 backdrop-blur-sm h-full">
-                <CardHeader>
-                  <CardTitle className="text-purple-300 flex items-center gap-2">
-                    <Sparkles className="h-5 w-5" />
+              <Card className="glass-card border-primary/10 h-full">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-mystic flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
+                    <Sparkles className="h-5 w-5 text-primary" />
                     Lối tắt
                   </CardTitle>
                 </CardHeader>
@@ -230,7 +242,7 @@ export default function UserDashboard() {
                     >
                       <Button
                         asChild
-                        className={`w-full bg-gradient-to-r ${action.color} hover:opacity-90 text-white font-semibold py-4 shadow-lg hover:shadow-lg transition-all duration-300 group`}
+                        className={`w-full bg-gradient-to-r ${action.color} hover:opacity-90 text-white font-semibold py-4 shadow-lg hover:glow-gold transition-all duration-300 group`}
                       >
                         <Link href={action.href} className="flex items-center justify-center gap-3 w-full">
                           <action.icon className="h-5 w-5 group-hover:scale-110 transition-transform" />
@@ -238,7 +250,7 @@ export default function UserDashboard() {
                             <div className="font-medium">{action.title}</div>
                             <div className="text-xs opacity-80">{action.description}</div>
                           </div>
-                          <ArrowRight className="h-4 w-4 ml-auto" />
+                          <ArrowRight className="h-4 w-4 ml-auto group-hover:translate-x-1 transition-transform" />
                         </Link>
                       </Button>
                     </motion.div>
@@ -247,14 +259,14 @@ export default function UserDashboard() {
               </Card>
             </div>
 
-            {/* Right Column: Recent Activity - 8 columns */}
+            {/* Right Column: Recent Activity - 8 columns với glass-card */}
             <div className="col-span-12 lg:col-span-8 space-y-4">
 
               {/* Recent Orders */}
-              <Card className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 border-slate-700/30 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-slate-200 flex items-center gap-2">
-                    <Package className="h-5 w-5" />
+              <Card className="glass-card border-primary/10">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-mystic flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
+                    <Package className="h-5 w-5 text-primary" />
                     Đơn hàng gần nhất
                   </CardTitle>
                 </CardHeader>
@@ -266,13 +278,13 @@ export default function UserDashboard() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3, delay: index * 0.1 }}
-                        className="flex items-center justify-between p-3 rounded-lg bg-slate-800/40 border border-slate-700/20 hover:bg-slate-800/60 transition-colors"
+                        className="flex items-center justify-between p-3 rounded-lg glass-card border-primary/5 hover:border-primary/20 transition-colors"
                       >
-                        <div className="flex-1">
-                          <div className="font-medium text-white">{order.packName}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-white truncate">{order.packName}</div>
                           <div className="text-sm text-slate-400">{order.date}</div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-shrink-0">
                           <div className="text-right">
                             <div className="font-medium text-white">{order.price}</div>
                             <div className={`text-xs px-2 py-1 rounded-full inline-flex items-center gap-1 ${getStatusColor(order.status)}`}>
@@ -287,11 +299,11 @@ export default function UserDashboard() {
                 </CardContent>
               </Card>
 
-              {/* Recent Tarot Readings */}
-              <Card className="bg-gradient-to-br from-purple-800/60 to-slate-900/60 border-purple-700/30 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-purple-200 flex items-center gap-2">
-                    <Clock className="h-5 w-5" />
+              {/* Recent Tarot Readings với glass-card và glow-purple */}
+              <Card className="glass-card border-secondary/20 glow-purple">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-mystic flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
+                    <Clock className="h-5 w-5 text-secondary" />
                     Lịch sử Tarot
                   </CardTitle>
                 </CardHeader>
@@ -303,13 +315,13 @@ export default function UserDashboard() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3, delay: index * 0.1 }}
-                        className="p-3 rounded-lg bg-purple-800/40 border border-purple-700/20 hover:bg-purple-800/60 transition-colors"
+                        className="p-3 rounded-lg glass-card border-secondary/10 hover:border-secondary/30 transition-colors"
                       >
                         <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="font-medium text-white">{reading.question}</div>
-                            <div className="text-sm text-purple-300">{reading.spread} • {reading.date}</div>
-                            <div className="text-xs text-purple-400 mt-1">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-white truncate">{reading.question}</div>
+                            <div className="text-sm text-secondary/80">{reading.spread} • {reading.date}</div>
+                            <div className="text-xs text-secondary/60 mt-1">
                               Lá bài: {reading.cards.join(", ")}
                             </div>
                           </div>

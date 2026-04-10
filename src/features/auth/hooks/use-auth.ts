@@ -1,7 +1,5 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
 import {
 	API_ENDPOINTS,
 	apiRequest,
@@ -19,6 +17,8 @@ import type {
 	UpdateProfilePayload,
 	UserProfile,
 } from "@/types/user";
+import { useQuery } from "@tanstack/react-query";
+import { useCallback, useState } from "react";
 
 function normalizeUser(payload: unknown): UserProfile | null {
 	if (!payload || typeof payload !== "object") {
@@ -40,13 +40,16 @@ function normalizeUser(payload: unknown): UserProfile | null {
 		customerId: id,
 		email,
 		name,
-		phoneNumber: String(raw.phoneNumber ?? "") || undefined,
+		phoneNumber: String(raw.phoneNumber ?? "").trim() || undefined,
 		role: role as "USER" | "STAFF" | "ADMIN" | undefined,
-		authProvider: String(raw.authProvider ?? raw.provider ?? "") || undefined,
-		avatarUrl: String(raw.avatarUrl ?? "") || undefined,
+		authProvider: String(raw.authProvider ?? raw.provider ?? "").trim() || undefined,
+		avatarUrl: String(raw.avatarUrl ?? "").trim() || undefined,
+		gender: String(raw.gender ?? "").trim() || undefined,
+		dateOfBirth: String(raw.dateOfBirth ?? "").trim() || undefined,
+		address: String(raw.address ?? "").trim() || undefined,
 		emailVerified: Boolean(raw.emailVerified ?? false),
-		createdAt: String(raw.createdAt ?? "") || undefined,
-		updatedAt: String(raw.updatedAt ?? "") || undefined,
+		createdAt: String(raw.createdAt ?? "").trim() || undefined,
+		updatedAt: String(raw.updatedAt ?? "").trim() || undefined,
 		isActive: raw.isActive !== undefined ? Boolean(raw.isActive) : undefined,
 	};
 }
@@ -79,7 +82,8 @@ function normalizeLoginResult(payload: unknown): {
 		normalizeUser(raw.user) ??
 		normalizeUser(raw.account) ??
 		normalizeUser(raw.profile) ??
-		normalizeUser(raw.data);
+		normalizeUser(data?.account) ??
+		normalizeUser(data?.user);
 
 	const userIdCandidate =
 		user?.customerId ??

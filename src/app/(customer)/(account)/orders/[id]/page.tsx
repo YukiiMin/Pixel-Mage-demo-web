@@ -14,12 +14,9 @@ export default async function OrderDetailRoute({
 
 	return (
 		<div className="relative min-h-screen overflow-x-hidden">
-			<StarBackground />
-			<Header />
-			<main className="relative z-10 pb-20 pt-28">
+			<main className="relative z-10 pb-20">
 				<OrderDetail orderId={id} />
 			</main>
-			<Footer />
 		</div>
 	);
 }

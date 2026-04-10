@@ -1,10 +1,10 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
 import type {
 	ValidateVoucherRequest,
 	ValidateVoucherResponse,
 	Voucher,
-} from "@/features/profile/types/wallet";
+} from "@/features/wallet/types/wallet";
+import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export function useVouchers(userId: number | null) {
 	return useQuery({

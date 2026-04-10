@@ -4,6 +4,9 @@ export interface UserProfile {
 	name: string;
 	phoneNumber?: string;
 	avatarUrl?: string;
+	gender?: string;
+	dateOfBirth?: string;
+	address?: string;
 	emailVerified?: boolean;
 	authProvider?: string;
 	createdAt?: string;
@@ -30,6 +33,9 @@ export interface UpdateProfilePayload {
 	name?: string;
 	phoneNumber?: string;
 	avatarUrl?: string;
+	gender?: string;
+	dateOfBirth?: string;
+	address?: string;
 }
 
 export interface ChangePasswordPayload {

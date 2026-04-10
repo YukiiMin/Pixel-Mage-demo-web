@@ -42,11 +42,7 @@ export function proxy(request: NextRequest) {
 		"/my-cards",
 		"/orders",
 		"/profile",
-		"/tarot",
 		"/checkout",
-		"/achievements",
-		"/card-gallery",
-		"/stories",
 		"/wallet",
 	];
 

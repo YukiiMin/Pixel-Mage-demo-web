@@ -6,12 +6,9 @@ import { ProfilePage } from "@/features/profile/";
 export default function ProfileRoute() {
 	return (
 		<div className="relative min-h-screen overflow-x-hidden">
-			<StarBackground />
-			<Header />
-			<main className="relative z-10 pb-20 pt-28">
+			<main className="relative z-10 pb-20">
 				<ProfilePage />
 			</main>
-			<Footer />
 		</div>
 	);
 }

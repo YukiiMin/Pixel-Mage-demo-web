@@ -1,8 +1,5 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { Loader2, Search, Wallet } from "lucide-react";
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
 	Table,
@@ -12,8 +9,11 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import type { WalletBalance } from "@/features/wallet/types/wallet";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import type { WalletBalance } from "@/features/profile/types/wallet";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2, Search, Wallet } from "lucide-react";
+import { useState } from "react";
 
 interface AdminWallet extends WalletBalance {
 	userId: number;

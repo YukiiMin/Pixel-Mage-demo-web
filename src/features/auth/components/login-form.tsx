@@ -1,5 +1,9 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { ApiHttpError } from "@/types/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, type Variants } from "framer-motion";
 import {
@@ -16,10 +20,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useAuth } from "@/features/auth/hooks/use-auth";
-import { ApiHttpError } from "@/types/api";
 
 const loginSchema = z.object({
 	email: z.string().email("Email không hợp lệ"),
@@ -68,9 +68,9 @@ export function LoginForm() {
 			// RBAC redirect: staff/admin → their portal, user → home
 			const role = result?.user?.role;
 			if (role === "ADMIN") {
-				router.replace("/staff/admin");
+				router.replace("/admin"); // /admin redirects to /admin/dashboard
 			} else if (role === "STAFF") {
-				router.replace("/staff/products");
+				router.replace("/staff"); // /staff redirects to /staff/products
 			} else {
 				router.replace("/");
 			}

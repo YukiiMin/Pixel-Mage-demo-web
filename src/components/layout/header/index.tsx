@@ -1,9 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useProfile } from "@/features/auth/hooks/use-auth";
 import {
 	clearStoredAuthSession,
@@ -12,6 +8,10 @@ import {
 	hasStoredAuthSession,
 	setStoredAuthSession,
 } from "@/lib/api-config";
+import { motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getInitials, resolveSectionHref, sectionLinks } from "./_config";
 import DesktopActions from "./desktop-actions";
 import DesktopNav from "./desktop-nav";
@@ -135,10 +135,11 @@ const Header = () => {
 		[pathname],
 	);
 
-	// ✅ Dùng tên/email thật từ profile API
+	// ✅ Dùng tên/email/avatar thật từ profile API
 	const displayName = profileData?.name || profileData?.email || "";
 	const userEmail = profileData?.email || "";
 	const initials = displayName ? getInitials(displayName) : "??";
+	const avatarUrl = profileData?.avatarUrl || null;
 
 	return (
 		<>
@@ -163,6 +164,7 @@ const Header = () => {
 						displayName={displayName}
 						userEmail={userEmail}
 						initials={initials}
+						avatarUrl={avatarUrl}
 						onLogout={handleLogout}
 					/>
 
@@ -191,6 +193,7 @@ const Header = () => {
 				displayName={displayName}
 				userEmail={userEmail}
 				initials={initials}
+				avatarUrl={avatarUrl}
 				mappedSectionLinks={mappedSectionLinks}
 				onLogout={handleLogout}
 			/>

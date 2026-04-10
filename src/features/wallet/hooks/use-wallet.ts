@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { WalletBalance } from "@/features/wallet/types/wallet";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
-import type { WalletBalance } from "@/features/profile/types/wallet";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useWalletBalance(userId: number | null) {
 	return useQuery({
