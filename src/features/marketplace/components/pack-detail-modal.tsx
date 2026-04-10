@@ -33,6 +33,7 @@ export function PackDetailModal({
 		"idle" | "creating_order" | "initiating_payment" | "qr_ready"
 	>("idle");
 	const [quantity, setQuantity] = useState<number>(1);
+	const [voucherCode, setVoucherCode] = useState("");
 	const createOrder = useCreateOrder();
 	const initiatePayment = useInitiatePayment();
 	const [checkoutData, setCheckoutData] = useState<{
@@ -59,6 +60,7 @@ export function PackDetailModal({
 				paymentMethod: "SEPAY",
 				shippingAddress: "Default Web Address",
 				notes: "Mua từ Marketplace",
+				voucherCode: voucherCode.trim() || undefined,
 			},
 			{
 				onSuccess: (orderData) => {
@@ -206,6 +208,23 @@ export function PackDetailModal({
 							</div>
 
 							<DropRateTable />
+
+							{/* Voucher Section */}
+							<div className="mt-6 flex flex-col gap-2 rounded-lg border border-border/50 bg-background/50 p-3">
+								<label htmlFor="voucher-code" className="text-xs font-semibold text-muted-foreground">
+									Mã giảm giá (Tuỳ chọn)
+								</label>
+								<div className="flex gap-2">
+									<input
+										id="voucher-code"
+										type="text"
+										placeholder="VD: WELCOME10"
+										className="h-10 flex-1 rounded-lg border border-border/50 bg-background px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary"
+										value={voucherCode}
+										onChange={(e) => setVoucherCode(e.target.value)}
+									/>
+								</div>
+							</div>
 
 							<div className="mt-6 flex items-center justify-between gap-4">
 								<div className="flex flex-col gap-1">
