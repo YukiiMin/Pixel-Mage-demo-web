@@ -436,4 +436,81 @@
 		background-clip: text;
 		animation: gold-shimmer 4s linear infinite;
 	}
+
+	/* ✦ BTN SHIMMER — sweep effect on hover ✦ */
+	.btn-shimmer {
+		position: relative;
+		overflow: hidden;
+	}
+	.btn-shimmer::after {
+		content: "";
+		position: absolute;
+		top: -50%;
+		left: -75%;
+		width: 50%;
+		height: 200%;
+		background: linear-gradient(
+			105deg,
+			transparent 30%,
+			rgba(255, 255, 255, 0.22) 50%,
+			transparent 70%
+		);
+		transform: skewX(-15deg);
+		pointer-events: none;
+		transition: none;
+	}
+	.btn-shimmer:hover::after {
+		animation: btn-shimmer-sweep 0.65s ease forwards;
+	}
+
+	@keyframes btn-shimmer-sweep {
+		from {
+			left: -75%;
+		}
+		to {
+			left: 130%;
+		}
+	}
+
+	/* ✦ Phone demo animations ✦ */
+	@keyframes confetti-fall {
+		0% {
+			transform: translateY(0) rotate(0deg);
+			opacity: 1;
+		}
+		100% {
+			transform: translateY(350px) rotate(360deg);
+			opacity: 0;
+		}
+	}
+
+	@keyframes pulse-dot {
+		0%,
+		100% {
+			opacity: 0.3;
+			transform: scale(0.8);
+		}
+		50% {
+			opacity: 1;
+			transform: scale(1.2);
+		}
+	}
+
+	.animate-pulse-dot {
+		animation: pulse-dot 1.2s ease-in-out infinite;
+	}
+
+	/* ✦ Section reveal blur effect ✦ */
+	@keyframes section-blur-in {
+		from {
+			opacity: 0;
+			filter: blur(12px);
+			transform: translateY(24px);
+		}
+		to {
+			opacity: 1;
+			filter: blur(0);
+			transform: translateY(0);
+		}
+	}
 }

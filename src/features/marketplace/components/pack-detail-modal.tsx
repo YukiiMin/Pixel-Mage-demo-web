@@ -211,7 +211,10 @@ export function PackDetailModal({
 
 							{/* Voucher Section */}
 							<div className="mt-6 flex flex-col gap-2 rounded-lg border border-border/50 bg-background/50 p-3">
-								<label htmlFor="voucher-code" className="text-xs font-semibold text-muted-foreground">
+								<label
+									htmlFor="voucher-code"
+									className="text-xs font-semibold text-muted-foreground"
+								>
 									Mã giảm giá (Tuỳ chọn)
 								</label>
 								<div className="flex gap-2">

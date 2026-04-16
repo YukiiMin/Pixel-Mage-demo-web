@@ -13,18 +13,28 @@ import {
 const HERO_IMAGE_URL =
 	"https://res.cloudinary.com/yukiimin-cloud/image/upload/v1775123777/00_e9wsbz.png";
 
+// CounterStat — đếm lại mỗi lần scroll vào (once: false)
 const CounterStat = ({ end, label }: { end: string; label: string }) => {
 	const ref = useRef<HTMLDivElement>(null);
-	const inView = useInView(ref, { once: true });
+	// once: true → Chỉ đếm 1 lần khi vừa scroll tới để tối ưu performance
+	const inView = useInView(ref, { once: true, amount: 0.5 });
 	const [val, setVal] = useState("0");
 
 	useEffect(() => {
-		if (!inView) return;
+		if (!inView) {
+			// Reset về 0 khi ra khỏi viewport
+			const raw = end.replace(/[^0-9.]/g, "");
+			const suffix = end.replace(/[0-9.]/g, "");
+			const num = parseFloat(raw) || 0;
+			setVal(num < 10 ? `0.0${suffix}` : `0${suffix}`);
+			return;
+		}
 		const raw = end.replace(/[^0-9.]/g, "");
 		const num = parseFloat(raw) || 0;
 		const suffix = end.replace(/[0-9.]/g, "");
 		const duration = 1200;
 		const start = performance.now();
+		let raf: number;
 		const tick = (now: number) => {
 			const p = Math.min((now - start) / duration, 1);
 			const eased = 1 - (1 - p) ** 3;
@@ -33,9 +43,10 @@ const CounterStat = ({ end, label }: { end: string; label: string }) => {
 					? (num * eased).toFixed(1)
 					: Math.round(num * eased).toString();
 			setVal(current + suffix);
-			if (p < 1) requestAnimationFrame(tick);
+			if (p < 1) raf = requestAnimationFrame(tick);
 		};
-		requestAnimationFrame(tick);
+		raf = requestAnimationFrame(tick);
+		return () => cancelAnimationFrame(raf);
 	}, [inView, end]);
 
 	return (
@@ -76,6 +87,8 @@ const HeroSection = () => {
 		>
 			{/* Gold radial glow */}
 			<div className="absolute right-[10%] top-1/2 -translate-y-1/2 w-125 h-125 rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
+			{/* Purple left glow */}
+			<div className="absolute left-[5%] bottom-1/4 w-96 h-96 rounded-full bg-purple-600/8 blur-[100px] pointer-events-none" />
 
 			<div className="container mx-auto px-4 sm:px-6">
 				<motion.div
@@ -100,11 +113,11 @@ const HeroSection = () => {
 						<h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
 							Khám Phá
 							<br />
-							<span className="gradient-gold-purple animate-shimmer inline-block">
+							<span className="text-mystic-gradient">
 								Thế Giới Tarot
 							</span>
 							<br />
-							<span className="gradient-gold-purple animate-shimmer inline-block">
+							<span className="text-mystic-gradient">
 								Huyền Bí
 							</span>
 						</h1>
@@ -117,13 +130,13 @@ const HeroSection = () => {
 						<div className="flex flex-wrap gap-4">
 							<a
 								href="/tarot"
-								className="gradient-gold-purple-bg text-primary-foreground font-semibold rounded-full px-7 py-3 glow-gold transition-transform hover:scale-105"
+								className="btn-shimmer gradient-gold-purple-bg text-primary-foreground font-semibold rounded-full px-7 py-3 glow-gold transition-transform hover:scale-105"
 							>
 								🔮 Bắt Đầu Đọc Bài
 							</a>
 							<a
 								href="#how-it-works"
-								className="border border-primary/40 text-primary font-medium rounded-full px-7 py-3 hover:bg-primary/10 transition-colors"
+								className="btn-shimmer border border-primary/40 text-primary font-medium rounded-full px-7 py-3 hover:bg-primary/10 transition-colors"
 							>
 								{">"} Tìm Hiểu Thêm
 							</a>
@@ -149,7 +162,7 @@ const HeroSection = () => {
 							</div>
 						</div>
 
-						{/* ✅ Stats được làm sạch — số thật */}
+						{/* Stats — reset khi scroll ra, đếm lại khi scroll vào */}
 						<div className="flex gap-8 pt-4">
 							<CounterStat end="78" label="Lá Bài" />
 							<div className="w-px bg-border" />
@@ -187,7 +200,7 @@ const HeroSection = () => {
 							<div className="absolute inset-x-0 bottom-0 h-20 rounded-b-2xl bg-linear-to-t from-background/40 to-transparent pointer-events-none" />
 						</motion.div>
 
-						{/* ✅ Floating badges với z-index cao hơn ảnh, đủ khoảng cách */}
+						{/* ✅ Floating badges */}
 						<FloatingBadge className="top-8 right-0 lg:-right-6" delay={2}>
 							✨ +1 The Moon
 						</FloatingBadge>

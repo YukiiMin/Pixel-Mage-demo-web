@@ -12,7 +12,8 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 // Favicon URL for the project
-const FAVICON_URL = "https://res.cloudinary.com/yukiimin-cloud/image/upload/v1775797205/favicon_pto0em.png";
+const FAVICON_URL =
+	"https://res.cloudinary.com/yukiimin-cloud/image/upload/v1775797205/favicon_pto0em.png";
 
 // Breadcrumb mapping for routes
 const routeLabels: Record<string, string> = {

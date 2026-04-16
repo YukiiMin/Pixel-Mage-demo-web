@@ -35,6 +35,16 @@ function formatVnd(amount: number): string {
 	}).format(amount);
 }
 
+function parseBackendDate(val: any): string {
+	if (!val) return "N/A";
+	if (Array.isArray(val)) {
+		const [year, month, day, hour = 0, minute = 0, second = 0] = val;
+		return new Date(year, month - 1, day, hour, minute, second).toLocaleString("vi-VN");
+	}
+	const date = new Date(val);
+	return isNaN(date.getTime()) ? "N/A" : date.toLocaleString("vi-VN");
+}
+
 const STATUS_STYLE: Record<string, string> = {
 	PENDING: "bg-yellow-400/10 text-yellow-300 border-yellow-400/30",
 	PROCESSING: "bg-blue-400/10 text-blue-300 border-blue-400/30",
@@ -79,6 +89,8 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 		});
 	};
 
+	const canCancel = order && order.status === "PENDING";
+
 	return (
 		<div
 			className="container mx-auto max-w-3xl px-6 pb-20"
@@ -94,8 +106,11 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 				</Link>
 			</div>
 
-			<section className="mb-8 rounded-3xl border border-border/40 bg-linear-to-r from-card/80 via-card/60 to-card/40 p-6 md:p-8">
-				<div className="flex items-center justify-between flex-wrap gap-4">
+			<section className="mb-8 rounded-3xl border border-border/40 bg-linear-to-r from-card/80 via-card/60 to-card/40 p-6 md:p-8 relative overflow-hidden group">
+				{/* Shimmer overlay cho phần Header đơn hàng */}
+				<div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_3s_infinite] bg-gradient-to-r from-transparent via-primary/5 to-transparent skew-x-12 z-0" />
+				
+				<div className="relative z-10 flex items-center justify-between flex-wrap gap-4">
 					<div>
 						<p className="badge-mystic mb-3 inline-flex">Commerce</p>
 						<h1
@@ -106,7 +121,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 						</h1>
 					</div>
 
-					{order && order.status === "PENDING" && (
+					{order && (
 						<AlertDialog
 							open={cancelDialogOpen}
 							onOpenChange={setCancelDialogOpen}
@@ -114,45 +129,52 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 							<AlertDialogTrigger asChild>
 								<button
 									data-testid="cancel-order-btn"
-									className="inline-flex items-center justify-center rounded-xl bg-destructive/10 px-4 py-2 text-sm font-semibold text-destructive hover:bg-destructive/20 border border-destructive/20 transition-colors"
+									disabled={!canCancel}
+									className={`inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold transition-colors border ${
+										canCancel
+											? "bg-destructive/10 text-destructive hover:bg-destructive/20 border-destructive/20"
+											: "bg-muted/50 text-muted-foreground border-border/50 cursor-not-allowed opacity-60"
+									}`}
 								>
-									Huỷ đơn hàng
+									{canCancel ? "Huỷ đơn hàng" : "Không thể huỷ"}
 								</button>
 							</AlertDialogTrigger>
-							<AlertDialogContent
-								className="glass-card border-border/50"
-								data-testid="cancel-confirm-dialog"
-							>
-								<AlertDialogHeader>
-									<AlertDialogTitle className="flex items-center gap-2">
-										<AlertCircle className="h-5 w-5 text-destructive" /> Xác
-										nhận huỷ
-									</AlertDialogTitle>
-									<AlertDialogDescription>
-										Bạn có chắc chắn muốn huỷ đơn hàng này không? Hành động này
-										không thể hoàn tác.
-									</AlertDialogDescription>
-								</AlertDialogHeader>
-								<AlertDialogFooter>
-									<AlertDialogCancel disabled={cancelOrder.isPending}>
-										Thoát
-									</AlertDialogCancel>
-									<AlertDialogAction
-										onClick={(e) => {
-											e.preventDefault();
-											handleCancel();
-										}}
-										className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-										disabled={cancelOrder.isPending}
-									>
-										{cancelOrder.isPending ? "Đang huỷ..." : "Đồng ý huỷ"}
-									</AlertDialogAction>
-								</AlertDialogFooter>
-							</AlertDialogContent>
+							{canCancel && (
+								<AlertDialogContent
+									className="glass-card border-border/50"
+									data-testid="cancel-confirm-dialog"
+								>
+									<AlertDialogHeader>
+										<AlertDialogTitle className="flex items-center gap-2">
+											<AlertCircle className="h-5 w-5 text-destructive" /> Xác
+											nhận huỷ
+										</AlertDialogTitle>
+										<AlertDialogDescription>
+											Bạn có chắc chắn muốn huỷ đơn hàng này không? Hành động này
+											không thể hoàn tác.
+										</AlertDialogDescription>
+									</AlertDialogHeader>
+									<AlertDialogFooter>
+										<AlertDialogCancel disabled={cancelOrder.isPending}>
+											Thoát
+										</AlertDialogCancel>
+										<AlertDialogAction
+											onClick={(e) => {
+												e.preventDefault();
+												handleCancel();
+											}}
+											className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+											disabled={cancelOrder.isPending}
+										>
+											{cancelOrder.isPending ? "Đang huỷ..." : "Đồng ý huỷ"}
+										</AlertDialogAction>
+									</AlertDialogFooter>
+								</AlertDialogContent>
+							)}
 						</AlertDialog>
 					)}
 				</div>
-				<p className="mt-2 text-sm text-muted-foreground">
+				<p className="relative z-10 mt-2 text-sm text-muted-foreground">
 					Thông tin chi tiết và trạng thái xử lý từ backend.
 				</p>
 			</section>
@@ -219,7 +241,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 							<div className="flex justify-between">
 								<dt className="text-muted-foreground">Ngày đặt hàng</dt>
 								<dd className="font-medium text-foreground">
-									{new Date(order.createdAt).toLocaleString("vi-VN")}
+									{parseBackendDate(order.createdAt)}
 								</dd>
 							</div>
 						</dl>

@@ -71,7 +71,8 @@ export function CheckoutPage({ productId }: Props) {
 
 	const createOrder = useCreateOrder();
 	const initiatePayment = useInitiatePayment();
-	const { data: orderStatus, refetch: refetchOrderStatus } = useOrderStatusPoll(orderId);
+	const { data: orderStatus, refetch: refetchOrderStatus } =
+		useOrderStatusPoll(orderId);
 
 	// ─── Countdown timer (5 phút) khi đang ở bước polling ───────────────────────
 	useEffect(() => {
@@ -82,7 +83,9 @@ export function CheckoutPage({ productId }: Props) {
 				if (c <= 1) {
 					clearInterval(timer);
 					setStep("failed");
-					setErrorMessage("Hết thời gian chờ thanh toán (5 phút). Vui lòng thử lại.");
+					setErrorMessage(
+						"Hết thời gian chờ thanh toán (5 phút). Vui lòng thử lại.",
+					);
 					return 0;
 				}
 				return c - 1;
@@ -98,7 +101,9 @@ export function CheckoutPage({ productId }: Props) {
 
 	// ─── Format countdown mm:ss ──────────────────────────────────────────────────
 	const formatCountdown = (secs: number) => {
-		const m = Math.floor(secs / 60).toString().padStart(2, "0");
+		const m = Math.floor(secs / 60)
+			.toString()
+			.padStart(2, "0");
 		const s = (secs % 60).toString().padStart(2, "0");
 		return `${m}:${s}`;
 	};
@@ -332,10 +337,14 @@ export function CheckoutPage({ productId }: Props) {
 					<div className="glass-card rounded-2xl border border-border/40 p-6 text-center">
 						{/* Header + countdown */}
 						<div className="mb-4 flex items-center justify-between">
-							<p className="text-sm font-medium text-foreground">Quét mã QR để thanh toán</p>
-							<span className={`font-mono text-sm font-bold tabular-nums ${
-								countdown <= 60 ? "text-destructive" : "text-primary"
-							}`}>
+							<p className="text-sm font-medium text-foreground">
+								Quét mã QR để thanh toán
+							</p>
+							<span
+								className={`font-mono text-sm font-bold tabular-nums ${
+									countdown <= 60 ? "text-destructive" : "text-primary"
+								}`}
+							>
 								Hết hạn sau: {formatCountdown(countdown)}
 							</span>
 						</div>
@@ -343,7 +352,10 @@ export function CheckoutPage({ productId }: Props) {
 						{/* Order info */}
 						{pack && orderId && (
 							<p className="mb-3 text-xs text-muted-foreground">
-								Đơn #{orderId} · <span className="font-semibold text-foreground">{new Intl.NumberFormat("vi-VN").format(pack.price)} VND</span>
+								Đơn #{orderId} ·{" "}
+								<span className="font-semibold text-foreground">
+									{new Intl.NumberFormat("vi-VN").format(pack.price)} VND
+								</span>
 							</p>
 						)}
 

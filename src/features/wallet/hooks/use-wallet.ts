@@ -1,27 +1,27 @@
-import type { WalletBalance } from '@/features/wallet/types/wallet'
-import { API_ENDPOINTS, apiRequest } from '@/lib/api-config'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { WalletBalance } from "@/features/wallet/types/wallet";
+import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useWalletBalance(userId: number | null) {
-  return useQuery({
-    queryKey: ['wallet', userId],
-    queryFn: () =>
-      apiRequest<WalletBalance>(API_ENDPOINTS.wallet.balance).then(
-        (r) => r.data
-      ),
-    enabled: !!userId,
-  })
+	return useQuery({
+		queryKey: ["wallet", userId],
+		queryFn: () =>
+			apiRequest<WalletBalance>(API_ENDPOINTS.wallet.balance).then(
+				(r) => r.data,
+			),
+		enabled: !!userId,
+	});
 }
 
 export function useExchangePoints(userId: number) {
-  const queryClient = useQueryClient()
+	const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: () =>
-      apiRequest<void>(API_ENDPOINTS.wallet.exchange, { method: 'POST' }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wallet', userId] })
-      queryClient.invalidateQueries({ queryKey: ['vouchers', userId] })
-    },
-  })
+	return useMutation({
+		mutationFn: () =>
+			apiRequest<void>(API_ENDPOINTS.wallet.exchange, { method: "POST" }),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["wallet", userId] });
+			queryClient.invalidateQueries({ queryKey: ["vouchers", userId] });
+		},
+	});
 }

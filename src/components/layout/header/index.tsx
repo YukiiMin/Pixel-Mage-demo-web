@@ -151,11 +151,7 @@ const Header = () => {
 				<div className="container mx-auto px-6 flex items-center justify-between">
 					<HeaderLogo />
 
-					<DesktopNav
-						pathname={pathname}
-						activeHash={activeHash}
-						mappedSectionLinks={mappedSectionLinks}
-					/>
+					<DesktopNav pathname={pathname} />
 
 					<DesktopActions
 						pathname={pathname}

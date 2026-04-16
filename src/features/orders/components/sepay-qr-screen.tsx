@@ -50,10 +50,22 @@ export function SepayQrScreen({
 
 	useEffect(() => {
 		if (order?.paymentStatus === "SUCCEEDED") {
-			toast.success("Thanh toán thành công!");
-			router.push(`/orders/${orderId}`);
+			import("canvas-confetti").then((confetti) => {
+				confetti.default({
+					particleCount: 150,
+					spread: 70,
+					origin: { y: 0.6 },
+					colors: ["#a855f7", "#3b82f6", "#f59e0b"],
+					zIndex: 9999,
+				});
+			});
+			toast.success("Thanh toán thành công! Đang chuyển hướng...");
+			setTimeout(() => {
+				onClose();
+				router.push(`/orders/${orderId}`);
+			}, 2500);
 		}
-	}, [order?.paymentStatus, orderId, router]);
+	}, [order?.paymentStatus, orderId, router, onClose]);
 
 	const min = Math.floor(countdown / 60);
 	const sec = countdown % 60;

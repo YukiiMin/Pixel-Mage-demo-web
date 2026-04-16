@@ -12,6 +12,13 @@ const StarBackground = dynamic(
 	{ ssr: false },
 );
 
+// Sidebar navigator — client-only (uses IntersectionObserver)
+const LandingSidebarNav = dynamic(
+	() =>
+		import("@/features/landing").then((m) => ({ default: m.LandingSidebarNav })),
+	{ ssr: false },
+);
+
 // Below-fold sections: lazy load with skeleton placeholders
 const FeaturedSection = dynamic(
 	() =>
@@ -69,6 +76,8 @@ export default function HomePage() {
 		<div className="relative min-h-screen overflow-x-hidden">
 			<StarBackground />
 			<Header />
+			{/* Tarot Sidebar Navigator — fixed right side, landing only */}
+			<LandingSidebarNav />
 			<main className="relative z-10">
 				<HeroSection />
 				<FeaturedSection />

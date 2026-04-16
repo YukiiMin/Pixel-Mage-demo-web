@@ -42,7 +42,8 @@ function normalizeUser(payload: unknown): UserProfile | null {
 		name,
 		phoneNumber: String(raw.phoneNumber ?? "").trim() || undefined,
 		role: role as "USER" | "STAFF" | "ADMIN" | undefined,
-		authProvider: String(raw.authProvider ?? raw.provider ?? "").trim() || undefined,
+		authProvider:
+			String(raw.authProvider ?? raw.provider ?? "").trim() || undefined,
 		avatarUrl: String(raw.avatarUrl ?? "").trim() || undefined,
 		gender: String(raw.gender ?? "").trim() || undefined,
 		dateOfBirth: String(raw.dateOfBirth ?? "").trim() || undefined,

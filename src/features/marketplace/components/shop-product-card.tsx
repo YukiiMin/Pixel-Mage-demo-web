@@ -39,15 +39,25 @@ export function ShopProductCard({
 
 			<div className="relative z-10">
 				{/* Pack Visual */}
-				<div className="mb-4 flex h-40 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
-					<div className="relative">
-						<div className="flex h-24 w-20 items-center justify-center rounded-lg border-2 border-primary/30 bg-card/80 shadow-lg">
-							<Package className="h-10 w-10 text-primary" />
+				<div className="relative mb-4 flex h-48 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
+					{product.imageUrl ? (
+						<img
+							src={product.imageUrl}
+							alt={product.name}
+							className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+						/>
+					) : (
+						<div className="relative">
+							<div className="flex h-24 w-20 items-center justify-center rounded-lg border-2 border-primary/30 bg-card/80 shadow-lg">
+								<Package className="h-10 w-10 text-primary opacity-60" />
+							</div>
+							<div className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+								?
+							</div>
 						</div>
-						<div className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-							?
-						</div>
-					</div>
+					)}
+					{/* Gradient fade overlay for smooth blend into title */}
+					<div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-60" />
 				</div>
 
 				{/* Title & Description */}

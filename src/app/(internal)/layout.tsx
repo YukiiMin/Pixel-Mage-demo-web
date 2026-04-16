@@ -14,17 +14,13 @@ export default function InternalLayout({
 
 			{/* 2. Main Content Area */}
 			<SidebarInset className="flex flex-1 flex-col bg-background">
-
 				{/* TOP: SaaS Dashboard Header */}
 				<InternalHeader />
 
 				{/* CONTENT */}
 				<main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-4 md:p-8">
-					<div className="mx-auto w-full max-w-7xl">
-						{children}
-					</div>
+					<div className="mx-auto w-full max-w-7xl">{children}</div>
 				</main>
-
 			</SidebarInset>
 		</SidebarProvider>
 	);

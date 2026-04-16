@@ -11,6 +11,12 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -41,8 +47,7 @@ import {
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { VNAddressSelect } from './vn-address-select'
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { LeafletMapPicker } from '@/components/shared/leaflet-map-picker'
 
 export function ProfilePage() {
   const router = useRouter()
@@ -98,7 +103,6 @@ export function ProfilePage() {
   const [avatarModalOpen, setAvatarModalOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [localProfile, setLocalProfile] = useState(profile)
-
 
   const [pwdEditing, setPwdEditing] = useState(false)
   const [oldPassword, setOldPassword] = useState('')
@@ -388,7 +392,9 @@ export function ProfilePage() {
                   onChange={onFileChange}
                   className="hidden"
                 />
-                <p className="text-xs text-muted-foreground">Nhấn vào ảnh để thay đổi</p>
+                <p className="text-xs text-muted-foreground">
+                  Nhấn vào ảnh để thay đổi
+                </p>
               </div>
 
               {/* Form Fields - 2 columns */}
@@ -455,17 +461,33 @@ export function ProfilePage() {
                 </div>
               </div>
 
-              {/* VN Address Component */}
-              <div className="space-y-3">
-                <label className="text-xs font-medium text-muted-foreground">
-                  Địa chỉ (Tỉnh/Thành → Quận/Huyện → Phường/Xã)
-                </label>
-                <VNAddressSelect
-                  key={editing ? 'edit-mode' : 'view-mode'}
-                  value={editAddress}
-                  onChange={setEditAddress}
-                  disabled={saving}
-                />
+              {/* Address Component Mới - Tích hợp Tìm kiếm & Bản đồ & Ô Nhập */}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Địa chỉ giao nhận hàng chi tiết
+                  </label>
+                  <Input
+                    value={editAddress}
+                    onChange={(e) => setEditAddress(e.target.value)}
+                    placeholder="VD: 123 Đường Điện Biên Phủ, Phường Đa Kao, Quận 1, TPHCM"
+                    disabled={saving}
+                    className="bg-card/60"
+                  />
+                </div>
+                
+                <div className="space-y-2 pt-2 border-t border-border/20">
+                  <label className="text-xs font-medium text-muted-foreground flex gap-2">
+                    Bản đồ OpenStreetMap Tracker (Hỗ trợ nhắm vị trí tự động)
+                  </label>
+                  <LeafletMapPicker
+                    initialAddress={editAddress}
+                    onLocationSelect={(lat, lng, formattedAddress) => {
+                      // Khi người dùng chọn/search/OSM tracker trên Map => ghi đè địa chỉ mới vào editAddress gửi lên DB
+                      setEditAddress(formattedAddress)
+                    }}
+                  />
+                </div>
               </div>
 
               {saveError && (
@@ -504,8 +526,12 @@ export function ProfilePage() {
               <div className="flex items-center gap-4">
                 <div
                   className="w-20 h-20 rounded-full overflow-hidden glow-gold cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
-                  onClick={() => displayProfile?.avatarUrl && setAvatarModalOpen(true)}
-                  title={displayProfile?.avatarUrl ? 'Click để xem ảnh đầy đủ' : ''}
+                  onClick={() =>
+                    displayProfile?.avatarUrl && setAvatarModalOpen(true)
+                  }
+                  title={
+                    displayProfile?.avatarUrl ? 'Click để xem ảnh đầy đủ' : ''
+                  }
                 >
                   {displayProfile?.avatarUrl ? (
                     <img
@@ -520,8 +546,12 @@ export function ProfilePage() {
                   )}
                 </div>
                 <div>
-                  <p className="text-lg font-semibold text-foreground">{displayProfile?.name}</p>
-                  <p className="text-sm text-muted-foreground">{displayProfile?.email}</p>
+                  <p className="text-lg font-semibold text-foreground">
+                    {displayProfile?.name}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {displayProfile?.email}
+                  </p>
                 </div>
               </div>
 
@@ -544,7 +574,9 @@ export function ProfilePage() {
                   <span className="text-foreground">
                     {displayProfile?.dateOfBirth
                       ? (() => {
-                          const rawDob = displayProfile.dateOfBirth as string | number[]
+                          const rawDob = displayProfile.dateOfBirth as
+                            | string
+                            | number[]
                           let y: number, m: number, d: number
                           if (typeof rawDob === 'string') {
                             // Try parsing various formats: "2004-12-11", "2004,12,11", "2004/12/11"

@@ -15,6 +15,16 @@ function formatVnd(amount: number): string {
 	}).format(amount);
 }
 
+function parseBackendDate(val: any): string {
+	if (!val) return "N/A";
+	if (Array.isArray(val)) {
+		const [year, month, day, hour = 0, minute = 0, second = 0] = val;
+		return new Date(year, month - 1, day, hour, minute, second).toLocaleString("vi-VN");
+	}
+	const date = new Date(val);
+	return isNaN(date.getTime()) ? "N/A" : date.toLocaleString("vi-VN");
+}
+
 export function OrdersPage() {
 	const userId = getStoredUserId();
 	const { data: orders = [], isLoading, isError, error } = useOrders(userId);
@@ -101,7 +111,7 @@ export function OrdersPage() {
 					</p>
 				</div>
 			) : !isError ? (
-				<section className="space-y-3" data-testid="orders-list">
+				<section className="space-y-4" data-testid="orders-list">
 					{orders.map((order) => {
 						let badgeClass =
 							"bg-muted/40 text-muted-foreground border-border/40";
@@ -117,14 +127,18 @@ export function OrdersPage() {
 						}
 
 						return (
-							<article
+							<Link
 								key={order.orderId}
-								className="glass-card rounded-2xl border border-border/50 p-5"
+								href={`/orders/${order.orderId}`}
+								className="block group relative overflow-hidden glass-card rounded-2xl border border-border/50 p-5 transition-all duration-300 hover:scale-[1.01] hover:shadow-lg hover:shadow-primary/5 hover:border-primary/30"
 								data-testid={`order-card-${order.orderId}`}
 							>
-								<div className="flex flex-wrap items-center justify-between gap-3">
+								{/* Shimmer Overlay */}
+								<div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-primary/5 to-transparent skew-x-12 z-0" />
+								
+								<div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
 									<div>
-										<p className="text-sm text-muted-foreground">
+										<p className="text-sm text-muted-foreground group-hover:text-primary/80 transition-colors">
 											Đơn #{order.orderId}
 										</p>
 										<p
@@ -143,18 +157,15 @@ export function OrdersPage() {
 										</p>
 									</div>
 								</div>
-								<p className="mt-3 text-sm text-muted-foreground">
-									Ngày: {new Date(order.createdAt).toLocaleString("vi-VN")}
-								</p>
-								<div className="mt-3 flex justify-end">
-									<Link
-										href={`/orders/${order.orderId}`}
-										className="text-xs font-medium text-primary transition-colors hover:underline"
-									>
+								<div className="relative z-10 mt-3 flex items-center justify-between">
+									<p className="text-sm text-muted-foreground">
+										Ngày: {parseBackendDate(order.createdAt)}
+									</p>
+									<span className="text-xs font-medium text-primary opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
 										Xem chi tiết →
-									</Link>
+									</span>
 								</div>
-							</article>
+							</Link>
 						);
 					})}
 				</section>

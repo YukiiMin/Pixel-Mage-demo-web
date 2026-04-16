@@ -2,7 +2,12 @@
 
 import { useProfile } from "@/features/auth/hooks/use-auth";
 import { NotificationBell } from "@/features/notifications/components/notification-bell";
-import { clearStoredAuthSession, getStoredUserId, getStoredUserRole, hasStoredAuthSession } from "@/lib/api-config";
+import {
+	clearStoredAuthSession,
+	getStoredUserId,
+	getStoredUserRole,
+	hasStoredAuthSession,
+} from "@/lib/api-config";
 import {
 	BarChart3,
 	BookOpen,
@@ -17,7 +22,7 @@ import {
 	Trophy,
 	User,
 	Users,
-	Wallet
+	Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -58,7 +63,8 @@ import {
 import { getInitials } from "./header/_config";
 
 // Favicon URL for the project
-const FAVICON_URL = "https://res.cloudinary.com/yukiimin-cloud/image/upload/v1775797205/favicon_pto0em.png";
+const FAVICON_URL =
+	"https://res.cloudinary.com/yukiimin-cloud/image/upload/v1775797205/favicon_pto0em.png";
 
 const staffLinks = [
 	{ label: "Gacha Products", href: "/staff/products", icon: Package },
@@ -133,8 +139,15 @@ export function InternalSidebar() {
 			<SidebarHeader className="border-b border-border/20 py-2">
 				<SidebarMenu>
 					<SidebarMenuItem>
-						<SidebarMenuButton size="lg" asChild className="hover:bg-transparent">
-							<Link href="/" className="flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
+						<SidebarMenuButton
+							size="lg"
+							asChild
+							className="hover:bg-transparent"
+						>
+							<Link
+								href="/"
+								className="flex items-center gap-2 group-data-[collapsible=icon]:justify-center"
+							>
 								<div className="flex aspect-square h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 transition-all overflow-hidden">
 									<img
 										src={FAVICON_URL}
@@ -166,7 +179,8 @@ export function InternalSidebar() {
 						<SidebarMenu className="gap-1.5">
 							{navLinks.map((item) => {
 								// Fix Active State logic
-								const isRootAdmin = item.href === "/admin" || item.href === "/staff";
+								const isRootAdmin =
+									item.href === "/admin" || item.href === "/staff";
 								const active = isRootAdmin
 									? pathname === item.href
 									: pathname.startsWith(item.href);
@@ -249,7 +263,10 @@ export function InternalSidebar() {
 							</DropdownMenuLabel>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem asChild>
-								<Link href="/profile" className="flex items-center gap-2 cursor-pointer">
+								<Link
+									href="/profile"
+									className="flex items-center gap-2 cursor-pointer"
+								>
 									<User className="h-4 w-4" />
 									<span>Hồ sơ cá nhân</span>
 								</Link>

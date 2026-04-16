@@ -267,7 +267,6 @@ export function buildApiUrl(path: string): string {
 	return normalizedPath;
 }
 
-
 export function clearStoredAuthSession(): void {
 	if (typeof window === "undefined") {
 		return;
