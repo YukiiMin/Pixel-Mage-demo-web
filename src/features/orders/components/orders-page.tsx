@@ -19,7 +19,9 @@ function parseBackendDate(val: any): string {
 	if (!val) return "N/A";
 	if (Array.isArray(val)) {
 		const [year, month, day, hour = 0, minute = 0, second = 0] = val;
-		return new Date(year, month - 1, day, hour, minute, second).toLocaleString("vi-VN");
+		return new Date(year, month - 1, day, hour, minute, second).toLocaleString(
+			"vi-VN",
+		);
 	}
 	const date = new Date(val);
 	return isNaN(date.getTime()) ? "N/A" : date.toLocaleString("vi-VN");
@@ -135,7 +137,7 @@ export function OrdersPage() {
 							>
 								{/* Shimmer Overlay */}
 								<div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-primary/5 to-transparent skew-x-12 z-0" />
-								
+
 								<div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
 									<div>
 										<p className="text-sm text-muted-foreground group-hover:text-primary/80 transition-colors">

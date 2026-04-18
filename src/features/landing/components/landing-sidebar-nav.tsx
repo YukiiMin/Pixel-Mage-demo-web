@@ -138,18 +138,20 @@ export default function LandingSidebarNav() {
 										className="relative z-10 group flex flex-col items-center"
 									>
 										<motion.div
-											animate={
-												isActive
-													? { scale: 1.3 }
-													: { scale: 1 }
-											}
-											transition={{ type: "spring", stiffness: 300, damping: 20 }}
+											animate={isActive ? { scale: 1.3 } : { scale: 1 }}
+											transition={{
+												type: "spring",
+												stiffness: 300,
+												damping: 20,
+											}}
 											className={`
 												w-8 h-8 rounded-full flex items-center justify-center text-sm
 												transition-all duration-300 my-0.5
-												${isActive
-													? `bg-gradient-to-br ${section.color} ${section.glow} ${section.activeText} border border-current/40`
-													: "text-white/25 hover:text-white/60 hover:scale-110"}
+												${
+													isActive
+														? `bg-gradient-to-br ${section.color} ${section.glow} ${section.activeText} border border-current/40`
+														: "text-white/25 hover:text-white/60 hover:scale-110"
+												}
 											`}
 										>
 											{section.symbol}
@@ -196,9 +198,11 @@ export default function LandingSidebarNav() {
 										className={`
 											group flex items-center gap-3 px-3 py-2.5 rounded-xl text-left
 											transition-all duration-200 relative overflow-hidden
-											${isActive
-												? `bg-gradient-to-r ${section.color} border border-current/20`
-												: "hover:bg-white/5 border border-transparent"}
+											${
+												isActive
+													? `bg-gradient-to-r ${section.color} border border-current/20`
+													: "hover:bg-white/5 border border-transparent"
+											}
 										`}
 									>
 										{/* Active glow */}
@@ -218,9 +222,11 @@ export default function LandingSidebarNav() {
 											transition={{ type: "spring", stiffness: 300 }}
 											className={`
 												text-base flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center
-												${isActive
-													? `${section.activeText} bg-current/10`
-													: "text-white/30 group-hover:text-white/60"}
+												${
+													isActive
+														? `${section.activeText} bg-current/10`
+														: "text-white/30 group-hover:text-white/60"
+												}
 												transition-colors duration-200
 											`}
 										>
@@ -230,7 +236,9 @@ export default function LandingSidebarNav() {
 										<div className="min-w-0 flex-1">
 											<p
 												className={`text-xs font-semibold leading-tight transition-colors ${
-													isActive ? section.activeText : "text-white/60 group-hover:text-white/90"
+													isActive
+														? section.activeText
+														: "text-white/60 group-hover:text-white/90"
 												}`}
 											>
 												{section.label}

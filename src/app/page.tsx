@@ -15,7 +15,9 @@ const StarBackground = dynamic(
 // Sidebar navigator — client-only (uses IntersectionObserver)
 const LandingSidebarNav = dynamic(
 	() =>
-		import("@/features/landing").then((m) => ({ default: m.LandingSidebarNav })),
+		import("@/features/landing").then((m) => ({
+			default: m.LandingSidebarNav,
+		})),
 	{ ssr: false },
 );
 

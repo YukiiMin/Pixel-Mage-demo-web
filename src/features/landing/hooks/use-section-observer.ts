@@ -25,8 +25,7 @@ export function useSectionObserver(
 		const observers: IntersectionObserver[] = [];
 
 		const observerCallback =
-			(id: string) =>
-			(entries: IntersectionObserverEntry[]) => {
+			(id: string) => (entries: IntersectionObserverEntry[]) => {
 				for (const entry of entries) {
 					if (entry.isIntersecting) {
 						setActiveSection(id);

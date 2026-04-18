@@ -6,10 +6,10 @@ import {
 	useSessionDetail,
 	useTarotSession,
 } from "@/features/tarot/hooks/use-tarot-session";
+import { useSpreads } from "@/features/tarot/hooks/use-spreads";
 import type { SessionPhase } from "@/features/tarot/stores/use-tarot-session-store";
 import { useTarotSessionStore } from "@/features/tarot/stores/use-tarot-session-store";
 import { CardDrawArea } from "./phases/card-draw-area";
-import { CardReveal } from "./phases/card-reveal";
 import { CompletionPhase } from "./phases/completion-phase";
 import { ShufflingPhase } from "./phases/shuffling-phase";
 import { ExpiredSession } from "./session/expired-session";
@@ -18,31 +18,28 @@ import { InterpretPanel } from "./session/interpret-panel";
 const PHASE_LABELS: Record<SessionPhase, string> = {
 	SETUP: "Bắt Đầu",
 	SHUFFLING: "Xào Bài",
-	DRAWING: "Chọn Bài",
+	DRAWING: "Bốc & Lật Bài",
 	REVEAL: "Lật Bài",
 	INTERPRET: "Giải Bài",
 	COMPLETE: "Hoàn Thành",
 };
 
+// Phases shown in progress bar (skip SETUP & REVEAL since they merged into DRAWING)
+const VISIBLE_PHASES: SessionPhase[] = ["SHUFFLING", "DRAWING", "INTERPRET", "COMPLETE"];
+
 export function TarotSessionPage({ sessionId }: { sessionId: number }) {
-	const { phase, phaseOrder, goTo } = useTarotSession();
-	const activePhaseIndex = phaseOrder.indexOf(phase);
-	const setActiveSession = useTarotSessionStore(
-		(state) => state.setActiveSession,
-	);
+	const { phase, goTo } = useTarotSession();
+	const setActiveSession = useTarotSessionStore((state) => state.setActiveSession);
 
 	const { data: sessionData, isLoading } = useSessionDetail(sessionId);
+	const { data: spreads } = useSpreads();
 
-	console.log("TarotSessionPage render:", {
-		sessionId,
-		isLoading,
-		status: sessionData?.status,
-		phase,
-	});
+	// Resolve how many cards to draw from the spread
+	const spreadInfo = spreads?.find((s) => s.spreadId === sessionData?.spreadId);
+	const cardsToDraw = spreadInfo?.positionCount ?? spreadInfo?.minCardsRequired ?? 3;
 
 	useEffect(() => {
 		if (sessionData) {
-			console.log("TarotSessionPage sessionData received:", sessionData.status);
 			setActiveSession(
 				sessionData.sessionId,
 				sessionData.spreadId,
@@ -52,17 +49,14 @@ export function TarotSessionPage({ sessionId }: { sessionId: number }) {
 
 			// Resume logic
 			if (sessionData.status === "COMPLETED") {
-				console.log("Transitioning to COMPLETE");
 				goTo("COMPLETE");
 			} else if (sessionData.status === "INTERPRETING") {
-				console.log("Transitioning to INTERPRET");
 				goTo("INTERPRET");
 			} else if (sessionData.status === "EXPIRED") {
-				// Expired handled by a separate render path below
+				// handled below
 			} else {
 				// PENDING
 				if (phase === "COMPLETE" || phase === "SETUP") {
-					console.log("Transitioning to SHUFFLING");
 					goTo("SHUFFLING");
 				}
 			}
@@ -86,10 +80,15 @@ export function TarotSessionPage({ sessionId }: { sessionId: number }) {
 		);
 	}
 
+	const activePhaseIndex = VISIBLE_PHASES.indexOf(
+		phase === "REVEAL" ? "DRAWING" : phase,
+	);
+
 	return (
-		<div className="container mx-auto max-w-3xl px-6">
+		<div className="container mx-auto max-w-4xl px-6">
+			{/* Progress bar — only show VISIBLE_PHASES */}
 			<div className="mb-10 flex flex-wrap items-center justify-center gap-1">
-				{phaseOrder.map((phaseName, index) => (
+				{VISIBLE_PHASES.map((phaseName, index) => (
 					<div key={phaseName} className="flex items-center gap-1 mb-2">
 						<div
 							className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
@@ -102,9 +101,9 @@ export function TarotSessionPage({ sessionId }: { sessionId: number }) {
 						>
 							{PHASE_LABELS[phaseName]}
 						</div>
-						{index < phaseOrder.length - 1 && (
+						{index < VISIBLE_PHASES.length - 1 && (
 							<div
-								className={`h-0.5 w-4 ${index < activePhaseIndex ? "bg-primary/40" : "bg-muted"}`}
+								className={`h-0.5 w-6 ${index < activePhaseIndex ? "bg-primary/40" : "bg-muted"}`}
 							/>
 						)}
 					</div>
@@ -115,15 +114,13 @@ export function TarotSessionPage({ sessionId }: { sessionId: number }) {
 				{phase === "SHUFFLING" && sessionData && (
 					<ShufflingPhase key="shuffle" onComplete={() => goTo("DRAWING")} />
 				)}
-				{phase === "DRAWING" && sessionData && (
+				{(phase === "DRAWING" || phase === "REVEAL") && sessionData && (
 					<CardDrawArea
 						key="draw"
 						sessionId={sessionId}
-						onConfirm={() => goTo("REVEAL")}
+						cardsToDraw={cardsToDraw}
+						onConfirm={() => goTo("INTERPRET")}
 					/>
-				)}
-				{phase === "REVEAL" && sessionData && (
-					<CardReveal key="reveal" onAllRevealed={() => goTo("INTERPRET")} />
 				)}
 				{phase === "INTERPRET" && sessionData && (
 					<InterpretPanel

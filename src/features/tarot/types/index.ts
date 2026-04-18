@@ -73,7 +73,7 @@ export interface InterpretResponse {
 export interface CreateSessionRequest {
 	spreadId: number;
 	mainQuestion: string;
-	mode: "EXPLORE";
+	mode: "EXPLORE" | "YOUR_DECK";
 }
 
 // ReadingCard từ BE (draw response)

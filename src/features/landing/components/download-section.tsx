@@ -2,22 +2,63 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useCallback } from "react";
-import { Check, ChevronRight, Smartphone, Layers, Sparkles } from "lucide-react";
+import {
+	Check,
+	ChevronRight,
+	Smartphone,
+	Layers,
+	Sparkles,
+} from "lucide-react";
 import Image from "next/image";
 import { ScrollSectionWrapper } from "./scroll-section-wrapper";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-type DemoScreen = "tarot-home" | "tarot-reading" | "tarot-result" | "collection-home" | "collection-grid";
+type DemoScreen =
+	| "tarot-home"
+	| "tarot-reading"
+	| "tarot-result"
+	| "collection-home"
+	| "collection-grid";
 type DemoFlow = "tarot" | "collection";
 
 // ─── Mock data for phone demo ────────────────────────────────────────────────
 const MOCK_CARDS = [
-	{ name: "The Fool", emoji: "🌟", rarity: "LEGENDARY", color: "from-amber-400 to-orange-600" },
-	{ name: "The Moon", emoji: "🌙", rarity: "RARE", color: "from-blue-400 to-purple-600" },
-	{ name: "The Sun", emoji: "☀️", rarity: "EPIC", color: "from-yellow-300 to-amber-500" },
-	{ name: "The Tower", emoji: "⚡", rarity: "RARE", color: "from-slate-400 to-gray-600" },
-	{ name: "The Star", emoji: "✨", rarity: "COMMON", color: "from-sky-400 to-blue-600" },
-	{ name: "The World", emoji: "🌍", rarity: "LEGENDARY", color: "from-emerald-400 to-teal-600" },
+	{
+		name: "The Fool",
+		emoji: "🌟",
+		rarity: "LEGENDARY",
+		color: "from-amber-400 to-orange-600",
+	},
+	{
+		name: "The Moon",
+		emoji: "🌙",
+		rarity: "RARE",
+		color: "from-blue-400 to-purple-600",
+	},
+	{
+		name: "The Sun",
+		emoji: "☀️",
+		rarity: "EPIC",
+		color: "from-yellow-300 to-amber-500",
+	},
+	{
+		name: "The Tower",
+		emoji: "⚡",
+		rarity: "RARE",
+		color: "from-slate-400 to-gray-600",
+	},
+	{
+		name: "The Star",
+		emoji: "✨",
+		rarity: "COMMON",
+		color: "from-sky-400 to-blue-600",
+	},
+	{
+		name: "The World",
+		emoji: "🌍",
+		rarity: "LEGENDARY",
+		color: "from-emerald-400 to-teal-600",
+	},
 ];
 
 const RARITY_COLORS: Record<string, string> = {
@@ -34,17 +75,25 @@ function TarotHomeScreen({ onStart }: { onStart: () => void }) {
 		<div className="flex flex-col h-full">
 			{/* Status bar */}
 			<div className="h-9 bg-gradient-to-r from-purple-900 to-indigo-900 flex items-center justify-center">
-				<span className="text-[10px] font-bold text-amber-400 tracking-widest">✦ PIXELMAGE ✦</span>
+				<span className="text-[10px] font-bold text-amber-400 tracking-widest">
+					✦ PIXELMAGE ✦
+				</span>
 			</div>
 			<div className="flex-1 bg-gradient-to-b from-[#0f0a1e] to-[#1a0e3a] p-4 flex flex-col gap-3 overflow-hidden">
 				{/* Hero card */}
 				<div className="relative rounded-2xl bg-gradient-to-br from-purple-900/60 to-indigo-900/60 border border-amber-400/20 p-4 text-center">
 					<div className="text-3xl mb-2">🔮</div>
-					<p className="text-amber-400 text-xs font-semibold tracking-wider">TAROT AI</p>
-					<p className="text-white/70 text-[10px] mt-1">Khám phá vận mệnh của bạn</p>
+					<p className="text-amber-400 text-xs font-semibold tracking-wider">
+						TAROT AI
+					</p>
+					<p className="text-white/70 text-[10px] mt-1">
+						Khám phá vận mệnh của bạn
+					</p>
 				</div>
 				{/* Quick spreads */}
-				<p className="text-white/50 text-[10px] uppercase tracking-wider font-medium">Kiểu trải bài</p>
+				<p className="text-white/50 text-[10px] uppercase tracking-wider font-medium">
+					Kiểu trải bài
+				</p>
 				{["Celtic Cross", "3 Lá Bài", "Tình Duyên"].map((s, i) => (
 					<button
 						key={s}
@@ -89,11 +138,17 @@ function TarotReadingScreen({ onReveal }: { onReveal: () => void }) {
 	return (
 		<div className="flex flex-col h-full">
 			<div className="h-9 bg-gradient-to-r from-purple-900 to-indigo-900 flex items-center justify-center">
-				<span className="text-[10px] font-bold text-amber-400 tracking-widest">✦ PIXELMAGE ✦</span>
+				<span className="text-[10px] font-bold text-amber-400 tracking-widest">
+					✦ PIXELMAGE ✦
+				</span>
 			</div>
 			<div className="flex-1 bg-gradient-to-b from-[#0f0a1e] to-[#1a0e3a] p-4 flex flex-col">
-				<p className="text-center text-white/60 text-[10px] mb-1">Trải Bài 3 Lá</p>
-				<p className="text-center text-amber-400/80 text-[9px] mb-4">Chạm để lật bài</p>
+				<p className="text-center text-white/60 text-[10px] mb-1">
+					Trải Bài 3 Lá
+				</p>
+				<p className="text-center text-amber-400/80 text-[9px] mb-4">
+					Chạm để lật bài
+				</p>
 				<div className="flex justify-center gap-3 mb-4">
 					{["Quá Khứ", "Hiện Tại", "Tương Lai"].map((label, i) => (
 						<button
@@ -104,16 +159,19 @@ function TarotReadingScreen({ onReveal }: { onReveal: () => void }) {
 						>
 							<div
 								className={`w-[60px] h-[90px] rounded-xl border-2 transition-all duration-500 flex items-center justify-center text-xl
-									${flipped[i]
-										? "border-amber-400/60 bg-gradient-to-br from-purple-900/80 to-indigo-900/80 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
-										: "border-white/20 bg-gradient-to-br from-indigo-900 to-purple-900 cursor-pointer hover:border-amber-400/40"
+									${
+										flipped[i]
+											? "border-amber-400/60 bg-gradient-to-br from-purple-900/80 to-indigo-900/80 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
+											: "border-white/20 bg-gradient-to-br from-indigo-900 to-purple-900 cursor-pointer hover:border-amber-400/40"
 									}`}
 							>
 								{flipped[i] ? MOCK_CARDS[i].emoji : "✦"}
 							</div>
 							<span className="text-[9px] text-white/50">{label}</span>
 							{flipped[i] && (
-								<span className="text-[9px] text-amber-400 font-medium">{MOCK_CARDS[i].name}</span>
+								<span className="text-[9px] text-amber-400 font-medium">
+									{MOCK_CARDS[i].name}
+								</span>
 							)}
 						</button>
 					))}
@@ -128,7 +186,9 @@ function TarotReadingScreen({ onReveal }: { onReveal: () => void }) {
 					</button>
 				)}
 				{!allFlipped && (
-					<p className="text-center text-white/30 text-[9px] mt-auto">Lật tất cả các lá để tiếp tục</p>
+					<p className="text-center text-white/30 text-[9px] mt-auto">
+						Lật tất cả các lá để tiếp tục
+					</p>
 				)}
 			</div>
 		</div>
@@ -139,12 +199,16 @@ function TarotResultScreen({ onReset }: { onReset: () => void }) {
 	return (
 		<div className="flex flex-col h-full">
 			<div className="h-9 bg-gradient-to-r from-purple-900 to-indigo-900 flex items-center justify-center">
-				<span className="text-[10px] font-bold text-amber-400 tracking-widest">✦ KẾT QUẢ ✦</span>
+				<span className="text-[10px] font-bold text-amber-400 tracking-widest">
+					✦ KẾT QUẢ ✦
+				</span>
 			</div>
 			<div className="flex-1 bg-gradient-to-b from-[#0f0a1e] to-[#1a0e3a] p-4 flex flex-col gap-3 overflow-auto">
 				<div className="text-center py-2">
 					<div className="text-2xl mb-1">✨</div>
-					<p className="text-amber-400 text-xs font-semibold">Giải Nghĩa Của Bạn</p>
+					<p className="text-amber-400 text-xs font-semibold">
+						Giải Nghĩa Của Bạn
+					</p>
 				</div>
 				{MOCK_CARDS.slice(0, 3).map((card, i) => (
 					<div
@@ -153,11 +217,23 @@ function TarotResultScreen({ onReset }: { onReset: () => void }) {
 					>
 						<div className="flex items-center gap-2">
 							<span>{card.emoji}</span>
-							<span className="text-white text-[11px] font-semibold">{card.name}</span>
-							<span className={`text-[9px] ml-auto ${RARITY_COLORS[card.rarity]}`}>{["Quá Khứ", "Hiện Tại", "Tương Lai"][i]}</span>
+							<span className="text-white text-[11px] font-semibold">
+								{card.name}
+							</span>
+							<span
+								className={`text-[9px] ml-auto ${RARITY_COLORS[card.rarity]}`}
+							>
+								{["Quá Khứ", "Hiện Tại", "Tương Lai"][i]}
+							</span>
 						</div>
 						<p className="text-white/50 text-[10px] leading-relaxed">
-							{["Một chương mới đang mở ra, hãy tin vào hành trình.", "Thay đổi đang đến — đón nhận với tâm thế bình an.", "Ánh sáng phía trước dẫn lối cho bước chân bạn."][i]}
+							{
+								[
+									"Một chương mới đang mở ra, hãy tin vào hành trình.",
+									"Thay đổi đang đến — đón nhận với tâm thế bình an.",
+									"Ánh sáng phía trước dẫn lối cho bước chân bạn.",
+								][i]
+							}
 						</p>
 					</div>
 				))}
@@ -177,19 +253,30 @@ function CollectionHomeScreen({ onBrowse }: { onBrowse: () => void }) {
 	return (
 		<div className="flex flex-col h-full">
 			<div className="h-9 bg-gradient-to-r from-purple-900 to-indigo-900 flex items-center justify-center">
-				<span className="text-[10px] font-bold text-amber-400 tracking-widest">✦ BỘ SƯU TẬP ✦</span>
+				<span className="text-[10px] font-bold text-amber-400 tracking-widest">
+					✦ BỘ SƯU TẬP ✦
+				</span>
 			</div>
 			<div className="flex-1 bg-gradient-to-b from-[#0f0a1e] to-[#1a0e3a] p-4 flex flex-col gap-3">
 				{/* Stats */}
 				<div className="grid grid-cols-3 gap-2">
-					{[["78", "Lá Bài"], ["12", "Sở Hữu"], ["4.9★", "Rating"]].map(([val, label]) => (
-						<div key={label} className="rounded-xl bg-white/5 border border-amber-400/10 p-2 text-center">
+					{[
+						["78", "Lá Bài"],
+						["12", "Sở Hữu"],
+						["4.9★", "Rating"],
+					].map(([val, label]) => (
+						<div
+							key={label}
+							className="rounded-xl bg-white/5 border border-amber-400/10 p-2 text-center"
+						>
 							<p className="text-amber-400 font-bold text-sm">{val}</p>
 							<p className="text-white/40 text-[9px]">{label}</p>
 						</div>
 					))}
 				</div>
-				<p className="text-white/50 text-[10px] uppercase tracking-wider font-medium">Bộ Sưu Tập</p>
+				<p className="text-white/50 text-[10px] uppercase tracking-wider font-medium">
+					Bộ Sưu Tập
+				</p>
 				<div className="flex gap-2 overflow-x-auto pb-1">
 					{["Major Arcana", "Minor Arcana", "Special"].map((set) => (
 						<button
@@ -219,8 +306,16 @@ function CollectionGridScreen({ onReset }: { onReset: () => void }) {
 	return (
 		<div className="flex flex-col h-full">
 			<div className="h-9 bg-gradient-to-r from-purple-900 to-indigo-900 flex items-center justify-center gap-2">
-				<button type="button" onClick={onReset} className="absolute left-3 text-amber-400/60 text-[10px]">←</button>
-				<span className="text-[10px] font-bold text-amber-400 tracking-widest">✦ MAJOR ARCANA ✦</span>
+				<button
+					type="button"
+					onClick={onReset}
+					className="absolute left-3 text-amber-400/60 text-[10px]"
+				>
+					←
+				</button>
+				<span className="text-[10px] font-bold text-amber-400 tracking-widest">
+					✦ MAJOR ARCANA ✦
+				</span>
 			</div>
 			<div className="flex-1 bg-gradient-to-b from-[#0f0a1e] to-[#1a0e3a] p-3 overflow-auto">
 				<div className="grid grid-cols-3 gap-2">
@@ -229,12 +324,18 @@ function CollectionGridScreen({ onReset }: { onReset: () => void }) {
 							key={card.name}
 							className="rounded-xl overflow-hidden border border-white/10 flex flex-col"
 						>
-							<div className={`h-[70px] bg-gradient-to-br ${card.color} flex items-center justify-center text-2xl`}>
+							<div
+								className={`h-[70px] bg-gradient-to-br ${card.color} flex items-center justify-center text-2xl`}
+							>
 								{card.emoji}
 							</div>
 							<div className="bg-[#0f0a1e]/80 px-1 py-1 text-center">
-								<p className="text-white/80 text-[9px] font-medium truncate">{card.name}</p>
-								<p className={`text-[8px] ${RARITY_COLORS[card.rarity]}`}>{card.rarity}</p>
+								<p className="text-white/80 text-[9px] font-medium truncate">
+									{card.name}
+								</p>
+								<p className={`text-[8px] ${RARITY_COLORS[card.rarity]}`}>
+									{card.rarity}
+								</p>
 							</div>
 						</div>
 					))}
@@ -262,13 +363,24 @@ function PhoneFrame({ flow }: PhoneDemoProps) {
 
 	const renderScreen = () => {
 		if (flow === "tarot") {
-			if (screen === "tarot-home") return <TarotHomeScreen onStart={() => setScreen("tarot-reading")} />;
-			if (screen === "tarot-reading") return <TarotReadingScreen onReveal={() => setScreen("tarot-result")} />;
-			if (screen === "tarot-result") return <TarotResultScreen onReset={() => setScreen("tarot-home")} />;
+			if (screen === "tarot-home")
+				return <TarotHomeScreen onStart={() => setScreen("tarot-reading")} />;
+			if (screen === "tarot-reading")
+				return (
+					<TarotReadingScreen onReveal={() => setScreen("tarot-result")} />
+				);
+			if (screen === "tarot-result")
+				return <TarotResultScreen onReset={() => setScreen("tarot-home")} />;
 		}
 		if (flow === "collection") {
-			if (screen === "collection-home") return <CollectionHomeScreen onBrowse={() => setScreen("collection-grid")} />;
-			if (screen === "collection-grid") return <CollectionGridScreen onReset={() => setScreen("collection-home")} />;
+			if (screen === "collection-home")
+				return (
+					<CollectionHomeScreen onBrowse={() => setScreen("collection-grid")} />
+				);
+			if (screen === "collection-grid")
+				return (
+					<CollectionGridScreen onReset={() => setScreen("collection-home")} />
+				);
 		}
 		return null;
 	};
@@ -354,7 +466,10 @@ export default function DownloadSection() {
 
 							<ul className="space-y-3">
 								{benefits.map((b, i) => (
-									<li key={i} className="flex items-center gap-3 text-muted-foreground">
+									<li
+										key={i}
+										className="flex items-center gap-3 text-muted-foreground"
+									>
 										<Check className="w-5 h-5 text-primary flex-shrink-0" />
 										{b}
 									</li>
@@ -374,9 +489,15 @@ export default function DownloadSection() {
 							</div>
 
 							<div className="flex gap-6 pt-4 text-sm text-muted-foreground">
-								<span><strong className="text-primary">4.8★</strong> Rating</span>
-								<span><strong className="text-primary">10K+</strong> Downloads</span>
-								<span><strong className="text-primary">100%</strong> Free</span>
+								<span>
+									<strong className="text-primary">4.8★</strong> Rating
+								</span>
+								<span>
+									<strong className="text-primary">10K+</strong> Downloads
+								</span>
+								<span>
+									<strong className="text-primary">100%</strong> Free
+								</span>
 							</div>
 						</div>
 					</ScrollSectionWrapper>

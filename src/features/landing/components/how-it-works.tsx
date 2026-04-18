@@ -77,7 +77,11 @@ const HowItWorks = () => {
 				</ScrollSectionWrapper>
 
 				{/* Tabs */}
-				<ScrollSectionWrapper direction="up" delay={0.1} className="flex justify-center gap-3 mb-12">
+				<ScrollSectionWrapper
+					direction="up"
+					delay={0.1}
+					className="flex justify-center gap-3 mb-12"
+				>
 					{tabs.map((t) => (
 						<button
 							key={t.id}
@@ -107,7 +111,11 @@ const HowItWorks = () => {
 							key={i}
 							initial={{ opacity: 0, y: 30, filter: "blur(6px)" }}
 							animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-							transition={{ duration: 0.5, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
+							transition={{
+								duration: 0.5,
+								delay: i * 0.12,
+								ease: [0.16, 1, 0.3, 1],
+							}}
 							className="glass-card rounded-2xl p-6 text-center group hover:glow-gold transition-all duration-300 border border-white/5 hover:border-primary/20 relative overflow-hidden"
 						>
 							{/* Hover shimmer sweep */}
@@ -120,14 +128,15 @@ const HowItWorks = () => {
 									{i + 1}
 								</div>
 								<step.icon className="w-8 h-8 mx-auto mb-3 text-primary" />
-								<h3 className="font-heading font-semibold mb-2">{step.title}</h3>
+								<h3 className="font-heading font-semibold mb-2">
+									{step.title}
+								</h3>
 								<p className="text-sm text-muted-foreground">{step.desc}</p>
 							</div>
 						</motion.div>
 					))}
 				</motion.div>
 			</div>
-			
 		</section>
 	);
 };

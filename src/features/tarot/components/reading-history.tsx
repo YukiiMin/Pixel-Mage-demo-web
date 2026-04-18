@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { motion } from "framer-motion";
 import { AlertCircle, BookOpen, Clock, Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { useTarotReadingHistory } from "@/features/tarot/hooks/use-tarot-reading-history";
 import { getStoredUserId } from "@/lib/api-config";
@@ -19,7 +19,12 @@ const SPREAD_NAMES: Record<number, string> = {
 
 export function ReadingHistory() {
 	const [searchTerm, setSearchTerm] = useState("");
+	const [isMounted, setIsMounted] = useState(false);
 	const userId = getStoredUserId();
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
 
 	const {
 		data: history,
@@ -68,7 +73,7 @@ export function ReadingHistory() {
 
 			{/* List */}
 			<div className="space-y-4">
-				{isLoading ? (
+				{!isMounted || isLoading ? (
 					Array.from({ length: 3 }).map((_, i) => (
 						<div
 							key={i}

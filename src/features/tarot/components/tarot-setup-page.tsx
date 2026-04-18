@@ -20,10 +20,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCreateSession } from "../hooks/use-create-session";
 
-const STEPS = ["Chọn Chủ Đề", "Câu Hỏi", "Kiểu Trải Bài"];
+const STEPS = ["Nguồn Bài", "Chọn Chủ Đề", "Câu Hỏi", "Kiểu Trải Bài"];
 
 export function TarotSetupPage() {
 	const shouldReduceMotion = useReducedMotion();
+	const [isMounted, setIsMounted] = useState(false);
 	const [step, setStep] = useState(0);
 	const router = useRouter();
 
@@ -35,7 +36,9 @@ export function TarotSetupPage() {
 	const [topic, setTopic] = useState<string | null>(null);
 
 	const [userId, setUserId] = useState<number | null>(null);
+	const [mode, setMode] = useState<"EXPLORE" | "YOUR_DECK">("EXPLORE");
 	useEffect(() => {
+		setIsMounted(true);
 		setUserId(getStoredUserId());
 	}, []);
 
@@ -56,7 +59,13 @@ export function TarotSetupPage() {
 	>(null);
 
 	const canContinue =
-		step === 0 ? Boolean(topic) : step === 2 ? Boolean(selectedSpreadId) : true;
+		step === 0
+			? true
+			: step === 1
+				? Boolean(topic)
+				: step === 3
+					? Boolean(selectedSpreadId)
+					: true;
 
 	const handleStart = async () => {
 		if (!selectedSpreadId) return;
@@ -64,7 +73,7 @@ export function TarotSetupPage() {
 			const session = await createSession.mutateAsync({
 				spreadId: selectedSpreadId,
 				mainQuestion: mainQuestion.trim(),
-				mode: "EXPLORE", // LUÔN LUÔN
+				mode: mode,
 			});
 			router.push(`/tarot/session/${session.sessionId}`);
 		} catch (error) {
@@ -107,11 +116,89 @@ export function TarotSetupPage() {
 			<AnimatePresence mode="wait">
 				{step === 0 && (
 					<motion.div
-						key="topic"
-						variants={shouldReduceMotion ? {} : staggerContainer}
-						initial={shouldReduceMotion ? { opacity: 1 } : "hidden"}
+						key="mode"
+						variants={isMounted && !shouldReduceMotion ? staggerContainer : {}}
+						initial={false}
 						animate="visible"
-						exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -60 }}
+						exit={{ opacity: 0 }}
+						className="space-y-6"
+					>
+						<motion.h2
+							variants={shouldReduceMotion ? {} : fadeInUp}
+							className="text-center text-3xl font-bold"
+						>
+							Chọn <span className="gradient-gold-purple">Nguồn Bài</span>
+						</motion.h2>
+						<motion.div
+							variants={shouldReduceMotion ? {} : fadeInUp}
+							className="grid grid-cols-1 md:grid-cols-2 gap-4"
+						>
+							<button
+								type="button"
+								onClick={() => setMode("EXPLORE")}
+								className={`glass-card rounded-2xl p-6 text-left transition-all duration-300 ${!shouldReduceMotion && "hover:scale-[1.02]"} ${
+									mode === "EXPLORE"
+										? "ring-2 ring-primary glow-gold"
+										: "hover:border-primary/30"
+								}`}
+							>
+								<div className="flex items-center gap-3 mb-2">
+									<div className="text-2xl">🌌</div>
+									<h3 className="text-xl font-bold text-white">
+										Toàn Bộ Hệ Thống
+									</h3>
+								</div>
+								<p className="text-sm text-white/60">
+									Sử dụng thẻ bài từ hệ thống. Rút ngẫu nhiên các lá bài từ bộ
+									bài vô tận của vũ trụ. Phù hợp cho chế độ khám phá.
+								</p>
+							</button>
+
+							<button
+								type="button"
+								onClick={() => setMode("YOUR_DECK")}
+								disabled={!hasCards}
+								className={`glass-card rounded-2xl p-6 text-left transition-all duration-300 ${
+									!hasCards
+										? "opacity-50 cursor-not-allowed grayscale"
+										: !shouldReduceMotion
+											? "hover:scale-[1.02]"
+											: ""
+								} ${
+									mode === "YOUR_DECK"
+										? "ring-2 ring-primary glow-gold"
+										: hasCards
+											? "hover:border-primary/30"
+											: ""
+								}`}
+							>
+								<div className="flex items-center gap-3 mb-2">
+									<div className="text-2xl">🎴</div>
+									<h3 className="text-xl font-bold text-white">
+										Bộ Bài Của Tôi
+									</h3>
+								</div>
+								<p className="text-sm text-white/60">
+									Sử dụng các thẻ bài bạn đã sở hữu, liên kết qua NFC. Kết nối
+									sâu sắc hơn với những lá bài vật lý của chính bạn.
+								</p>
+								{!hasCards && (
+									<p className="mt-3 text-xs text-destructive font-semibold">
+										* Bạn chưa sở hữu lá bài nào.
+									</p>
+								)}
+							</button>
+						</motion.div>
+					</motion.div>
+				)}
+
+				{step === 1 && (
+					<motion.div
+						key="topic"
+						variants={isMounted && !shouldReduceMotion ? staggerContainer : {}}
+						initial={false}
+						animate="visible"
+						exit={{ opacity: 0 }}
 						className="space-y-6"
 					>
 						<motion.h2
@@ -153,28 +240,30 @@ export function TarotSetupPage() {
 					</motion.div>
 				)}
 
-				{step === 1 && (
+				{step === 2 && (
 					<motion.div
 						key="question"
-						variants={shouldReduceMotion ? {} : staggerContainer}
-						initial={shouldReduceMotion ? { opacity: 1 } : "hidden"}
+						variants={isMounted && !shouldReduceMotion ? staggerContainer : {}}
+						initial={false}
 						animate="visible"
-						exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -60 }}
+						exit={{ opacity: 0 }}
 						className="space-y-6"
 					>
 						<motion.h2
-							variants={shouldReduceMotion ? {} : fadeInUp}
+							variants={isMounted && !shouldReduceMotion ? fadeInUp : {}}
 							className="text-center text-3xl font-bold"
 						>
 							Bạn muốn hỏi <span className="gradient-gold-purple">câu gì?</span>
 						</motion.h2>
 						<motion.p
-							variants={shouldReduceMotion ? {} : fadeInUp}
+							variants={isMounted && !shouldReduceMotion ? fadeInUp : {}}
 							className="text-center text-sm text-muted-foreground"
 						>
 							Tùy chọn — bạn có thể bỏ qua nếu muốn đọc bài tổng quát
 						</motion.p>
-						<motion.div variants={shouldReduceMotion ? {} : fadeInUp}>
+						<motion.div
+							variants={isMounted && !shouldReduceMotion ? fadeInUp : {}}
+						>
 							<Textarea
 								value={mainQuestion}
 								onChange={(event) => setMainQuestion(event.target.value)}
@@ -189,14 +278,20 @@ export function TarotSetupPage() {
 					</motion.div>
 				)}
 
-				{step === 2 && <SpreadSelector />}
+				{step === 3 && <SpreadSelector />}
 			</AnimatePresence>
 
-			{step === 2 && activeSessionBannerData !== null && (
-				<ActiveSessionBanner sessionId={activeSessionBannerData} />
+			{step === 3 && activeSessionBannerData !== null && (
+				<ActiveSessionBanner
+					sessionId={activeSessionBannerData}
+					onCanceled={() => {
+						setActiveSessionBannerData(null);
+						handleStart();
+					}}
+				/>
 			)}
 
-			{step === 2 && !canStart && activeSessionBannerData === null && (
+			{step === 3 && !canStart && activeSessionBannerData === null && (
 				<GuestReadingBanner />
 			)}
 
@@ -209,7 +304,7 @@ export function TarotSetupPage() {
 				>
 					<ArrowLeft className="mr-1 h-4 w-4" /> Quay Lại
 				</Button>
-				{step < 2 ? (
+				{step < 3 ? (
 					<Button
 						onClick={() => setStep((current) => current + 1)}
 						disabled={!canContinue}

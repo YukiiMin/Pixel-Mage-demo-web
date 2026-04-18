@@ -57,32 +57,18 @@ export function InterpretPanel({
 	};
 
 	if (status === "COMPLETED" || aiInterpretation) {
+		// Ngay khi có kết quả hoặc COMPLETED, trạng thái sẽ được Next.js route / TarotSessionPage xử lý
+		// để nhảy sang phase COMPLETE. Chúng ta giữ UI trống hoặc loading skeleton trong lúc đó.
 		return (
 			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}
-				className="space-y-6"
-				data-testid="interpret-panel"
+				className="flex min-h-100 flex-col items-center justify-center space-y-6 text-center"
 			>
-				<h2
-					className="text-center font-(--font-heading) text-2xl"
-					style={{ color: "hsl(270 40% 80%)" }}
-				>
-					<Sparkles
-						className="mr-2 inline h-5 w-5"
-						style={{ color: "hsl(270 40% 80%)" }}
-					/>
-					Thông Điệp Từ Vũ Trụ
+				<h2 className="text-center font-(--font-heading) text-2xl text-primary glow-gold animate-pulse">
+					Vũ Trụ Đã Chuyển Lời...
 				</h2>
-				<div className="glass-card mx-auto min-h-50 max-w-2xl rounded-2xl p-6 md:p-8">
-					<pre
-						className="whitespace-pre-wrap font-(--font-body) text-sm leading-relaxed"
-						style={{ color: "hsl(270 40% 80%)" }}
-					>
-						{aiInterpretation}
-					</pre>
-				</div>
 			</motion.div>
 		);
 	}

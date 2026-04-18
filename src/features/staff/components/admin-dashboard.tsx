@@ -23,6 +23,7 @@ import {
 } from "recharts";
 import { toast } from "sonner";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
+import { AdminMusicSettings } from "@/features/audio/components/admin-music-settings";
 
 // ────────────────────────────────
 // MOCK DATA (replace with real BE endpoint when ready)
@@ -437,6 +438,8 @@ export function AdminDashboard() {
 					</table>
 				</div>
 			</div>
+			{/* Music Settings */}
+			<AdminMusicSettings />
 		</div>
 	);
 }

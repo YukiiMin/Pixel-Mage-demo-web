@@ -29,7 +29,11 @@ interface ExpressCheckoutDrawerProps {
 	open: boolean;
 	onClose: () => void;
 	product: ProductResponse | null;
-	onQrReady: (checkoutData: { orderId: number; paymentUrl: string; totalAmount: number }) => void;
+	onQrReady: (checkoutData: {
+		orderId: number;
+		paymentUrl: string;
+		totalAmount: number;
+	}) => void;
 }
 
 export function ExpressCheckoutDrawer({
@@ -41,7 +45,7 @@ export function ExpressCheckoutDrawer({
 	const [quantity, setQuantity] = useState(1);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [shippingAddress, setShippingAddress] = useState(
-		"Vui long cap nhat dia chi o trang Ho so"
+		"Vui long cap nhat dia chi o trang Ho so",
 	);
 	const [showMapPicker, setShowMapPicker] = useState(false);
 
@@ -89,14 +93,14 @@ export function ExpressCheckoutDrawer({
 								toast.error(err.message || "Loi khoi tao thanh toan");
 								setIsProcessing(false);
 							},
-						}
+						},
 					);
 				},
 				onError: (err: Error) => {
 					setIsProcessing(false);
 					toast.error(err.message || "Loi tao don hang");
 				},
-			}
+			},
 		);
 	};
 
@@ -127,7 +131,9 @@ export function ExpressCheckoutDrawer({
 								{/* Map header */}
 								<div className="p-4 border-b border-border/50 flex items-center gap-2 bg-muted/20 shrink-0">
 									<MapPin className="w-5 h-5 text-primary shrink-0" />
-									<h3 className="font-semibold text-sm flex-1">Chon dia chi giao hang</h3>
+									<h3 className="font-semibold text-sm flex-1">
+										Chon dia chi giao hang
+									</h3>
 								</div>
 								{/* Map body */}
 								<div className="flex-1 min-h-0 overflow-y-auto p-4">
@@ -143,7 +149,11 @@ export function ExpressCheckoutDrawer({
 								</div>
 								{/* Map footer */}
 								<div className="p-3 text-right border-t border-border/50 bg-muted/20 shrink-0">
-									<Button variant="ghost" size="sm" onClick={() => setShowMapPicker(false)}>
+									<Button
+										variant="ghost"
+										size="sm"
+										onClick={() => setShowMapPicker(false)}
+									>
 										Dong
 									</Button>
 								</div>
@@ -157,13 +167,14 @@ export function ExpressCheckoutDrawer({
 							<CreditCard className="w-5 h-5 text-primary" />
 							Phieu Thanh Toan
 						</SheetTitle>
-						<SheetDescription className="hidden">Checkout Details</SheetDescription>
+						<SheetDescription className="hidden">
+							Checkout Details
+						</SheetDescription>
 					</SheetHeader>
 
 					{/* SCROLLABLE BODY */}
 					<div className="flex-1 overflow-y-auto w-full">
 						<div className="p-4 sm:p-5 space-y-5">
-
 							{/* --- Address --- */}
 							<div className="space-y-2">
 								<div className="flex items-center justify-between">
@@ -192,7 +203,9 @@ export function ExpressCheckoutDrawer({
 											<p className="text-xs font-medium text-foreground whitespace-normal line-clamp-2">
 												{shippingAddress}
 											</p>
-											<p className="text-[10px] text-muted-foreground mt-0.5">Mac dinh</p>
+											<p className="text-[10px] text-muted-foreground mt-0.5">
+												Mac dinh
+											</p>
 										</div>
 										<ChevronRight className="w-4 h-4 text-muted-foreground self-center opacity-50 group-hover:opacity-100 transition-opacity shrink-0" />
 									</div>
@@ -232,11 +245,15 @@ export function ExpressCheckoutDrawer({
 												>
 													<Minus className="w-3 h-3" />
 												</button>
-												<span className="w-8 text-center text-xs font-semibold">{quantity}</span>
+												<span className="w-8 text-center text-xs font-semibold">
+													{quantity}
+												</span>
 												<button
 													className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
 													onClick={() =>
-														setQuantity(Math.min(product.stockCount, quantity + 1))
+														setQuantity(
+															Math.min(product.stockCount, quantity + 1),
+														)
 													}
 													disabled={quantity >= product.stockCount}
 												>
@@ -250,7 +267,9 @@ export function ExpressCheckoutDrawer({
 
 							{/* --- Payment Method --- */}
 							<div className="space-y-2">
-								<h3 className="text-sm font-semibold text-foreground">Phuong thuc thanh toan</h3>
+								<h3 className="text-sm font-semibold text-foreground">
+									Phuong thuc thanh toan
+								</h3>
 								<div className="border-2 border-primary/40 rounded-xl p-3 bg-primary/5 flex items-center gap-3 relative overflow-hidden cursor-pointer">
 									<div className="absolute inset-0 -translate-x-full animate-[shimmer_3s_infinite] bg-linear-to-r from-transparent via-purple-500/10 to-transparent skew-x-12" />
 									<div className="w-8 h-8 rounded bg-white flex items-center justify-center shrink-0 p-1 relative z-10 shadow-sm border border-border/20">
@@ -261,7 +280,9 @@ export function ExpressCheckoutDrawer({
 										/>
 									</div>
 									<div className="flex-1 relative z-10">
-										<p className="text-sm font-bold text-foreground">SEPay QR Code</p>
+										<p className="text-sm font-bold text-foreground">
+											SEPay QR Code
+										</p>
 										<p className="text-[10px] text-muted-foreground">
 											Chuyen khoan lien ngan hang mien phi
 										</p>

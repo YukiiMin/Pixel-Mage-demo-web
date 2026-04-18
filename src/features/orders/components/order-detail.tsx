@@ -39,7 +39,9 @@ function parseBackendDate(val: any): string {
 	if (!val) return "N/A";
 	if (Array.isArray(val)) {
 		const [year, month, day, hour = 0, minute = 0, second = 0] = val;
-		return new Date(year, month - 1, day, hour, minute, second).toLocaleString("vi-VN");
+		return new Date(year, month - 1, day, hour, minute, second).toLocaleString(
+			"vi-VN",
+		);
 	}
 	const date = new Date(val);
 	return isNaN(date.getTime()) ? "N/A" : date.toLocaleString("vi-VN");
@@ -109,7 +111,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 			<section className="mb-8 rounded-3xl border border-border/40 bg-linear-to-r from-card/80 via-card/60 to-card/40 p-6 md:p-8 relative overflow-hidden group">
 				{/* Shimmer overlay cho phần Header đơn hàng */}
 				<div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_3s_infinite] bg-gradient-to-r from-transparent via-primary/5 to-transparent skew-x-12 z-0" />
-				
+
 				<div className="relative z-10 flex items-center justify-between flex-wrap gap-4">
 					<div>
 						<p className="badge-mystic mb-3 inline-flex">Commerce</p>
@@ -150,8 +152,8 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 											nhận huỷ
 										</AlertDialogTitle>
 										<AlertDialogDescription>
-											Bạn có chắc chắn muốn huỷ đơn hàng này không? Hành động này
-											không thể hoàn tác.
+											Bạn có chắc chắn muốn huỷ đơn hàng này không? Hành động
+											này không thể hoàn tác.
 										</AlertDialogDescription>
 									</AlertDialogHeader>
 									<AlertDialogFooter>

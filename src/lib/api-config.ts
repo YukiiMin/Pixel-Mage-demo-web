@@ -83,6 +83,13 @@ export const API_ENDPOINTS = {
 	adminCache: {
 		clear: "/api/admin/cache/clear",
 	},
+	themeMusic: {
+		active: "/api/theme-music/active",
+		list: "/api/theme-music",
+		upload: "/api/theme-music/upload",
+		activate: (id: number) => `/api/theme-music/${id}/activate`,
+		delete: (id: number) => `/api/theme-music/${id}`,
+	},
 	cardManagement: {
 		list: "/api/cards/list",
 		publicList: "/api/cards/public/list",
@@ -206,6 +213,7 @@ export const API_ENDPOINTS = {
 		interpret: (id: number | string) =>
 			`/api/v1/readings/sessions/${id}/interpret`,
 		sessionById: (id: number | string) => `/api/v1/readings/sessions/${id}`,
+		cancelSession: (id: number | string) => `/api/v1/readings/sessions/${id}`,
 	},
 	wallet: {
 		balance: "/api/wallet/balance",

@@ -48,22 +48,39 @@ export function CardReveal({ onAllRevealed }: CardRevealProps) {
 						<div className="relative mx-auto aspect-2/3 w-full max-w-50 perspective-1000">
 							<div
 								className={cn(
-									"tarot-card-face absolute inset-0 rounded-xl",
+									"tarot-card-face absolute inset-0 rounded-xl overflow-hidden glass-card",
 									card.isReversed && "rotate-180",
 								)}
-								style={{
-									backgroundImage: `url('/images/deck/card-back.jpg')`, // Tạm thời dùng mặt sau nếu chưa có ảnh
-									backgroundSize: "cover",
-									backgroundPosition: "center",
-									...(card.isReversed
-										? { filter: "sepia(0.3) saturate(1.5) hue-rotate(320deg)" }
-										: {}),
-								}}
 							>
-								{/* Placeholder for actual image if image path is not resolving properly */}
-								<div className="absolute inset-0 flex items-center justify-center bg-black/40 text-center font-bold text-white backdrop-blur-xs">
-									{card.cardTemplate.name}
-								</div>
+								{/* Card Image */}
+								{card.cardTemplate.imageUrl ? (
+									// Using standard img tag with tailwind for smooth rendering
+									<img
+										src={card.cardTemplate.imageUrl}
+										alt={card.cardTemplate.name}
+										className="h-full w-full object-cover"
+										style={{
+											...(card.isReversed
+												? { filter: "sepia(0.3) saturate(1.2)" }
+												: {}),
+										}}
+									/>
+								) : (
+									<div
+										className="h-full w-full"
+										style={{
+											backgroundImage: `url('/images/deck/card-back.jpg')`,
+											backgroundSize: "cover",
+											backgroundPosition: "center",
+										}}
+									/>
+								)}
+								{/* Fallback Text layer (if image fails or is absent) */}
+								{!card.cardTemplate.imageUrl && (
+									<div className="absolute inset-0 flex items-center justify-center bg-black/50 text-center font-bold text-white backdrop-blur-xs">
+										{card.cardTemplate.name}
+									</div>
+								)}
 							</div>
 						</div>
 
