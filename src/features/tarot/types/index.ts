@@ -1,6 +1,6 @@
 export type TarotTopic = "love" | "career" | "general" | "finance";
 export type SpreadType = "1-card" | "3-cards" | "celtic-cross";
-export type DeckMode = "EXPLORE";
+export type DeckMode = "EXPLORE" | "YOUR_DECK";
 
 export type SessionPhase =
 	| "SHUFFLING"

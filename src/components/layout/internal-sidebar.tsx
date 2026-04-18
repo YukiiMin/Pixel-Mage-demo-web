@@ -14,10 +14,13 @@ import {
 	ChevronDown,
 	CreditCard,
 	LayoutDashboard,
+	Layers,
 	Link2Off,
 	LogOut,
 	NfcIcon,
 	Package,
+	PackagePlus,
+	ShoppingBag,
 	Ticket,
 	Trophy,
 	User,
@@ -67,7 +70,7 @@ const FAVICON_URL =
 	"https://res.cloudinary.com/yukiimin-cloud/image/upload/v1775797205/favicon_pto0em.png";
 
 const staffLinks = [
-	{ label: "Gacha Products", href: "/staff/products", icon: Package },
+	{ label: "Sản phẩm & Pack", href: "/staff/products", icon: ShoppingBag },
 	{ label: "Unlink Requests", href: "/staff/unlink-requests", icon: Link2Off },
 ];
 
@@ -208,6 +211,9 @@ export function InternalSidebar() {
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
+
+				{/* ADMIN — Pack & Product Group */}
+
 			</SidebarContent>
 
 			{/* FOOTER - Clean: Notification + User Dropdown */}

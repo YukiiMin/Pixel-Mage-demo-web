@@ -56,6 +56,14 @@ export const API_ENDPOINTS = {
 		list: "/api/products",
 		create: "/api/products",
 		byId: (id: number | string) => `/api/products/${id}`,
+		active: (id: number | string) => `/api/products/${id}/active`,
+		visibility: (id: number | string) => `/api/products/${id}/visibility`,
+	},
+	packCategories: {
+		list: "/api/pack-categories",
+		create: "/api/pack-categories",
+		byId: (id: number | string) => `/api/pack-categories/${id}`,
+		toggleActive: (id: number | string) => `/api/pack-categories/${id}/toggle-active`,
 	},
 	inventoryManagement: {
 		list: "/api/inventory",
@@ -125,6 +133,7 @@ export const API_ENDPOINTS = {
 		create: "/api/packs/create",
 		byId: (id: number | string) => `/api/packs/${id}`,
 		updateStatus: (id: number | string) => `/api/packs/${id}/status`,
+		generate: (categoryId: number | string, quantity: number | string) => `/api/packs/generate?packCategoryId=${categoryId}&quantity=${quantity}`,
 	},
 	orderManagement: {
 		list: "/api/orders",

@@ -49,6 +49,8 @@ import {
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { PackStatusBadge, CardStatusBadge, RarityBadge } from "./shared/pack-status-badge";
+import { SimpleStatCard } from "./shared/stats-card";
 
 // ─────────────────────────────────────────────
 // Component
@@ -68,122 +70,75 @@ export function AdminPackMonitoring() {
 	const fetchPacks = useCallback(async () => {
 		setLoading(true);
 		try {
-			// TODO: Implement actual API calls
-			// Mock data for demonstration
-			const mockPacks: Pack[] = Array.from({ length: 50 }, (_, i) => ({
-				packId: i + 1,
+			const res = await fetch("/api/packs");
+			const json = await res.json();
+			if (!res.ok) {
+				throw new Error(json.message || "Failed to fetch packs");
+			}
+
+			const realPacks: Pack[] = (json.data || []).map((p: any) => ({
+				packId: p.packId,
 				product: {
-					productId: (i % 3) + 1,
-					name: [
-						"PixelMage Standard Pack",
-						"Major Sealed Box",
-						"PixelMage Blister Promo",
-					][i % 3],
-					description: "Standard pack with 5 random cards",
-					price: [99000, 299000, 49000][i % 3],
-					imageUrl: `/api/placeholder/200/150?text=Pack${(i % 3) + 1}`,
+					productId: p.packCategoryId,
+					name: p.packCategoryName || `Pack ${p.packId}`,
+					description: "",
+					price: 0,
+					imageUrl: p.packCategoryImageUrl,
 				},
-				status: ["STOCKED", "RESERVED", "SOLD"][i % 3] as PackStatus,
+				status: p.status,
 				createdBy: {
-					accountId: 1,
-					name: "Warehouse Staff",
-					email: "staff@pixelmage.com",
+					accountId: p.createdByAccountId,
+					name: p.createdByAccountId ? `Admin #${p.createdByAccountId}` : "System",
+					email: "",
 				},
-				createdAt: new Date(
-					Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000,
-				).toISOString(),
-				packDetails: Array.from({ length: 5 }, (_, j) => ({
-					packDetailId: j + 1,
-					positionIndex: j + 1,
+				createdAt: p.createdAt || new Date().toISOString(),
+				packDetails: (p.packDetails || []).map((pd: any, j: number) => ({
+					packDetailId: j,
+					positionIndex: pd.positionIndex,
 					card: {
-						cardId: i * 5 + j + 1,
-						nfcUid: `nfc_${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
-						softwareUuid: `uuid_${Math.random().toString(36).substr(2, 8)}`,
-						status: j < 2 ? "LINKED" : j < 4 ? "SOLD" : ("READY" as CardStatus),
-						serialNumber: `SN${String(Math.floor(Math.random() * 100000)).padStart(6, "0")}`,
-						productionBatch: `BATCH${String(Math.floor(Math.random() * 100)).padStart(3, "0")}`,
+						cardId: pd.cardId || -1,
+						nfcUid: pd.nfcUid || "N/A",
+						softwareUuid: "",
+						status: pd.cardStatus || "READY",
+						serialNumber: pd.cardId ? `SN${String(pd.cardId).padStart(6, "0")}` : "",
+						productionBatch: "",
 						cardCondition: "NEW",
 						cardTemplate: {
-							cardTemplateId: Math.floor(Math.random() * 20) + 1,
-							name: `Mystic Card #${Math.floor(Math.random() * 100)}`,
-							rarity: ["COMMON", "RARE", "LEGENDARY"][j % 3] as Rarity,
-							imagePath: `/api/placeholder/100/150?text=Card${Math.floor(Math.random() * 100)}`,
+							cardTemplateId: 0,
+							name: pd.cardName || "Unknown Card",
+							rarity: pd.rarity || "COMMON",
+							imagePath: pd.imagePath || "",
 						},
-						owner:
-							j < 2
-								? {
-										accountId: Math.floor(Math.random() * 100) + 1,
-										name: `Customer ${Math.floor(Math.random() * 100) + 1}`,
-										email: `customer${Math.floor(Math.random() * 100) + 1}@example.com`,
-									}
-								: undefined,
-						linkedAt:
-							j < 2
-								? new Date(
-										Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000,
-									).toISOString()
-								: undefined,
-						soldAt:
-							j < 4
-								? new Date(
-										Date.now() - Math.random() * 14 * 24 * 60 * 60 * 1000,
-									).toISOString()
-								: undefined,
-						createdAt: new Date(
-							Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000,
-						).toISOString(),
-						updatedAt: new Date(
-							Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000,
-						).toISOString(),
+						createdAt: new Date().toISOString(),
+						updatedAt: new Date().toISOString(),
 					},
 				})),
-				order: ["RESERVED", "SOLD"].includes(
-					["STOCKED", "RESERVED", "SOLD"][i % 3],
-				)
-					? {
-							orderId: i + 1,
-							customer: {
-								accountId: Math.floor(Math.random() * 100) + 1,
-								name: `Customer ${Math.floor(Math.random() * 100) + 1}`,
-								email: `customer${Math.floor(Math.random() * 100) + 1}@example.com`,
-							},
-							orderDate: new Date(
-								Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000,
-							).toISOString(),
-						}
-					: undefined,
+				order: undefined,
 			}));
 
-			setPacks(mockPacks);
-			setTotalPages(Math.ceil(mockPacks.length / 20));
+			setPacks(realPacks);
+			setTotalPages(Math.ceil(realPacks.length / 20) || 1);
 
-			// Calculate stats
-			const mockStats: PackMonitoringStats = {
-				totalPacks: mockPacks.length,
-				stockedPacks: mockPacks.filter((p) => p.status === "STOCKED").length,
-				reservedPacks: mockPacks.filter((p) => p.status === "RESERVED").length,
-				soldPacks: mockPacks.filter((p) => p.status === "SOLD").length,
-				totalCards: mockPacks.reduce((acc, p) => acc + p.packDetails.length, 0),
-				linkedCards: mockPacks.reduce(
-					(acc, p) =>
-						acc +
-						p.packDetails.filter((pd) => pd.card.status === "LINKED").length,
+			const newStats: PackMonitoringStats = {
+				totalPacks: realPacks.length,
+				stockedPacks: realPacks.filter((p) => p.status === "STOCKED").length,
+				reservedPacks: realPacks.filter((p) => p.status === "RESERVED").length,
+				soldPacks: realPacks.filter((p) => p.status === "SOLD").length,
+				totalCards: realPacks.reduce((acc, p) => acc + p.packDetails.length, 0),
+				linkedCards: realPacks.reduce(
+					(acc, p) => acc + p.packDetails.filter((pd) => pd.card.status === "LINKED").length,
 					0,
 				),
-				pendingCards: mockPacks.reduce(
-					(acc, p) =>
-						acc +
-						p.packDetails.filter((pd) => pd.card.status === "READY").length,
+				pendingCards: realPacks.reduce(
+					(acc, p) => acc + p.packDetails.filter((pd) => pd.card.status === "READY").length,
 					0,
 				),
-				soldCards: mockPacks.reduce(
-					(acc, p) =>
-						acc +
-						p.packDetails.filter((pd) => pd.card.status === "SOLD").length,
+				soldCards: realPacks.reduce(
+					(acc, p) => acc + p.packDetails.filter((pd) => pd.card.status === "SOLD").length,
 					0,
 				),
 			};
-			setStats(mockStats);
+			setStats(newStats);
 		} catch (err) {
 			toast.error(getApiErrorMessage(err, "Không thể tải dữ liệu Pack"));
 		} finally {
@@ -205,49 +160,7 @@ export function AdminPackMonitoring() {
 		return matchesSearch && matchesStatus;
 	});
 
-	const getStatusColor = (status: string) => {
-		switch (status) {
-			case "STOCKED":
-				return "bg-blue-500/10 text-blue-400 border-blue-500/25";
-			case "RESERVED":
-				return "bg-yellow-500/10 text-yellow-400 border-yellow-500/25";
-			case "SOLD":
-				return "bg-green-500/10 text-green-400 border-green-500/25";
-			default:
-				return "bg-muted/40 text-muted-foreground";
-		}
-	};
-
-	const getCardStatusColor = (status: string) => {
-		switch (status) {
-			case "PENDING_BIND":
-				return "bg-gray-500/10 text-gray-400 border-gray-500/25";
-			case "READY":
-				return "bg-blue-500/10 text-blue-400 border-blue-500/25";
-			case "SOLD":
-				return "bg-yellow-500/10 text-yellow-400 border-yellow-500/25";
-			case "LINKED":
-				return "bg-green-500/10 text-green-400 border-green-500/25";
-			case "DEACTIVATED":
-				return "bg-red-500/10 text-red-400 border-red-500/25";
-			default:
-				return "bg-muted/40 text-muted-foreground";
-		}
-	};
-
-	const getRarityColor = (rarity: string) => {
-		switch (rarity) {
-			case "LEGENDARY":
-				return "bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-400 border-yellow-500/30";
-			case "RARE":
-				return "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 border-blue-500/30";
-			case "COMMON":
-				return "bg-gray-500/10 text-gray-400 border-gray-500/30";
-			default:
-				return "bg-muted/40 text-muted-foreground";
-		}
-	};
-
+	// Shared UI components handle status and rarity colors.
 	const formatCurrency = (amount: number) => {
 		return new Intl.NumberFormat("vi-VN", {
 			style: "currency",
@@ -285,122 +198,67 @@ export function AdminPackMonitoring() {
 			{/* Stats Cards */}
 			{stats && (
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-					<Card className="glass-card">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-								<div className="p-2 bg-blue-500/10 rounded-lg">
-									<Package className="h-5 w-5 text-blue-400" />
-								</div>
-								<div>
-									<p className="text-sm text-muted-foreground">Tổng Pack</p>
-									<p className="text-2xl font-bold">{stats.totalPacks}</p>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					<Card className="glass-card">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-								<div className="p-2 bg-blue-500/10 rounded-lg">
-									<Box className="h-5 w-5 text-blue-400" />
-								</div>
-								<div>
-									<p className="text-sm text-muted-foreground">Trong kho</p>
-									<p className="text-2xl font-bold text-blue-400">
-										{stats.stockedPacks}
-									</p>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					<Card className="glass-card">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-								<div className="p-2 bg-yellow-500/10 rounded-lg">
-									<Clock className="h-5 w-5 text-yellow-400" />
-								</div>
-								<div>
-									<p className="text-sm text-muted-foreground">Đã đặt</p>
-									<p className="text-2xl font-bold text-yellow-400">
-										{stats.reservedPacks}
-									</p>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					<Card className="glass-card">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-								<div className="p-2 bg-green-500/10 rounded-lg">
-									<CheckCircle2 className="h-5 w-5 text-green-400" />
-								</div>
-								<div>
-									<p className="text-sm text-muted-foreground">Đã bán</p>
-									<p className="text-2xl font-bold text-green-400">
-										{stats.soldPacks}
-									</p>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
+					<SimpleStatCard
+						label="Tổng Pack"
+						value={stats.totalPacks}
+						icon={Package}
+						iconColor="text-blue-400"
+						iconBgColor="bg-blue-500/10"
+					/>
+					<SimpleStatCard
+						label="Trong kho"
+						value={stats.stockedPacks}
+						icon={Box}
+						iconColor="text-blue-400"
+						iconBgColor="bg-blue-500/10"
+						valueColor="text-blue-400"
+					/>
+					<SimpleStatCard
+						label="Đã đặt"
+						value={stats.reservedPacks}
+						icon={Clock}
+						iconColor="text-yellow-400"
+						iconBgColor="bg-yellow-500/10"
+						valueColor="text-yellow-400"
+					/>
+					<SimpleStatCard
+						label="Đã bán"
+						value={stats.soldPacks}
+						icon={CheckCircle2}
+						iconColor="text-green-400"
+						iconBgColor="bg-green-500/10"
+						valueColor="text-green-400"
+					/>
 				</div>
 			)}
 
 			{/* Card Stats */}
 			{stats && (
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-					<Card className="glass-card">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-								<div className="p-2 bg-green-500/10 rounded-lg">
-									<Zap className="h-5 w-5 text-green-400" />
-								</div>
-								<div>
-									<p className="text-sm text-muted-foreground">
-										Thẻ đã liên kết
-									</p>
-									<p className="text-xl font-bold text-green-400">
-										{stats.linkedCards}
-									</p>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					<Card className="glass-card">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-								<div className="p-2 bg-blue-500/10 rounded-lg">
-									<PackageOpen className="h-5 w-5 text-blue-400" />
-								</div>
-								<div>
-									<p className="text-sm text-muted-foreground">Thẻ sẵn sàng</p>
-									<p className="text-xl font-bold text-blue-400">
-										{stats.pendingCards}
-									</p>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					<Card className="glass-card">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-								<div className="p-2 bg-yellow-500/10 rounded-lg">
-									<ShoppingCart className="h-5 w-5 text-yellow-400" />
-								</div>
-								<div>
-									<p className="text-sm text-muted-foreground">Thẻ đã bán</p>
-									<p className="text-xl font-bold text-yellow-400">
-										{stats.soldCards}
-									</p>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
+					<SimpleStatCard
+						label="Thẻ đã liên kết"
+						value={stats.linkedCards}
+						icon={Zap}
+						iconColor="text-green-400"
+						iconBgColor="bg-green-500/10"
+						valueColor="text-green-400"
+					/>
+					<SimpleStatCard
+						label="Thẻ sẵn sàng"
+						value={stats.pendingCards}
+						icon={PackageOpen}
+						iconColor="text-blue-400"
+						iconBgColor="bg-blue-500/10"
+						valueColor="text-blue-400"
+					/>
+					<SimpleStatCard
+						label="Thẻ đã bán"
+						value={stats.soldCards}
+						icon={ShoppingCart}
+						iconColor="text-yellow-400"
+						iconBgColor="bg-yellow-500/10"
+						valueColor="text-yellow-400"
+					/>
 				</div>
 			)}
 
@@ -514,30 +372,17 @@ export function AdminPackMonitoring() {
 											</div>
 										</TableCell>
 										<TableCell>
-											<Badge className={getStatusColor(pack.status)}>
-												{pack.status === "STOCKED" && (
-													<Box className="h-3 w-3 mr-1" />
-												)}
-												{pack.status === "RESERVED" && (
-													<Clock className="h-3 w-3 mr-1" />
-												)}
-												{pack.status === "SOLD" && (
-													<CheckCircle2 className="h-3 w-3 mr-1" />
-												)}
-												{pack.status}
-											</Badge>
+											<PackStatusBadge status={pack.status} />
 										</TableCell>
 										<TableCell>
 											<div className="text-sm">
 												<div className="flex gap-1">
 													{pack.packDetails.slice(0, 3).map((pd) => (
-														<Badge
+														<RarityBadge
 															key={pd.packDetailId}
-															variant="outline"
-															className={`text-xs ${getRarityColor(pd.card.cardTemplate.rarity)}`}
-														>
-															{pd.card.cardTemplate.rarity[0]}
-														</Badge>
+															rarity={pd.card.cardTemplate.rarity}
+															short
+														/>
 													))}
 													{pack.packDetails.length > 3 && (
 														<Badge variant="outline" className="text-xs">
@@ -634,9 +479,7 @@ export function AdminPackMonitoring() {
 												<p className="text-2xl font-bold text-primary">
 													{formatCurrency(selectedPack.product.price)}
 												</p>
-												<Badge className={getStatusColor(selectedPack.status)}>
-													{selectedPack.status}
-												</Badge>
+												<PackStatusBadge status={selectedPack.status} />
 											</div>
 										</div>
 										<div className="space-y-2">
@@ -708,9 +551,7 @@ export function AdminPackMonitoring() {
 														key={rarity}
 														className="flex items-center justify-between"
 													>
-														<Badge className={getRarityColor(rarity)}>
-															{rarity}
-														</Badge>
+														<RarityBadge rarity={rarity} />
 														<span className="font-medium">{count} thẻ</span>
 													</div>
 												);
@@ -772,31 +613,10 @@ export function AdminPackMonitoring() {
 														</div>
 													</TableCell>
 													<TableCell>
-														<Badge
-															className={getRarityColor(
-																packDetail.card.cardTemplate.rarity,
-															)}
-														>
-															{packDetail.card.cardTemplate.rarity}
-														</Badge>
+														<RarityBadge rarity={packDetail.card.cardTemplate.rarity} />
 													</TableCell>
 													<TableCell>
-														<Badge
-															className={getCardStatusColor(
-																packDetail.card.status,
-															)}
-														>
-															{packDetail.card.status === "LINKED" && (
-																<Smartphone className="h-3 w-3 mr-1" />
-															)}
-															{packDetail.card.status === "READY" && (
-																<PackageOpen className="h-3 w-3 mr-1" />
-															)}
-															{packDetail.card.status === "SOLD" && (
-																<ShoppingCart className="h-3 w-3 mr-1" />
-															)}
-															{packDetail.card.status}
-														</Badge>
+														<CardStatusBadge status={packDetail.card.status} />
 													</TableCell>
 													<TableCell>
 														<code className="text-xs bg-muted px-2 py-1 rounded">

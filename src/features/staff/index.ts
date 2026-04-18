@@ -17,6 +17,8 @@ export { AdminPhysicalCardsPage } from "./components/admin-physical-cards-page";
 export { AdminVouchersPage } from "./components/admin-vouchers-page";
 export { AdminWalletPage } from "./components/admin-wallet-page";
 export { AdminPackMonitoring } from "./components/admin-pack-monitoring";
+export { AdminPackCategoriesPage } from "./components/admin-pack-categories-page";
+export { AdminProductPackHub } from "./components/admin-product-pack-hub";
 
 // ── Staff Pages ───────────────────────────────────────────────────────────────
 export { GachaPoolManagement } from "./components/gacha-pool-management";
