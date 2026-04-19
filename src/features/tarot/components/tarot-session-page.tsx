@@ -1,12 +1,13 @@
 "use client";
 
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import { useEffect } from "react";
 import {
 	useSessionDetail,
 	useTarotSession,
 } from "@/features/tarot/hooks/use-tarot-session";
 import { useSpreads } from "@/features/tarot/hooks/use-spreads";
+import type { Spread } from "@/features/tarot/types";
 import type { SessionPhase } from "@/features/tarot/stores/use-tarot-session-store";
 import { useTarotSessionStore } from "@/features/tarot/stores/use-tarot-session-store";
 import { CardDrawArea } from "./phases/card-draw-area";
@@ -27,16 +28,30 @@ const PHASE_LABELS: Record<SessionPhase, string> = {
 // Phases shown in progress bar (skip SETUP & REVEAL since they merged into DRAWING)
 const VISIBLE_PHASES: SessionPhase[] = ["SHUFFLING", "DRAWING", "INTERPRET", "COMPLETE"];
 
+
+// Helper: robustly determine card count from spread data
+function resolveCardCount(spread?: Spread): number {
+	if (spread?.positionCount && spread.positionCount > 0) return spread.positionCount;
+	if (spread?.minCardsRequired && spread.minCardsRequired > 0) return spread.minCardsRequired;
+	// Name-based fallback
+	const name = (spread?.name ?? "").toLowerCase();
+	if (name.includes("celtic") || name.includes("thập") || name.includes("10")) return 10;
+	if (name.includes("relationship") || name.includes("tình yêu") || name.includes("7")) return 7;
+	if (name.includes("một") || name.includes("1-card") || name.includes("single")) return 1;
+	return 3;
+}
+
 export function TarotSessionPage({ sessionId }: { sessionId: number }) {
 	const { phase, goTo } = useTarotSession();
 	const setActiveSession = useTarotSessionStore((state) => state.setActiveSession);
 
 	const { data: sessionData, isLoading } = useSessionDetail(sessionId);
-	const { data: spreads } = useSpreads();
+	const { data: spreads, isLoading: isSpreadsLoading } = useSpreads();
 
 	// Resolve how many cards to draw from the spread
 	const spreadInfo = spreads?.find((s) => s.spreadId === sessionData?.spreadId);
-	const cardsToDraw = spreadInfo?.positionCount ?? spreadInfo?.minCardsRequired ?? 3;
+	// Robust fallback: || catches 0 values, name-based last resort
+	const cardsToDraw = resolveCardCount(spreadInfo);
 
 	useEffect(() => {
 		if (sessionData) {
@@ -63,7 +78,7 @@ export function TarotSessionPage({ sessionId }: { sessionId: number }) {
 		}
 	}, [sessionData, setActiveSession, goTo, phase]);
 
-	if (isLoading) {
+	if (isLoading || isSpreadsLoading) {
 		return (
 			<div className="container mx-auto max-w-4xl px-6 py-12">
 				<div className="h-10 w-48 mx-auto bg-muted/20 animate-pulse rounded mb-8" />
@@ -110,30 +125,40 @@ export function TarotSessionPage({ sessionId }: { sessionId: number }) {
 				))}
 			</div>
 
-			<AnimatePresence mode="wait">
-				{phase === "SHUFFLING" && sessionData && (
-					<ShufflingPhase key="shuffle" onComplete={() => goTo("DRAWING")} />
-				)}
-				{(phase === "DRAWING" || phase === "REVEAL") && sessionData && (
-					<CardDrawArea
-						key="draw"
-						sessionId={sessionId}
-						cardsToDraw={cardsToDraw}
-						onConfirm={() => goTo("INTERPRET")}
-					/>
-				)}
-				{phase === "INTERPRET" && sessionData && (
-					<InterpretPanel
-						key="interpreting"
-						sessionId={sessionId}
-						status={sessionData.status}
-						onComplete={() => goTo("COMPLETE")}
-					/>
-				)}
-				{phase === "COMPLETE" && sessionData && (
-					<CompletionPhase key="complete" sessionId={sessionId} />
-				)}
-			</AnimatePresence>
+			<LayoutGroup>
+				<AnimatePresence mode="popLayout">
+					{phase === "SHUFFLING" && sessionData && (
+						<ShufflingPhase key="shuffle" onComplete={() => goTo("DRAWING")} />
+					)}
+					{(phase === "DRAWING" || phase === "REVEAL" || phase === "INTERPRET") && sessionData && spreads && (
+						<motion.div key="draw-interpret-container" className="relative" exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.5 }}>
+							<CardDrawArea
+								key={`draw-${cardsToDraw}`}
+								sessionId={sessionId}
+								cardsToDraw={cardsToDraw}
+								onConfirm={() => goTo("INTERPRET")}
+							/>
+							{phase === "INTERPRET" && (
+								<motion.div 
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									className="absolute inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-md rounded-3xl"
+								>
+									<InterpretPanel
+										key="interpreting"
+										sessionId={sessionId}
+										status={sessionData.status}
+										onComplete={() => goTo("COMPLETE")}
+									/>
+								</motion.div>
+							)}
+						</motion.div>
+					)}
+					{phase === "COMPLETE" && sessionData && (
+						<CompletionPhase key="complete" sessionId={sessionId} />
+					)}
+				</AnimatePresence>
+			</LayoutGroup>
 		</div>
 	);
 }

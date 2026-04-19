@@ -119,9 +119,10 @@ export function InterpretPanel({
 			) : (
 				<>
 					<div
-						className="relative flex h-24 w-24 items-center justify-center"
+						className="relative flex h-64 w-64 items-center justify-center"
 						data-testid="spinner"
 					>
+						{/* Ring 1 - Outer Gold */}
 						<motion.div
 							animate={{ rotate: 360 }}
 							transition={{
@@ -129,14 +130,38 @@ export function InterpretPanel({
 								repeat: Number.POSITIVE_INFINITY,
 								ease: "linear",
 							}}
-							className="absolute inset-0 rounded-full border-2 border-dashed border-secondary/50"
+							className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary border-b-primary shadow-[0_0_20px_hsla(var(--primary)/0.5)]"
 						/>
+						{/* Ring 2 - Middle Purple Reverse */}
 						<motion.div
-							animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
-							transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-							className="absolute inset-2 rounded-full border border-secondary glow-purple"
+							animate={{ rotate: -360 }}
+							transition={{
+								duration: 5,
+								repeat: Number.POSITIVE_INFINITY,
+								ease: "linear",
+							}}
+							className="absolute inset-4 rounded-full border-2 border-transparent border-l-secondary border-r-secondary"
 						/>
-						<Sparkles className="h-8 w-8 text-secondary" />
+						{/* Ring 3 - Inner Dashed */}
+						<motion.div
+							animate={{ rotate: 360 }}
+							transition={{
+								duration: 12,
+								repeat: Number.POSITIVE_INFINITY,
+								ease: "linear",
+							}}
+							className="absolute inset-10 rounded-full border border-dashed border-primary/50"
+						/>
+						{/* Astro Core */}
+						<motion.div
+							animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.7, 1, 0.7] }}
+							transition={{
+								duration: 2,
+								repeat: Number.POSITIVE_INFINITY,
+								ease: "easeInOut",
+							}}
+							className="h-10 w-10 rounded-full bg-primary shadow-[0_0_40px_20px_hsla(var(--primary)/0.5)]"
+						/>
 					</div>
 					<div className="space-y-2">
 						<h3

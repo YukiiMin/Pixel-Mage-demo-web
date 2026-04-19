@@ -1,9 +1,12 @@
-import { AdminAchievementsPage } from "@/features/staff";
+"use client";
 
-export const metadata = {
-	title: "Quản lý Achievement — PixelMage Admin",
-};
+import { ComingSoon } from "@/components/ui/coming-soon";
 
-export default function AchievementsPage() {
-	return <AdminAchievementsPage />;
+export default function InternalAchievementsPage() {
+	return (
+		<ComingSoon
+			featureName="Hệ thống Danh Hiệu"
+			description="Tính năng phân bổ danh hiệu cho người dùng đang được PixelMage xây dựng và áp dụng trong thời gian tới."
+		/>
+	);
 }

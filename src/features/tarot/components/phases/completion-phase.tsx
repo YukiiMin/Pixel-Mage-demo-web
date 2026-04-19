@@ -98,7 +98,8 @@ export function CompletionPhase({ sessionId }: CompletionPhaseProps) {
 								transition={{ delay: index * 0.08 }}
 								className="group flex flex-col items-center gap-2"
 							>
-								<div
+								<motion.div
+									layoutId={`card-container-${card.positionIndex}`}
 									className={`relative aspect-[2/3] w-24 overflow-hidden rounded-lg border border-white/10 shadow-xl transition-transform duration-500 group-hover:scale-105 ${
 										card.isReversed ? "rotate-180" : ""
 									}`}

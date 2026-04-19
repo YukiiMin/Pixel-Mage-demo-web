@@ -21,8 +21,10 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { API_ENDPOINTS, apiRequest } from "@/lib/api-config";
+import type { PageResponse } from "@/types/api";
 import { AdminMusicSettings } from "@/features/audio/components/admin-music-settings";
 
 // ────────────────────────────────
@@ -67,18 +69,22 @@ export interface AdminStatsResponse {
 	totalUsers: number;
 	totalOrders: number;
 	totalRevenue: number;
-	/** BE field name is totalCardTemplates (not totalCards) */
 	totalCardTemplates: number;
 	revenueByDay: { date: string; revenue: number }[];
-	/** BE field: `packName` (not `name`) */
 	revenueByPackType: { packName: string; revenue: number }[];
-	recentOrders: {
-		orderId: number;
-		customerName: string;
-		amount: number;
-		status: string;
-		createdAt: string;
-	}[];
+	recentOrders: AdminOrderResponse[];
+}
+
+export interface AdminOrderResponse {
+	orderId: number;
+	status: string;
+	paymentStatus: string;
+	totalAmount: number;
+	finalAmount: number;
+	createdAt: any;
+	orderDate: any;
+	userId?: number;
+    customerName?: string;
 }
 
 // ────────────────────────────────
@@ -91,6 +97,42 @@ function formatVnd(amount: number): string {
 		currency: "VND",
 		maximumFractionDigits: 0,
 	}).format(amount);
+}
+
+function parseArrayDate(dateArray: any): string {
+	if (Array.isArray(dateArray) && dateArray.length >= 3) {
+		const [year, month, day, hour = 0, minute = 0, second = 0] = dateArray;
+		return new Date(
+			year,
+			month - 1,
+			day,
+			hour,
+			minute,
+			second,
+		).toLocaleDateString("vi-VN", {
+			day: "2-digit",
+			month: "2-digit",
+			year: "numeric",
+			hour: "2-digit",
+			minute: "2-digit",
+		});
+	}
+	if (typeof dateArray === "string") {
+		const d = new Date(dateArray);
+		if (!Number.isNaN(d.getTime()))
+			return d.toLocaleDateString("vi-VN", {
+				day: "2-digit",
+				month: "2-digit",
+				year: "numeric",
+				hour: "2-digit",
+				minute: "2-digit",
+			});
+	}
+	return "N/A";
+}
+
+function getOrderAmount(order: AdminOrderResponse): number {
+	return order.finalAmount ?? order.totalAmount ?? (order as any).amount ?? 0;
 }
 
 function StatCard({
@@ -148,21 +190,39 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export function AdminDashboard() {
-	const [stats, setStats] = useState<AdminStatsResponse | null>(null);
-	const [loading, setLoading] = useState(true);
+	const { data: stats, isLoading: statsLoading } = useQuery<AdminStatsResponse>({
+		queryKey: ["admin-stats"],
+		queryFn: async (): Promise<AdminStatsResponse> => {
+			const res = await apiRequest<AdminStatsResponse>(API_ENDPOINTS.adminDashboard.stats);
+			return res.data as AdminStatsResponse;
+		},
+		refetchInterval: 15000, // Refresh every 15s for real-time
+	});
 
-	useEffect(() => {
-		apiRequest(API_ENDPOINTS.adminDashboard.stats)
-			.then((res) => {
-				setStats(res.data as AdminStatsResponse);
-			})
-			.catch((err) => {
-				console.error("Dashboard Stats Error:", err);
-			})
-			.finally(() => {
-				setLoading(false);
-			});
-	}, []);
+	// Fetch orders specifically to get real recent orders since stats payload might be missing fields
+	const { data: recentOrdersData, isLoading: ordersLoading } = useQuery<AdminOrderResponse[]>({
+		queryKey: ["admin-orders-recent"],
+		queryFn: async (): Promise<AdminOrderResponse[]> => {
+			const res = await apiRequest<PageResponse<AdminOrderResponse> | AdminOrderResponse[]>(`${API_ENDPOINTS.orderManagement.list}?size=10&sort=createdAt,desc`);
+            const data = res.data;
+            if (data && typeof data === "object" && "content" in data) return data.content;
+			return Array.isArray(data) ? data : [];
+		},
+		refetchInterval: 15000,
+	});
+
+	// Fetch active card templates only (as requested by user)
+	const { data: activeCardsData, isLoading: cardsLoading } = useQuery({
+		queryKey: ["admin-active-cards"],
+		queryFn: async () => {
+			const res = await apiRequest<PageResponse<unknown> | unknown[]>(`${API_ENDPOINTS.cardTemplates.list}?size=500&includeInvisible=false`);
+			const data = res.data;
+			if (data && typeof data === "object" && "content" in data) return data.content;
+			return Array.isArray(data) ? data : [];
+		},
+	});
+
+	const loading = statsLoading || ordersLoading || cardsLoading;
 
 	const handleClearCache = async () => {
 		if (
@@ -195,7 +255,7 @@ export function AdminDashboard() {
 		);
 	}
 
-	const safeStats = stats || {
+	const safeStats: AdminStatsResponse = stats ? stats : ({
 		totalUsers: 0,
 		totalOrders: 0,
 		totalRevenue: 0,
@@ -203,7 +263,7 @@ export function AdminDashboard() {
 		revenueByDay: [],
 		revenueByPackType: [],
 		recentOrders: [],
-	};
+	} as AdminStatsResponse);
 
 	return (
 		<div className="space-y-6">
@@ -257,8 +317,8 @@ export function AdminDashboard() {
 				<StatCard
 					icon={CreditCard}
 					label="Loại thẻ"
-					value={String(safeStats.totalCardTemplates)}
-					sub="Loại thẻ hiện có"
+					value={String(activeCardsData?.length || safeStats.totalCardTemplates)}
+					sub="Loại thẻ (đang active)"
 					iconClass="text-emerald-400"
 				/>
 				{/* NEW STATS (Pending BE update) */}
@@ -412,7 +472,7 @@ export function AdminDashboard() {
 							</tr>
 						</thead>
 						<tbody>
-							{safeStats.recentOrders.map((order) => (
+							{(recentOrdersData?.slice(0, 5) || safeStats.recentOrders.slice(0, 5)).map((order: AdminOrderResponse) => (
 								<tr
 									key={order.orderId}
 									className="border-b border-border/20 text-sm last:border-0"
@@ -421,13 +481,13 @@ export function AdminDashboard() {
 										#{order.orderId}
 									</td>
 									<td className="py-3 font-medium text-foreground">
-										{order.customerName}
+										{order.customerName || `Customer #${order.userId || '---'}`}
 									</td>
 									<td className="py-3 text-muted-foreground">
-										{order.createdAt}
+										{parseArrayDate(order.createdAt || order.orderDate)}
 									</td>
 									<td className="py-3 text-right font-stats font-semibold text-primary">
-										{formatVnd(order.amount)}
+										{formatVnd(getOrderAmount(order))}
 									</td>
 									<td className="py-3 text-right">
 										<StatusBadge status={order.status} />

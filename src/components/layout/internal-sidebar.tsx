@@ -70,8 +70,9 @@ const FAVICON_URL =
 	"https://res.cloudinary.com/yukiimin-cloud/image/upload/v1775797205/favicon_pto0em.png";
 
 const staffLinks = [
-	{ label: "Sản phẩm & Pack", href: "/staff/products", icon: ShoppingBag },
-	{ label: "Unlink Requests", href: "/staff/unlink-requests", icon: Link2Off },
+	{ label: "Sản phẩm & Pack", href: "/staff/products", icon: Package },
+	{ label: "Quản lý Đơn hàng", href: "/staff/orders", icon: ShoppingBag },
+	{ label: "Yêu cầu huỷ liên kết", href: "/staff/unlink-requests", icon: Link2Off },
 ];
 
 const adminOnlyLinks = [
