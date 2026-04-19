@@ -9,9 +9,7 @@ interface VideoContentPlayerProps {
 	content: CardContent;
 }
 
-export const VideoContentPlayer: React.FC<VideoContentPlayerProps> = ({
-	content,
-}) => {
+export function VideoContentPlayer({ content }: VideoContentPlayerProps) {
 	const [isPlaying, setIsPlaying] = React.useState(false);
 	const videoRef = React.useRef<HTMLVideoElement>(null);
 
@@ -31,7 +29,7 @@ export const VideoContentPlayer: React.FC<VideoContentPlayerProps> = ({
 			initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
 			animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
 			transition={{ duration: 0.8, ease: "easeOut" }}
-			className="relative group w-full aspect-video rounded-xl overflow-hidden glass-card overflow-hidden"
+			className="relative group w-full aspect-video rounded-xl overflow-hidden glass-card"
 		>
 			{/* Shimmer Border Overlay */}
 			<div className="absolute inset-0 pointer-events-none z-10 border border-white/10 rounded-xl" />
@@ -63,8 +61,8 @@ export const VideoContentPlayer: React.FC<VideoContentPlayerProps> = ({
 					</motion.div>
 
 					<div className="absolute bottom-8 left-0 right-0 text-center">
-						<h3 className="text-mystic-gradient text-2xl animate-flicker">
-							{content.title || "Nhấn để khởi động linh hồn"}
+						<h3 className="text-mystic-gradient text-2xl animate-flicker uppercase tracking-widest font-heading">
+							{content.title || "Khởi động linh hồn"}
 						</h3>
 					</div>
 				</div>
@@ -72,8 +70,11 @@ export const VideoContentPlayer: React.FC<VideoContentPlayerProps> = ({
 
 			{/* Info Overlay on Hover */}
 			<div className="absolute top-4 left-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-				<div className="badge-mystic">Tâm Điểm Linh Hồn</div>
+				<div className="px-3 py-1 rounded-full bg-primary/20 border border-primary/40 text-[10px] text-primary uppercase tracking-widest font-bold backdrop-blur-md">
+					Tâm Điểm Linh Hồn
+				</div>
 			</div>
 		</motion.div>
 	);
-};
+}
+

@@ -621,11 +621,11 @@ function ContentItem({
 							{content.title || "Không có tiêu đề"}
 						</h4>
 						{content.isPublic ? (
-							<Badge variant="ghost" className="h-5 px-1.5 text-[10px] bg-green-500/10 text-green-400 border-green-500/20">
+							<Badge variant="outline" className="h-5 px-1.5 text-[10px] bg-green-500/10 text-green-400 border-green-500/20">
 								Public
 							</Badge>
 						) : (
-							<Badge variant="ghost" className="h-5 px-1.5 text-[10px] bg-amber-500/10 text-amber-400 border-amber-500/20">
+							<Badge variant="outline" className="h-5 px-1.5 text-[10px] bg-amber-500/10 text-amber-400 border-amber-500/20">
 								Pro
 							</Badge>
 						)}
@@ -853,7 +853,7 @@ export function EnhancedCardDetailModal({
 								</div>
 
 								<h2 className="text-5xl font-bold font-heading text-mystic-gradient animate-flicker mb-4 leading-tight">
-									{card.cardName}
+									{card.name}
 								</h2>
 
 								<div className="relative group/desc">
@@ -947,7 +947,7 @@ export function EnhancedCardDetailModal({
 											if (!activeContent) return null;
 											
 											if (activeContent.contentType === "TEXT" || activeContent.contentType === "STORY") {
-												return <LoreContentViewer content={{ ...activeContent, contentUrl: activeContent.textData || activeContent.contentUrl }} />;
+												return <LoreContentViewer content={activeContent} />;
 											}
 											if (activeContent.contentType === "VIDEO") {
 												return <VideoContentPlayer content={activeContent} />;
