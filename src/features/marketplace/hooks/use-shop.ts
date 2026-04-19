@@ -38,8 +38,8 @@ export function useShop() {
 			const term = searchTerm.toLowerCase();
 			result = result.filter(
 				(p) =>
-					p.name.toLowerCase().includes(term) ||
-					p.description.toLowerCase().includes(term),
+					p.name?.toLowerCase().includes(term) ||
+					p.description?.toLowerCase().includes(term),
 			);
 		}
 

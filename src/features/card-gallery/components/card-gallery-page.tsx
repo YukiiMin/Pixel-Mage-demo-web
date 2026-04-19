@@ -13,8 +13,8 @@ export function CardGalleryPageClient() {
 
 	const filteredFrameworks = frameworks.filter(
 		(framework) =>
-			framework.name.toLowerCase().includes(search.toLowerCase()) ||
-			framework.description.toLowerCase().includes(search.toLowerCase()),
+			framework.name?.toLowerCase().includes(search.toLowerCase()) ||
+			framework.description?.toLowerCase().includes(search.toLowerCase()),
 	);
 
 	return (

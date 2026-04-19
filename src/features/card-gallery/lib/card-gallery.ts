@@ -97,8 +97,8 @@ export async function getCardTemplates(
 	try {
 		const params = new URLSearchParams();
 
-		if (filters.page) params.append("page", filters.page.toString());
-		if (filters.limit) params.append("size", filters.limit.toString());
+		if (filters.page !== undefined) params.append("page", filters.page.toString());
+		if (filters.limit !== undefined) params.append("size", filters.limit.toString());
 		if (filters.sortBy) {
 			const sortValue =
 				filters.sortOrder === "desc"

@@ -17,6 +17,7 @@ import type {
 } from "@/features/card-gallery/types";
 import { getApiErrorMessage } from "@/types/api";
 import { hasStoredAuthSession } from "@/lib/api-config";
+import { useDebounce } from "@/hooks/use-debounce";
 import { useQuery } from "@tanstack/react-query";
 import {
 	AnimatePresence,
@@ -461,6 +462,9 @@ function CardFrameworkContent() {
 		staleTime: 1000 * 60 * 5,
 	});
 
+	// Debounce search to avoid API flooding per-keystroke
+	const debouncedSearch = useDebounce(filters.search, 350);
+
 	// Derive API-compatible rarity param (undefined = no filter)
 	const rarityParam = filters.rarity === "ALL" ? undefined : filters.rarity;
 
@@ -475,13 +479,13 @@ function CardFrameworkContent() {
 			frameworkId,
 			page,
 			rarityParam,
-			filters.search,
+			debouncedSearch,
 			filters.sortBy,
 			filters.sortOrder,
 		],
 		queryFn: async () => {
 			const result = await getCardTemplatesByFramework(frameworkId, {
-				search: filters.search,
+				search: debouncedSearch,
 				rarity: rarityParam,
 				sortBy: filters.sortBy,
 				sortOrder: filters.sortOrder,
@@ -903,6 +907,36 @@ function CardFrameworkContent() {
 				onClose={() => setSelectedCard(null)}
 				isAuthenticated={isAuthenticated}
 				frameworkName={frameworkDisplayName}
+				onNext={() => {
+					if (!selectedCard) return;
+					const currentIndex = cards.findIndex(
+						(c: CardTemplateWithContent) =>
+							c.cardTemplateId === selectedCard.cardTemplateId,
+					);
+					if (currentIndex !== -1) {
+						if (currentIndex < cards.length - 1) {
+							setSelectedCard(cards[currentIndex + 1]);
+						} else {
+							// Loop to start of page
+							setSelectedCard(cards[0]);
+						}
+					}
+				}}
+				onPrev={() => {
+					if (!selectedCard) return;
+					const currentIndex = cards.findIndex(
+						(c: CardTemplateWithContent) =>
+							c.cardTemplateId === selectedCard.cardTemplateId,
+					);
+					if (currentIndex !== -1) {
+						if (currentIndex > 0) {
+							setSelectedCard(cards[currentIndex - 1]);
+						} else {
+							// Loop to end of page
+							setSelectedCard(cards[cards.length - 1]);
+						}
+					}
+				}}
 			/>
 		</div>
 	);

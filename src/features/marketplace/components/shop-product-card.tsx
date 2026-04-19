@@ -37,6 +37,19 @@ export function ShopProductCard({
 				</div>
 			)}
 
+			{/* Product Type Badge */}
+			<div className="absolute left-3 top-3 z-10">
+				{product.productType === "SINGLE_CARD" ? (
+					<span className="inline-flex items-center gap-1 rounded-full bg-sky-500/15 px-2 py-1 text-[10px] font-semibold text-sky-400 border border-sky-500/30">
+						🃏 Thẻ vật lý
+					</span>
+				) : (
+					<span className="inline-flex items-center gap-1 rounded-full bg-purple-500/15 px-2 py-1 text-[10px] font-semibold text-purple-400 border border-purple-500/30">
+						✨ Gacha Pack
+					</span>
+				)}
+			</div>
+
 			<div className="relative z-10">
 				{/* Pack Visual */}
 				<div className="relative mb-4 flex h-48 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
@@ -68,12 +81,12 @@ export function ShopProductCard({
 					{product.description}
 				</p>
 
-				{/* Pool Preview */}
+				{/* Pool Preview / Card Template Info */}
 				{product.poolPreview && product.poolPreview.length > 0 && (
 					<div className="mb-4">
 						<p className="mb-2 text-xs font-medium text-muted-foreground">
 							<Sparkles className="mr-1 inline h-3 w-3" />
-							Có thể nhận được:
+							{product.productType === "SINGLE_CARD" ? "Loại lá bài:" : "Có thể nhận được:"}
 						</p>
 						<div className="flex -space-x-2 overflow-hidden">
 							{product.poolPreview.slice(0, 5).map((preview) => (

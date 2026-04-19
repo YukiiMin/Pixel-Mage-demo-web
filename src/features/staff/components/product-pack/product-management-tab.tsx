@@ -233,7 +233,7 @@ export function ProductManagementTab() {
 
 	const handleToggleActive = async (p: AdminProduct) => {
 		try {
-			await fetch(`/api/products/${p.productId}/active`, { method: "PATCH" });
+			await fetch(`/api/products/${p.productId}/toggle-active`, { method: "PUT" });
 			toast.success(p.isActive ? `"${p.name}" đã vô hiệu hóa` : `"${p.name}" đã kích hoạt`);
 			fetchAll();
 			setActiveTarget(null);
@@ -244,7 +244,7 @@ export function ProductManagementTab() {
 
 	const handleToggleVisibility = async (p: AdminProduct) => {
 		try {
-			await fetch(`/api/products/${p.productId}/visibility`, { method: "PATCH" });
+			await fetch(`/api/products/${p.productId}/toggle-visibility`, { method: "PUT" });
 			toast.success(
 				p.isVisible ? `"${p.name}" đã ẩn khỏi shop` : `"${p.name}" đã hiển thị trên shop`
 			);
@@ -659,8 +659,8 @@ export function ProductManagementTab() {
 							</div>
 						)}
 
-						{/* Quick Stock Generator for SINGLE_CARD (Create Mode Only) */}
-						{form.productType === "SINGLE_CARD" && !editTarget && (
+						{/* Quick Stock Generator for SINGLE_CARD */}
+						{form.productType === "SINGLE_CARD" && (
 							<div className="space-y-1.5 p-4 rounded-lg border border-primary/20 bg-primary/5">
 								<Label className="flex items-center gap-2 text-primary font-medium">
 									<Package className="h-4 w-4" /> Số lượng nhập kho ban đầu

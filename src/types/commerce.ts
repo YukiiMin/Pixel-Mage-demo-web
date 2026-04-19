@@ -88,5 +88,9 @@ export interface ProductResponse {
 	isLimited?: boolean;
 	isVisible?: boolean;
 	isActive?: boolean;
+	productType?: "GACHA_PACK" | "SINGLE_CARD";
+	packCategoryId?: number;
+	cardTemplateId?: number;
+	poolSize?: number;
 	poolPreview: CardTemplateSummaryResponse[];
 }

@@ -40,6 +40,9 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { VideoContentPlayer } from "./video-content-player";
+import { LoreContentViewer } from "./lore-content-viewer";
 
 // ─────────────────────────────────────────────
 // Types & Interfaces
@@ -50,6 +53,8 @@ interface CardDetailModalProps {
 	onClose: () => void;
 	isAuthenticated: boolean;
 	frameworkName?: string;
+	onNext?: () => void;
+	onPrev?: () => void;
 }
 
 // ─────────────────────────────────────────────
@@ -98,7 +103,8 @@ const glowVariants = {
 // ─────────────────────────────────────────────
 // Helper Functions
 // ─────────────────────────────────────────────
-const getRarityConfig = (rarity: string) => {
+const getRarityConfig = (rarity?: string) => {
+	const normalizedRarity = (rarity || "COMMON").toUpperCase();
 	const configs: Record<
 		string,
 		{
@@ -131,7 +137,7 @@ const getRarityConfig = (rarity: string) => {
 			icon: <Zap className="h-4 w-4" />,
 		},
 	};
-	return configs[rarity] || configs.COMMON;
+	return configs[normalizedRarity] || configs.COMMON;
 };
 
 const getElementIcon = (element?: string) => {
@@ -355,53 +361,48 @@ function CardImageSection({
 
 function CardStats({ card }: { card: CardTemplateWithContent }) {
 	return (
-		<div className="grid grid-cols-2 gap-3">
-			<Card className="bg-card/50 border-border/30">
-				<CardContent className="p-3 flex items-center gap-3">
-					<div className="p-2 rounded-lg bg-blue-500/10">
-						<Users className="h-4 w-4 text-blue-400" />
+		<div className="grid grid-cols-2 gap-4">
+			<div className="bg-card/40 backdrop-blur-sm border border-border/30 rounded-2xl p-4 group/stat hover:border-primary/40 transition-all duration-500">
+				<div className="flex items-center gap-3 mb-2">
+					<div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 group-hover/stat:scale-110 transition-transform">
+						<Users className="h-5 w-5 text-blue-400" />
 					</div>
-					<div>
-						<p className="text-xs text-muted-foreground">Số người sở hữu</p>
-						<p className="text-lg font-bold text-foreground">
-							{card.ownerCount?.toLocaleString() || 0}
-						</p>
-					</div>
-				</CardContent>
-			</Card>
+					<span className="text-[10px] uppercase tracking-wider text-muted-foreground font-body font-semibold">Sở hữu</span>
+				</div>
+				<p className="text-2xl font-bold text-foreground font-stats">
+					{card.ownerCount?.toLocaleString() || 0}
+				</p>
+			</div>
 
-			<Card className="bg-card/50 border-border/30">
-				<CardContent className="p-3 flex items-center gap-3">
-					<div className="p-2 rounded-lg bg-orange-500/10">
-						<Percent className="h-4 w-4 text-orange-400" />
+			<div className="bg-card/40 backdrop-blur-sm border border-border/30 rounded-2xl p-4 group/stat hover:border-primary/40 transition-all duration-500">
+				<div className="flex items-center gap-3 mb-2">
+					<div className="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 group-hover/stat:scale-110 transition-transform">
+						<Percent className="h-5 w-5 text-orange-400" />
 					</div>
-					<div>
-						<p className="text-xs text-muted-foreground">Tỷ lệ rơi</p>
-						<p className="text-lg font-bold text-foreground">
-							{card.dropRate || 0}%
-						</p>
-					</div>
-				</CardContent>
-			</Card>
+					<span className="text-[10px] uppercase tracking-wider text-muted-foreground font-body font-semibold">Drop Rate</span>
+				</div>
+				<p className="text-2xl font-bold text-foreground font-stats">
+					{card.dropRate || 0}%
+				</p>
+			</div>
 
-			<Card className="bg-card/50 border-border/30 col-span-2">
-				<CardContent className="p-3">
-					<div className="flex items-center justify-between mb-2">
-						<span className="text-xs text-muted-foreground">Độ hiếm</span>
-						<span className="text-sm font-semibold">{card.rarity}</span>
-					</div>
-					<div className="h-2 bg-muted rounded-full overflow-hidden">
-						<motion.div
-							className="h-full bg-linear-to-r from-green-500 via-yellow-500 to-red-500"
-							initial={{ width: 0 }}
-							animate={{
-								width: `${Math.min((card.dropRate || 0) * 10, 100)}%`,
-							}}
-							transition={{ duration: 1, delay: 0.3 }}
-						/>
-					</div>
-				</CardContent>
-			</Card>
+			<div className="col-span-2 bg-card/20 border border-primary/10 rounded-2xl p-5 space-y-3 relative overflow-hidden group/progress">
+				<div className="absolute inset-0 bg-primary/5 opacity-0 group-hover/progress:opacity-100 transition-opacity" />
+				<div className="flex items-center justify-between relative z-10">
+					<span className="text-xs text-primary/70 font-semibold uppercase tracking-widest">Rarity Progression</span>
+					<span className="text-sm font-bold text-primary">{card.rarity}</span>
+				</div>
+				<div className="h-2 bg-muted/30 rounded-full overflow-hidden relative z-10 border border-white/5">
+					<motion.div
+						className="h-full bg-linear-to-r from-primary/40 via-primary to-primary-foreground shadow-[0_0_15px_rgba(212,175,55,0.5)]"
+						initial={{ width: 0 }}
+						animate={{
+							width: `${Math.min((card.dropRate || 0) * 10, 100)}%`,
+						}}
+						transition={{ duration: 1.5, ease: "easeOut" }}
+					/>
+				</div>
+			</div>
 		</div>
 	);
 }
@@ -410,10 +411,12 @@ function ContentSection({
 	card,
 	accessLevel,
 	isAuthenticated,
+	onSelect,
 }: {
 	card: CardTemplateWithContent;
 	accessLevel: ContentAccessLevel;
 	isAuthenticated: boolean;
+	onSelect: (contentId: string) => void;
 }) {
 	const [activeTab, setActiveTab] = useState("all");
 	const contents = card.cardContents || [];
@@ -490,14 +493,15 @@ function ContentSection({
 					</TabsList>
 
 					<TabsContent value="all" className="mt-4">
-						<ScrollArea className="h-75 pr-4">
+						<ScrollArea className="h-[400px] pr-4">
 							<div className="space-y-3">
 								{filteredContents.map((content, index) => (
 									<ContentItem
 										key={content.contentId}
 										content={content}
 										isLocked={!isAuthenticated && !content.isPublic}
-										delay={index * 0.1}
+										delay={index * 0.05}
+										onSelect={onSelect}
 									/>
 								))}
 							</div>
@@ -505,16 +509,17 @@ function ContentSection({
 					</TabsContent>
 
 					<TabsContent value="text" className="mt-4">
-						<ScrollArea className="h-75 pr-4">
+						<ScrollArea className="h-[400px] pr-4">
 							<div className="space-y-3">
 								{filteredContents
-									.filter((c) => c.contentType === "TEXT")
+									.filter((c) => c.contentType === "TEXT" || c.contentType === "STORY")
 									.map((content, index) => (
 										<ContentItem
 											key={content.contentId}
 											content={content}
 											isLocked={!isAuthenticated && !content.isPublic}
-											delay={index * 0.1}
+											delay={index * 0.05}
+											onSelect={onSelect}
 										/>
 									))}
 							</div>
@@ -522,7 +527,7 @@ function ContentSection({
 					</TabsContent>
 
 					<TabsContent value="image" className="mt-4">
-						<ScrollArea className="h-75 pr-4">
+						<ScrollArea className="h-[400px] pr-4">
 							<div className="space-y-3">
 								{filteredContents
 									.filter(
@@ -533,7 +538,8 @@ function ContentSection({
 											key={content.contentId}
 											content={content}
 											isLocked={!isAuthenticated && !content.isPublic}
-											delay={index * 0.1}
+											delay={index * 0.05}
+											onSelect={onSelect}
 										/>
 									))}
 							</div>
@@ -541,7 +547,7 @@ function ContentSection({
 					</TabsContent>
 
 					<TabsContent value="video" className="mt-4">
-						<ScrollArea className="h-75 pr-4">
+						<ScrollArea className="h-[400px] pr-4">
 							<div className="space-y-3">
 								{filteredContents
 									.filter((c) => c.contentType === "VIDEO")
@@ -550,7 +556,8 @@ function ContentSection({
 											key={content.contentId}
 											content={content}
 											isLocked={!isAuthenticated && !content.isPublic}
-											delay={index * 0.1}
+											delay={index * 0.05}
+											onSelect={onSelect}
 										/>
 									))}
 							</div>
@@ -573,84 +580,67 @@ function ContentItem({
 	content,
 	isLocked,
 	delay = 0,
+	onSelect,
 }: {
 	content: CardContentData;
 	isLocked: boolean;
 	delay?: number;
+	onSelect: (contentId: string) => void;
 }) {
 	const config = getContentTypeConfig(content.contentType);
 
 	return (
 		<motion.div
 			initial={{ opacity: 0, x: -20 }}
-			animate={{ opacity: 1, x: 0 }}
+			whileInView={{ opacity: 1, x: 0 }}
+			viewport={{ once: true }}
 			transition={{ duration: 0.3, delay }}
-			className={`relative rounded-xl border ${isLocked ? "border-amber-500/30" : "border-border/30"} bg-card/30 overflow-hidden`}
+			onClick={() => !isLocked && onSelect(content.contentId)}
+			className={`relative rounded-xl border ${isLocked ? "border-amber-500/30" : "border-border/30"} bg-card/30 overflow-hidden group/item cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all duration-300`}
 		>
 			{isLocked && (
 				<div className="absolute inset-0 backdrop-blur-md bg-background/80 z-10 flex items-center justify-center">
 					<div className="text-center">
 						<Lock className="h-8 w-8 text-amber-400 mx-auto mb-2" />
 						<p className="text-sm text-amber-200">Nội dung độc quyền</p>
-						<p className="text-xs text-amber-100/60">Đăng nhập để xem</p>
+						<p className="text-xs text-amber-100/60 font-jakarta">Đăng nhập để xem</p>
 					</div>
 				</div>
 			)}
 
-			<div className="p-4 opacity-100">
-				{/* Header */}
-				<div className="flex items-center gap-3 mb-3">
-					<div className={`p-2 rounded-lg bg-muted ${config?.color ?? "text-muted-foreground"}`}>
-						{config?.icon}
+			<div className="p-4 flex items-center gap-4">
+				{/* Type Icon */}
+				<div className={`p-3 rounded-lg bg-muted/50 border border-border/20 group-hover/item:border-primary/30 transition-colors ${config?.color ?? "text-muted-foreground"}`}>
+					{config?.icon}
+				</div>
+				
+				{/* Info */}
+				<div className="flex-1 min-w-0">
+					<div className="flex items-center gap-2 mb-1">
+						<h4 className="font-semibold text-foreground truncate group-hover/item:text-primary transition-colors">
+							{content.title || "Không có tiêu đề"}
+						</h4>
+						{content.isPublic ? (
+							<Badge variant="ghost" className="h-5 px-1.5 text-[10px] bg-green-500/10 text-green-400 border-green-500/20">
+								Public
+							</Badge>
+						) : (
+							<Badge variant="ghost" className="h-5 px-1.5 text-[10px] bg-amber-500/10 text-amber-400 border-amber-500/20">
+								Pro
+							</Badge>
+						)}
 					</div>
-					<div className="flex-1">
-						<h4 className="font-semibold text-foreground">{content.title}</h4>
-						<span className={`text-xs ${config?.color ?? "text-muted-foreground"}`}>{config?.label ?? content.contentType}</span>
+					<div className="flex items-center gap-2 text-xs text-muted-foreground line-clamp-1">
+						<span className="capitalize">{config?.label || "Archive"}</span>
+						<span>•</span>
+						<span>{content.contentType === "TEXT" || content.contentType === "STORY" ? "Bản thảo cổ" : "Đa phương tiện"}</span>
 					</div>
-					{content.isPublic ? (
-						<Badge className="bg-green-500/10 text-green-400 border-green-500/30 text-xs">
-							Công khai
-						</Badge>
-					) : (
-						<Badge className="bg-amber-500/10 text-amber-400 border-amber-500/30 text-xs">
-							Độc quyền
-						</Badge>
-					)}
 				</div>
 
-				{/* Content Body */}
-				{content.contentType === "TEXT" && content.textData && (
-					<p className="text-sm text-muted-foreground leading-relaxed line-clamp-4">
-						{content.textData}
-					</p>
-				)}
-
-				{content.contentType === "IMAGE" && content.contentUrl && (
-					<div className="rounded-lg overflow-hidden bg-muted/20">
-						<Image
-							src={content.contentUrl}
-							alt={content.title || "Hình ảnh"}
-							width={400}
-							height={300}
-							className="w-full h-auto object-cover"
-						/>
-					</div>
-				)}
-
-				{content.contentType === "VIDEO" && content.thumbnailUrl && (
-					<div className="rounded-lg overflow-hidden bg-muted/20 relative">
-						<Image
-							src={content.thumbnailUrl}
-							alt={content.title || "Video thumbnail"}
-							width={400}
-							height={300}
-							className="w-full h-auto object-cover"
-						/>
-						<div className="absolute inset-0 flex items-center justify-center bg-black/40">
-							<div className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
-								<Play className="h-6 w-6 text-white" />
-							</div>
-						</div>
+				{/* Selection Arrow */}
+				{!isLocked && (
+					<div className="opacity-0 group-hover/item:opacity-100 translate-x-4 group-hover/item:translate-x-0 transition-all duration-300">
+						<ChevronRight className="h-5 w-5 text-primary" />
 					</div>
 				)}
 			</div>
@@ -670,7 +660,7 @@ function ActionPanel({
 			{/* Buy Button */}
 			<Button
 				size="lg"
-				className="w-full bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold shadow-lg shadow-primary/25"
+				className="w-full bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold shadow-lg shadow-primary/25 btn-shimmer"
 				asChild
 			>
 				<Link
@@ -769,7 +759,10 @@ export function EnhancedCardDetailModal({
 	onClose,
 	isAuthenticated,
 	frameworkName,
+	onNext,
+	onPrev,
 }: CardDetailModalProps) {
+	const [selectedContentId, setSelectedContentId] = useState<string | null>(null);
 	const accessLevel = useContentAccess(card, isAuthenticated);
 
 	if (!card) return null;
@@ -783,6 +776,42 @@ export function EnhancedCardDetailModal({
 					<DialogTitle>{card.name}</DialogTitle>
 				</DialogHeader>
 
+				{/* Cinematic Starfield Background */}
+				<div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+					<div className="absolute inset-0 bg-[#0a0a0f]" />
+					<div className="absolute top-0 left-0 w-full h-[30%] bg-linear-to-b from-primary/10 to-transparent" />
+					<div className="absolute bottom-0 left-0 w-full h-[30%] bg-linear-to-t from-slate-900/50 to-transparent" />
+					
+					{/* Twinkling Stars */}
+					{[...Array(20)].map((_, i) => (
+						<motion.div
+							key={i}
+							className="absolute w-1 h-1 bg-white rounded-full animate-twinkle"
+							style={{
+								top: `${Math.random() * 100}%`,
+								left: `${Math.random() * 100}%`,
+								opacity: Math.random() * 0.7,
+								animationDelay: `${Math.random() * 5}s`,
+								animationDuration: `${2 + Math.random() * 3}s`,
+							}}
+						/>
+					))}
+					
+					{/* Floating particles */}
+					{[...Array(8)].map((_, i) => (
+						<motion.div
+							key={`p-${i}`}
+							className="absolute w-2 h-2 bg-primary/20 rounded-full blur-sm animate-float"
+							style={{
+								top: `${Math.random() * 100}%`,
+								left: `${Math.random() * 100}%`,
+								animationDelay: `${Math.random() * 8}s`,
+								animationDuration: `${10 + Math.random() * 10}s`,
+							}}
+						/>
+					))}
+				</div>
+
 				<AnimatePresence mode="wait">
 					<motion.div
 						key={card.cardTemplateId}
@@ -790,59 +819,83 @@ export function EnhancedCardDetailModal({
 						initial="hidden"
 						animate="visible"
 						exit="exit"
-						className="grid grid-cols-1 lg:grid-cols-12 gap-0"
+						className="grid grid-cols-1 lg:grid-cols-12 gap-0 relative z-10"
 					>
-						{/* Left Column - Card Image */}
-						<div className="lg:col-span-5 p-6 lg:p-8 bg-linear-to-br from-slate-900/50 to-background">
+						{/* Pane 1 (Left) - Card Image Visuals */}
+						<div className="lg:col-span-4 p-6 lg:p-8 bg-linear-to-br from-slate-900/80 to-background/40 backdrop-blur-md border-r border-border/20">
 							<CardImageSection card={card} rarityConfig={rarityConfig} />
 
-							{/* Mobile-only Stats */}
+							{/* Mobile-only Stats - Hidden on Desktop since it moves to Right pane */}
 							<div className="mt-6 lg:hidden">
 								<CardStats card={card} />
 							</div>
 						</div>
 
-						{/* Right Column - Details */}
-						<div className="lg:col-span-7 p-6 lg:p-8 space-y-6">
+						{/* Pane 2 (Center) - Core Identity & Actions */}
+						<div className={`lg:col-span-4 p-6 lg:p-8 space-y-6 flex flex-col transition-all duration-500 relative overflow-hidden ${selectedContentId ? "opacity-30 blur-xs pointer-events-none" : "opacity-100"}`}>
+							{/* Premium Shimmer Overlay */}
+							<div className="absolute top-0 inset-x-0 h-px bg-linear-to-r from-transparent via-primary/50 to-transparent" />
+							
 							{/* Header Info */}
 							<div>
-								<div className="flex items-center gap-2 mb-2">
+								<div className="flex items-center gap-2 mb-3">
 									<Badge
-										className={`${rarityConfig.bg} ${rarityConfig.color} border ${rarityConfig.border}`}
+										className={`${rarityConfig.bg} ${rarityConfig.color} border ${rarityConfig.border} px-3 py-1 shadow-lg animate-pulse-glow`}
 									>
 										{rarityConfig.icon}
-										<span className="ml-1">{card.rarity}</span>
+										<span className="ml-1 tracking-[0.2em] font-bold">{card.rarity}</span>
 									</Badge>
 									{frameworkName && (
-										<Badge variant="outline" className="border-border/50">
+										<Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary/70 text-[10px] tracking-widest uppercase">
 											{frameworkName}
 										</Badge>
 									)}
 								</div>
 
-								<h2 className="text-3xl lg:text-4xl font-bold gradient-gold-purple mb-3">
-									{card.name}
+								<h2 className="text-5xl font-bold font-heading text-mystic-gradient animate-flicker mb-4 leading-tight">
+									{card.cardName}
 								</h2>
 
-								<p className="text-muted-foreground leading-relaxed">
-									{card.description || "Chưa có mô tả cho lá bài này."}
-								</p>
+								<div className="relative group/desc">
+									<p className="text-base text-ethereal/90 leading-relaxed border-l-2 border-primary/20 pl-4 py-1 italic opacity-80 animate-fog-in">
+										{card.description || "Huyền tích về lá bài này đang chờ được khám phá..."}
+									</p>
+									<div className="absolute -left-1 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/50 via-primary to-primary/50 group-hover:via-primary-foreground transition-all duration-300" />
+								</div>
 							</div>
 
-							{/* Desktop Stats */}
-							<div className="hidden lg:block">
-								<CardStats card={card} />
+							<div className="flex-1" />
+
+							{/* Actions - Now in the Center Column */}
+							<div className="pt-6 border-t border-border/20">
+								<ActionPanel card={card} onClose={onClose} />
+							</div>
+						</div>
+
+						{/* Pane 3 (Right) - The Archive (Library & Stats) */}
+						<div className={`lg:col-span-4 p-6 lg:p-8 bg-black/20 backdrop-blur-sm border-l border-border/20 flex flex-col transition-all duration-500 ${selectedContentId ? "lg:translate-x-full lg:opacity-0" : "opacity-100"}`}>
+							<div className="flex items-center gap-2 mb-6">
+								<div className="p-1.5 rounded-full bg-primary/10 border border-primary/20">
+									<Zap className="h-5 w-5 text-primary" />
+								</div>
+								<h3 className="text-xl font-heading font-semibold text-gold-shimmer">
+									Chỉ Số Thẻ Bài
+								</h3>
 							</div>
 
-							{/* Content Section */}
-							<div className="border-t border-border/30 pt-6">
-								<div className="flex items-center gap-2 mb-4">
-									<BookOpen className="h-5 w-5 text-primary" />
-									<h3 className="text-lg font-semibold">
-										Nội dung & Câu chuyện
-									</h3>
-									<Badge className="bg-blue-500/10 text-blue-400 border-blue-500/30 ml-2">
-										{card.totalContentPieces || 0}
+							<CardStats card={card} />
+
+							{/* Content Library */}
+							<div className="mt-8 flex-1 flex flex-col">
+								<div className="flex items-center justify-between mb-4">
+									<div className="flex items-center gap-2">
+										<BookOpen className="h-5 w-5 text-primary" />
+										<h3 className="text-2xl font-heading font-semibold text-gold-shimmer">
+											Kho Lưu Trữ
+										</h3>
+									</div>
+									<Badge className="bg-primary/20 text-primary border-primary/40 font-stats">
+										{card.cardContents?.length || 0}
 									</Badge>
 								</div>
 
@@ -850,13 +903,116 @@ export function EnhancedCardDetailModal({
 									card={card}
 									accessLevel={accessLevel}
 									isAuthenticated={isAuthenticated}
+									onSelect={(id) => setSelectedContentId(id)}
 								/>
 							</div>
+						</div>
 
-							{/* Actions */}
-							<div className="border-t border-border/30 pt-6">
-								<ActionPanel card={card} onClose={onClose} />
-							</div>
+						{/* Archive Detail View - Interaction Solution */}
+						<AnimatePresence>
+							{selectedContentId && (
+								<motion.div
+									initial={{ opacity: 0, x: 200, filter: "blur(10px)" }}
+									animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+									exit={{ opacity: 0, x: 200, filter: "blur(10px)" }}
+									transition={{ type: "spring", damping: 25, stiffness: 200 }}
+									className="absolute inset-y-0 right-0 w-full lg:w-[66.6%] z-[60] bg-background/98 backdrop-blur-2xl border-l border-primary/20 p-6 lg:p-10 shadow-[-20px_0_50px_rgba(0,0,0,0.5)] flex flex-col"
+								>
+									{/* Decorative Overlay background */}
+									<div className="absolute inset-0 pointer-events-none opacity-20 overflow-hidden">
+										<div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 blur-[120px] rounded-full" />
+										<div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/10 blur-[100px] rounded-full" />
+									</div>
+
+									<div className="flex items-center justify-between mb-8 relative z-10">
+										<Button
+											variant="ghost"
+											onClick={() => setSelectedContentId(null)}
+											className="text-primary hover:text-primary-foreground hover:bg-primary/20"
+										>
+											<ChevronLeft className="h-5 w-5 mr-2" />
+											Quay lại Thư Viện
+										</Button>
+										
+										{selectedContentId && card.cardContents?.find(c => c.contentId === selectedContentId)?.title && (
+											<h4 className="text-lg font-heading text-primary font-bold">
+												{card.cardContents.find(c => c.contentId === selectedContentId)?.title}
+											</h4>
+										)}
+									</div>
+
+									<ScrollArea className="flex-1 pr-4">
+										{(() => {
+											const activeContent = card.cardContents?.find(c => c.contentId === selectedContentId);
+											if (!activeContent) return null;
+											
+											if (activeContent.contentType === "TEXT" || activeContent.contentType === "STORY") {
+												return <LoreContentViewer content={{ ...activeContent, contentUrl: activeContent.textData || activeContent.contentUrl }} />;
+											}
+											if (activeContent.contentType === "VIDEO") {
+												return <VideoContentPlayer content={activeContent} />;
+											}
+											if (activeContent.contentType === "IMAGE") {
+												return (
+													<div className="rounded-xl overflow-hidden border border-primary/20 shadow-2xl">
+														<Image 
+															src={activeContent.contentUrl || ""} 
+															alt={activeContent.title || "Lore Image"} 
+															width={800} 
+															height={600} 
+															className="w-full h-auto object-contain"
+														/>
+													</div>
+												);
+											}
+											return null;
+										})()}
+									</ScrollArea>
+								</motion.div>
+							)}
+						</AnimatePresence>
+
+						{/* Navigation Arrows - Premium Absolute Position Fix */}
+						<div className="absolute inset-0 pointer-events-none z-40 overflow-hidden">
+							{onPrev && (
+								<div 
+									className="absolute left-0 top-1/2 -translate-y-1/2 h-64 w-24 pointer-events-auto flex items-center justify-start group/nav-left cursor-pointer"
+									onClick={(e) => {
+										e.stopPropagation();
+										onPrev();
+									}}
+									aria-label="Lá bài trước"
+								>
+									<motion.div 
+										initial={{ x: -60, opacity: 0 }}
+										whileHover={{ x: 0, opacity: 1 }}
+										transition={{ type: "spring", damping: 20, stiffness: 100 }}
+										className="p-4 bg-linear-to-r from-primary/30 to-transparent backdrop-blur-md rounded-r-3xl border-y border-r border-primary/40 flex items-center justify-center shadow-[15px_0_30px_-15px_rgba(255,184,0,0.2)]"
+									>
+										<ChevronLeft className="h-10 w-10 text-primary" />
+									</motion.div>
+								</div>
+							)}
+
+							{onNext && (
+								<div 
+									className="absolute right-0 top-1/2 -translate-y-1/2 h-64 w-24 pointer-events-auto flex items-center justify-end group/nav-right cursor-pointer"
+									onClick={(e) => {
+										e.stopPropagation();
+										onNext();
+									}}
+									aria-label="Lá bài sau"
+								>
+									<motion.div 
+										initial={{ x: 60, opacity: 0 }}
+										whileHover={{ x: 0, opacity: 1 }}
+										transition={{ type: "spring", damping: 20, stiffness: 100 }}
+										className="p-4 bg-linear-to-l from-primary/30 to-transparent backdrop-blur-md rounded-l-3xl border-y border-l border-primary/40 flex items-center justify-center shadow-[-15px_0_30px_-15px_rgba(255,184,0,0.2)]"
+									>
+										<ChevronRight className="h-10 w-10 text-primary" />
+									</motion.div>
+								</div>
+							)}
 						</div>
 					</motion.div>
 				</AnimatePresence>
