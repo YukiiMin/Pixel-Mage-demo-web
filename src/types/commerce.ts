@@ -86,5 +86,7 @@ export interface ProductResponse {
 	imageUrl?: string;
 	collectionType?: CollectionType;
 	isLimited?: boolean;
+	isVisible?: boolean;
+	isActive?: boolean;
 	poolPreview: CardTemplateSummaryResponse[];
 }

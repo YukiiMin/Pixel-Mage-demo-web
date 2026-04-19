@@ -42,6 +42,8 @@ export function useMarketplace() {
 	const filteredPacks = useMemo(() => {
 		const normalizedSearch = searchTerm.trim().toLowerCase();
 		const result = packs.filter((pack) => {
+			// 🔒 Chỉ hiển thị sản phẩm đang visible và active với khách hàng
+			if (!pack.isVisible || !pack.isActive) return false;
 			const matchLimited = !limitedOnly || pack.isLimited;
 			const matchSearch =
 				normalizedSearch.length === 0 ||

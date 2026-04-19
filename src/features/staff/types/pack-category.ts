@@ -86,4 +86,5 @@ export interface ProductRequest {
 	isActive?: boolean;
 	packCategoryId?: number;
 	cardTemplateId?: number;
+	initialStock?: number;
 }

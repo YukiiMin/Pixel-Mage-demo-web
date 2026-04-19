@@ -16,6 +16,7 @@ import type {
 	Rarity,
 } from "@/features/card-gallery/types";
 import { getApiErrorMessage } from "@/types/api";
+import { hasStoredAuthSession } from "@/lib/api-config";
 import { useQuery } from "@tanstack/react-query";
 import {
 	AnimatePresence,
@@ -442,7 +443,11 @@ function CardFrameworkContent() {
 		page: 0,
 		limit: PAGE_SIZE,
 	});
-	const [isAuthenticated] = useState(false);
+	const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+	useEffect(() => {
+		setIsAuthenticated(hasStoredAuthSession());
+	}, []);
 
 	// Reset page when filter changes
 	useEffect(() => {
@@ -816,8 +821,41 @@ function CardFrameworkContent() {
 				</p>
 			</div>
 
-			{/* ── Cards Grid ── */}
-			<div className="container mx-auto px-4 pb-12">
+			{/* ── Cards Grid — wrapped in hover-pagination group ── */}
+			<div className="relative group/gallery container mx-auto px-4 pb-12">
+
+				{/* Hover Left Arrow */}
+				{!isLoading && totalPages > 1 && page > 0 && (
+					<button
+						type="button"
+						onClick={() => {
+							setPage((p) => Math.max(0, p - 1));
+							window.scrollTo({ top: 0, behavior: "smooth" });
+						}}
+						className="absolute left-0 top-0 bottom-0 z-20 w-14 flex items-center justify-center opacity-0 group-hover/gallery:opacity-100 bg-gradient-to-r from-black/60 to-transparent transition-all duration-300 pointer-events-auto rounded-l-xl"
+					>
+						<div className="h-12 w-12 rounded-full bg-black/50 border border-amber-500/30 flex items-center justify-center shadow-lg hover:bg-amber-500/20 hover:border-amber-400/70 transition-colors backdrop-blur-md">
+							<ChevronLeft className="h-7 w-7 text-amber-400" />
+						</div>
+					</button>
+				)}
+
+				{/* Hover Right Arrow */}
+				{!isLoading && totalPages > 1 && page < totalPages - 1 && (
+					<button
+						type="button"
+						onClick={() => {
+							setPage((p) => Math.min(totalPages - 1, p + 1));
+							window.scrollTo({ top: 0, behavior: "smooth" });
+						}}
+						className="absolute right-0 top-0 bottom-0 z-20 w-14 flex items-center justify-center opacity-0 group-hover/gallery:opacity-100 bg-gradient-to-l from-black/60 to-transparent transition-all duration-300 pointer-events-auto rounded-r-xl"
+					>
+						<div className="h-12 w-12 rounded-full bg-black/50 border border-amber-500/30 flex items-center justify-center shadow-lg hover:bg-amber-500/20 hover:border-amber-400/70 transition-colors backdrop-blur-md">
+							<ChevronRight className="h-7 w-7 text-amber-400" />
+						</div>
+					</button>
+				)}
+
 				{isLoading ? (
 					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
 						{Array.from({ length: PAGE_SIZE }).map((_, i) => (
@@ -848,6 +886,7 @@ function CardFrameworkContent() {
 					</AnimatePresence>
 				)}
 
+				{/* Bottom numeric pagination bar — kept for fine-grained navigation */}
 				<Pagination
 					currentPage={page}
 					totalPages={totalPages}

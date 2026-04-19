@@ -179,8 +179,17 @@ const getContentTypeConfig = (type: CardContentType) => {
 			label: "Audio",
 			color: "text-yellow-400",
 		},
+		STORY: {
+			icon: <BookOpen className="h-4 w-4" />,
+			label: "Câu chuyện",
+			color: "text-violet-400",
+		},
 	};
-	return configs[type];
+	return configs[type] ?? {
+		icon: <FileText className="h-4 w-4" />,
+		label: type ?? "Khác",
+		color: "text-muted-foreground",
+	};
 };
 
 // ─────────────────────────────────────────────
@@ -591,12 +600,12 @@ function ContentItem({
 			<div className="p-4 opacity-100">
 				{/* Header */}
 				<div className="flex items-center gap-3 mb-3">
-					<div className={`p-2 rounded-lg bg-muted ${config.color}`}>
-						{config.icon}
+					<div className={`p-2 rounded-lg bg-muted ${config?.color ?? "text-muted-foreground"}`}>
+						{config?.icon}
 					</div>
 					<div className="flex-1">
 						<h4 className="font-semibold text-foreground">{content.title}</h4>
-						<span className={`text-xs ${config.color}`}>{config.label}</span>
+						<span className={`text-xs ${config?.color ?? "text-muted-foreground"}`}>{config?.label ?? content.contentType}</span>
 					</div>
 					{content.isPublic ? (
 						<Badge className="bg-green-500/10 text-green-400 border-green-500/30 text-xs">

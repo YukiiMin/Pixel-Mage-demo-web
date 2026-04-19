@@ -9,7 +9,7 @@ export type ShopSort = "newest" | "price-asc" | "price-desc" | "stock";
 
 async function fetchProducts(): Promise<ProductResponse[]> {
 	const res = await apiRequest<ProductResponse[]>(
-		API_ENDPOINTS.productManagement.list,
+		API_ENDPOINTS.productManagement.publicList,
 	);
 	return res.data ?? [];
 }
@@ -30,7 +30,8 @@ export function useShop() {
 	});
 
 	const filteredProducts = useMemo(() => {
-		let result = [...products];
+		// 🔒 Chỉ hiển thị sản phẩm đang visible và active với khách hàng
+		let result = products.filter((p) => p.isVisible && p.isActive);
 
 		// Search filter
 		if (searchTerm.trim()) {

@@ -53,7 +53,8 @@ export const API_ENDPOINTS = {
 		exists: (roleName: string) => `/api/roles/exists/${roleName}`,
 	},
 	productManagement: {
-		list: "/api/products",
+		list: "/api/products",             // Admin only — trả toàn bộ
+		publicList: "/api/products/public", // Customer — chỉ isVisible + isActive
 		create: "/api/products",
 		byId: (id: number | string) => `/api/products/${id}`,
 		active: (id: number | string) => `/api/products/${id}/active`,
@@ -81,6 +82,8 @@ export const API_ENDPOINTS = {
 		byRarity: (rarity: string) => `/api/card-templates/by-rarity/${rarity}`,
 		byArcana: (arcanaType: string) =>
 			`/api/card-templates/by-arcana/${arcanaType}`,
+		toggleVisibility: (id: number | string) =>
+			`/api/card-templates/${id}/visibility`, // Admin: PATCH
 	},
 	cardFrameworks: {
 		list: "/api/card-frameworks",
@@ -262,7 +265,7 @@ export const API_ENDPOINTS = {
 		reject: (id: number | string) => `/api/staff/unlink-requests/${id}/reject`,
 	},
 	marketplace: {
-		catalog: ["/api/packs/available", "/api/products"] as const,
+		catalog: ["/api/packs/available", "/api/products/public"] as const, // public endpoint
 		packs: "/api/packs/available",
 		packById: (id: number | string) => `/api/packs/${id}`,
 	},

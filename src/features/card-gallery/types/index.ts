@@ -24,7 +24,8 @@ export interface CardFramework {
 // ─────────────────────────────────────────────
 // Card Content Types (Rich media content for Card Templates)
 // ─────────────────────────────────────────────
-export type CardContentType = "TEXT" | "IMAGE" | "VIDEO" | "GIF" | "AUDIO";
+export type CardContentType = "TEXT" | "IMAGE" | "VIDEO" | "GIF" | "AUDIO" | "STORY";
+
 
 export interface CardContent {
 	contentId: string;

@@ -13,6 +13,8 @@ export interface ProductResponse {
 	imageUrl?: string;
 	createdAt?: string;
 	updatedAt?: string;
+	isVisible?: boolean;
+	isActive?: boolean;
 }
 
 export interface PackRequestDTO {
@@ -58,6 +60,9 @@ export interface CardTemplateResponse {
 	imagePath?: string;
 	frameworkId?: number;
 	frameworkName?: string;
+	cardType?: string;
+	isVisible?: boolean;
+	isActive?: boolean;
 }
 
 export interface CardTemplateSummary {
