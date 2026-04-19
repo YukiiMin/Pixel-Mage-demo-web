@@ -117,7 +117,7 @@ export function CompletionPhase({ sessionId }: CompletionPhaseProps) {
 											</span>
 										</div>
 									)}
-								</div>
+								</motion.div>
 								<div className="text-center">
 									<p className="text-[10px] font-bold uppercase tracking-wider text-primary/60">
 										{card.positionName}
